@@ -22,10 +22,8 @@ next-env.d.ts
 /build
 
 # assets
-/public/sequence/
-/public/videos/
-/public/city selection/
-/public/QR/
+# (All assets now tracked for Vercel deployment)
+/public/nothing_to_ignore_here
 
 # misc
 .DS_Store
