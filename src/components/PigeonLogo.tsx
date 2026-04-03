@@ -18,62 +18,55 @@ export default function PigeonLogo({ className, size = 24, animate = true }: Pig
       xmlns="http://www.w3.org/2000/svg"
       className={className}
       animate={animate ? {
-        y: [0, -4, 0],
+        y: [0, -3, 0],
       } : {}}
       transition={{
-        duration: 4,
+        duration: 3,
         repeat: Infinity,
         ease: "easeInOut"
       }}
     >
       <defs>
-        <linearGradient id="pigeon-gradient" x1="0%" y1="100%" x2="100%" y2="0%">
-          <stop offset="0%" stopColor="#f59e0b" /> {/* Bright Orange */}
-          <stop offset="40%" stopColor="#ec4899" /> {/* Pink/Magenta */}
-          <stop offset="100%" stopColor="#8b5cf6" /> {/* Deep Purple */}
-        </linearGradient>
-        <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-          <feGaussianBlur stdDeviation="1.5" result="blur" />
+        <filter id="white-glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="2.5" result="blur" />
           <feComposite in="SourceGraphic" in2="blur" operator="over" />
         </filter>
       </defs>
 
-      {/* Trailing 4-pointed Stars (Exact shapes from image) */}
-      <g opacity="0.6">
+      {/* High-Precision Trailing Sparks (White glints) */}
+      <g opacity="0.4">
         <motion.path
-          d="M12 28C14 30 16 32 12 34C10 32 8 30 12 28Z"
-          fill="url(#pigeon-gradient)"
-          animate={{ opacity: [0.3, 0.8, 0.3], scale: [0.8, 1.2, 0.8] }}
+          d="M12 28C14 29 15 31 12 32C10 31 9 29 12 28Z"
+          fill="white"
+          animate={{ opacity: [0.2, 0.6, 0.2], scale: [0.8, 1.1, 0.8] }}
           transition={{ duration: 2, repeat: Infinity }}
         />
         <motion.path
-          d="M20 38C23 41 26 44 20 47C17 44 14 41 20 38Z"
-          fill="url(#pigeon-gradient)"
-          animate={{ opacity: [0.4, 1, 0.4], scale: [0.9, 1.3, 0.9] }}
-          transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
+          d="M20 38C22 40 24 42 20 44C18 42 16 40 20 38Z"
+          fill="white"
+          animate={{ opacity: [0.4, 0.8, 0.4], scale: [0.9, 1.2, 0.9] }}
+          transition={{ duration: 2, repeat: Infinity, delay: 0.4 }}
         />
         <motion.path
-          d="M15 52C16.5 53.5 18 55 15 56.5C13.5 55 12 53.5 15 52Z"
-          fill="url(#pigeon-gradient)"
-          animate={{ opacity: [0.2, 0.6, 0.2], scale: [0.7, 1.1, 0.7] }}
-          transition={{ duration: 2, repeat: Infinity, delay: 1 }}
+          d="M15 52C16 53 17 54 15 55C14 54 13 53 15 52Z"
+          fill="white"
+          animate={{ opacity: [0.1, 0.4, 0.1], scale: [0.7, 1.0, 0.7] }}
+          transition={{ duration: 2, repeat: Infinity, delay: 0.8 }}
         />
       </g>
 
-      {/* High-Fidelity Silhouette Reconstruction */}
+      {/* Master Cinematic Silhouette (Solid White / High Fidelity) */}
       <motion.path
-        d="M92 48.5C88 47 82 46 78 47.5C74 49 71 52 70 56C68.5 61 69 67 71 72C68 70 65.5 66 64 62C61 54 61.5 45 65 38C68.5 31 75 25 82 22C72 26 62 34 58 45C54 56 56 68 63 78C56 71 52 62 52 52C52 42 56 31 63 22C43 32 30 52 32 75C34 68 38 62 45 58C52 54 60 55 68 58C58 55 48 55 38 58C36 72 38 85 45 92C38 84 34 74 32 64C28 62 22 62 16 64"
-        fill="url(#pigeon-gradient)"
-        filter="url(#glow)"
-        initial={{ pathLength: 0 }}
-        animate={{ pathLength: 1 }}
-        transition={{ duration: 1.5, ease: "easeInOut" }}
+        d="M94 48.5C89 47 83 46 79 47.5C75 49 72 52 71 56C69.5 61 70 67 72 72C69 70 66.5 66 65 62C62 54 62.5 45 66 38C69.5 31 76 25 83 22C73 26 63 34 59 45C55 56 57 68 64 78C57 71 53 62 53 52C53 42 57 31 64 22C44 32 31 52 33 75C35 68 39 62 46 58C53 54 61 55 69 58C59 55 49 55 39 58C37 72 39 85 46 92C39 84 35 74 33 64C29 62 23 62 17 64"
+        fill="white"
+        filter="url(#white-glow)"
+        style={{ filter: "drop-shadow(0 0 5px rgba(255, 255, 255, 0.3))" }}
       />
       
-      {/* Precision Beak & Head Hook */}
+      {/* Precision Tip Detail */}
       <path
-        d="M94 48L88 44C91 46 93 47 94 48Z"
-        fill="url(#pigeon-gradient)"
+        d="M95 48L89 44C92 46 94 47 95 48Z"
+        fill="white"
       />
     </motion.svg>
   );
