@@ -1,11 +1,17 @@
 import type { Metadata } from "next";
-import { Lexend, Roboto_Mono } from "next/font/google";
+import { Lexend, Roboto_Mono, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 
 const lexend = Lexend({
   subsets: ["latin"],
   variable: "--font-lexend",
   weight: ["300", "400", "500", "600", "700", "800", "900"],
+});
+
+const plusJakarta = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  variable: "--font-jakarta",
+  weight: ["400", "500", "600", "700", "800"],
 });
 
 const robotoMono = Roboto_Mono({
@@ -29,7 +35,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body
-        className={`${lexend.variable} ${robotoMono.variable} antialiased bg-black text-white selection:bg-white selection:text-black overflow-x-hidden`}
+        className={`${lexend.variable} ${plusJakarta.variable} ${robotoMono.variable} antialiased bg-black text-white selection:bg-white selection:text-black overflow-x-hidden`}
       >
         <AuthProvider>
           <SmoothScroll>

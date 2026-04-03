@@ -37,19 +37,19 @@ export default function Preloader({ progress, isReady }: PreloaderProps) {
           
           <div className="relative flex flex-col items-center">
             {/* The "milo" title with the O-Loading Engine */}
-            <div className="flex items-center font-[family-name:var(--font-lexend)] text-6xl md:text-8xl font-black uppercase tracking-[0.1em] italic">
-              <span className="text-white/40">mil</span>
+            <div className="flex items-center font-[family-name:var(--font-jakarta)] text-6xl md:text-8xl font-extrabold uppercase tracking-[0.2em]">
+              <span className="text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.4)]">mil</span>
               
               {/* The Dynamic "O" Loading Engine */}
-              <div className="relative w-[1.2em] h-[1.2em] flex items-center justify-center ml-[-0.1em]">
+              <div className="relative w-[1.1em] h-[1.1em] flex items-center justify-center ml-[-0.05em]">
                 <svg viewBox="0 0 100 100" className="w-full h-full transform -rotate-90">
                   {/* Background Track */}
                   <circle
                     cx="50"
                     cy="50"
                     r={radius}
-                    stroke="rgba(255, 255, 255, 0.05)"
-                    strokeWidth="12"
+                    stroke="rgba(255, 255, 255, 0.1)"
+                    strokeWidth="10"
                     fill="none"
                   />
                   {/* Progress Fill */}
@@ -58,17 +58,17 @@ export default function Preloader({ progress, isReady }: PreloaderProps) {
                     cy="50"
                     r={radius}
                     stroke="white"
-                    strokeWidth="12"
+                    strokeWidth="10"
                     fill="none"
                     strokeDasharray={circumference}
                     animate={{ strokeDashoffset }}
                     transition={{ duration: 0.5, ease: "easeOut" }}
                     strokeLinecap="round"
-                    className="drop-shadow-[0_0_15px_rgba(255,255,255,0.5)]"
+                    className="drop-shadow-[0_0_20px_rgba(255,255,255,0.6)]"
                   />
                 </svg>
                 {/* Percentage readout (Minimalist) */}
-                <div className="absolute inset-0 flex items-center justify-center text-[10px] md:text-sm font-black not-italic tracking-normal text-white drop-shadow-[0_0_5px_rgba(0,0,0,1)]">
+                <div className="absolute inset-0 flex items-center justify-center text-[10px] md:text-sm font-black tracking-normal text-white drop-shadow-[0_0_10px_rgba(0,0,0,0.5)]">
                   {Math.round(progress)}
                 </div>
               </div>
@@ -76,11 +76,11 @@ export default function Preloader({ progress, isReady }: PreloaderProps) {
 
             {/* Technical Detail Footer */}
             <motion.p 
-              animate={{ opacity: [0.2, 0.5, 0.2] }}
+              animate={{ opacity: [0.3, 0.6, 0.3] }}
               transition={{ duration: 1.5, repeat: Infinity }}
-              className="font-[family-name:var(--font-roboto-mono)] text-[8px] tracking-[0.8em] uppercase text-white/10 mt-12 text-center"
+              className="font-[family-name:var(--font-roboto-mono)] text-[8px] tracking-[0.8em] uppercase text-white/20 mt-12 text-center drop-shadow-md"
             >
-              Initializing jurisdictional synchronization...
+              Jurisdictional synchronization in progress...
             </motion.p>
           </div>
 
