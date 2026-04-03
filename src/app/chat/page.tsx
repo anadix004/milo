@@ -122,9 +122,9 @@ export default function ChatPage() {
               <Link href="/" className="lg:hidden p-2 text-white/30 hover:text-white transition-colors">
                 <ChevronLeft size={24} />
               </Link>
-              <div className="w-12 h-12 bg-cyan-500/20 rounded-full flex items-center justify-center text-cyan-400 group relative">
-                <Bird size={24} />
-                <div className="absolute inset-0 bg-cyan-400/20 rounded-full animate-ping" />
+              <div className="relative group p-2">
+                <PigeonLogo size={48} animate={true} className="drop-shadow-[0_0_15px_rgba(34,211,238,0.4)]" />
+                <div className="absolute inset-0 bg-cyan-400/10 rounded-full animate-ping -z-10" />
               </div>
               <div>
                 <h1 className="text-white text-xl font-black uppercase tracking-widest leading-tight">

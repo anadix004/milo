@@ -1,8 +1,9 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { User, Bird, PlusCircle, Menu } from "lucide-react";
+import { User, PlusCircle, Menu } from "lucide-react";
 import { useAuth } from "./AuthContext";
+import PigeonLogo from "./PigeonLogo";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
@@ -68,7 +69,6 @@ export default function Header({ onProfileClick, onChatClick, onEventClick, isSi
         </Link>
       </div>
 
-      {/* Top Right: Pigeon Chat & Event Submission */}
       <div className="flex gap-4 items-center flex-row pointer-events-auto">
         {/* Pigeon Chat Hub Link */}
         <Link 
@@ -80,19 +80,8 @@ export default function Header({ onProfileClick, onChatClick, onEventClick, isSi
               : "bg-black/20 border-white/10 text-white/70 hover:text-white hover:bg-white/10"
           )}
         >
-          <motion.div
-            animate={isChatPage ? {} : { 
-              y: [0, -2, 0],
-              rotate: [0, 5, -5, 0]
-            }}
-            transition={{ 
-              duration: 3, 
-              repeat: Infinity, 
-              ease: "easeInOut" 
-            }}
-          >
-            <Bird size={18} />
-          </motion.div>
+          <PigeonLogo size={20} animate={!isChatPage} />
+          
           {/* Pulsing Pigeon Notification (only hide on chat page) */}
           {!isChatPage && (
             <span className="absolute -top-1 -right-1 w-3 h-3 bg-cyan-500 rounded-full blur-[2px] opacity-60 animate-pulse" />
