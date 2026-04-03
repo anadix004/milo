@@ -4,6 +4,7 @@ import { useState, useRef, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import clsx from "clsx";
 import { EVENTS, EventData } from "@/constants/events";
+import { Filter, ArrowUpDown } from "lucide-react";
 import IdentityScan from "@/components/IdentityScan";
 
 import { parsePrice } from "@/utils/price";
@@ -65,45 +66,58 @@ export default function EventListing({ selectedCity }: EventListingProps) {
           </p>
         </div>
 
-        {/* Filter & Sort Controls */}
-        <div className="flex flex-col gap-4">
+        {/* Premium Filter & Sort Hub */}
+        <div className="flex flex-col xl:flex-row items-stretch xl:items-center gap-6 bg-white/[0.02] border border-white/5 p-2 rounded-[2rem] lg:rounded-full backdrop-blur-3xl shadow-2xl">
           {/* Categories */}
-          <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
-            {CATEGORIES.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setSelectedCat(cat)}
-                className={clsx(
-                  "px-4 py-1.5 rounded-full text-[10px] uppercase font-bold tracking-widest transition-all border whitespace-nowrap",
-                  selectedCat === cat 
-                    ? "bg-white text-black border-white" 
-                    : "bg-transparent text-white/40 border-white/10 hover:border-white/30"
-                )}
-              >
-                {cat}
-              </button>
-            ))}
+          <div className="flex items-center gap-4 px-4 py-2 bg-white/5 rounded-full border border-white/5">
+            <Filter size={14} className="text-white/20 whitespace-nowrap" />
+            <div className="flex gap-2 overflow-x-auto no-scrollbar py-1">
+              {CATEGORIES.map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setSelectedCat(cat)}
+                  className={clsx(
+                    "px-4 py-1.5 rounded-full text-[10px] uppercase font-bold tracking-[0.2em] transition-all whitespace-nowrap font-[family-name:var(--font-jakarta)]",
+                    selectedCat === cat 
+                      ? "bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.4)]" 
+                      : "text-white/40 hover:text-white/80 hover:bg-white/5"
+                  )}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
           </div>
 
+          <div className="hidden xl:block w-px h-8 bg-white/10" />
+
           {/* Sorting */}
-          <div className="flex gap-2 items-center">
-            <span className="text-[9px] uppercase tracking-[0.2em] text-white/20 font-bold mr-2">Sort by:</span>
-            {[
-              { id: "featured", label: "Featured" },
-              { id: "price-low", label: "Price: Low" },
-              { id: "price-high", label: "Price: High" }
-            ].map((sort) => (
-              <button
-                key={sort.id}
-                onClick={() => setSortOrder(sort.id as any)}
-                className={clsx(
-                  "text-[9px] uppercase font-bold tracking-widest transition-all",
-                  sortOrder === sort.id ? "text-white" : "text-white/20 hover:text-white/40"
-                )}
-              >
-                {sort.label}
-              </button>
-            ))}
+          <div className="flex items-center gap-4 px-4 py-2">
+            <div className="flex items-center gap-2 text-white/20">
+              <ArrowUpDown size={14} />
+              <span className="text-[9px] uppercase tracking-[0.3em] font-black font-[family-name:var(--font-jakarta)] whitespace-nowrap">Sort by:</span>
+            </div>
+            <div className="flex gap-4">
+              {[
+                { id: "featured", label: "Featured" },
+                { id: "price-low", label: "Price: Low" },
+                { id: "price-high", label: "Price: High" }
+              ].map((sort) => (
+                <button
+                  key={sort.id}
+                  onClick={() => setSortOrder(sort.id as any)}
+                  className={clsx(
+                    "text-[10px] uppercase font-bold tracking-widest transition-all font-[family-name:var(--font-jakarta)] whitespace-nowrap relative group",
+                    sortOrder === sort.id ? "text-white" : "text-white/30 hover:text-white/60"
+                  )}
+                >
+                  {sort.label}
+                  {sortOrder === sort.id && (
+                    <motion.div layoutId="sortUnderline" className="absolute -bottom-1 left-0 right-0 h-0.5 bg-white rounded-full" />
+                  )}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       </div>
