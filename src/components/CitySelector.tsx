@@ -54,7 +54,7 @@ export default function CitySelector({ selectedCity, onSelect }: CitySelectorPro
 
   return (
     <section className="relative py-12 md:py-20 bg-black flex flex-col items-center justify-center z-20">
-      {/* Background Nebula depth */}
+      {/* Background depth and texture */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.03),transparent_70%)] -z-10" />
 
       {/* The "Select Your City" Trigger Bar */}
@@ -70,7 +70,7 @@ export default function CitySelector({ selectedCity, onSelect }: CitySelectorPro
               </svg>
             </div>
             <span className="font-[family-name:var(--font-lexend)] text-xs md:text-sm font-black uppercase tracking-[0.4em] text-white/80 group-hover:text-white truncate">
-              {selectedCityData ? `JURISDICTION: ${selectedCityData.name}` : "SELECT YOUR CITY"}
+              {selectedCityData ? `YOUR CITY: ${selectedCityData.name}` : "SELECT YOUR CITY"}
             </span>
           </div>
 
@@ -105,6 +105,7 @@ export default function CitySelector({ selectedCity, onSelect }: CitySelectorPro
                     {/* Compact Separator */}
                     {idx !== 0 && <div className="hidden lg:block w-px h-8 bg-white/10 mx-4" />}
                     
+                    {/* Monument Selection Trigger */}
                     <div
                       onClick={() => {
                         onSelect(city.id);
@@ -154,7 +155,7 @@ export default function CitySelector({ selectedCity, onSelect }: CitySelectorPro
       <div className="mt-12 flex gap-8 md:gap-12 font-[family-name:var(--font-roboto-mono)] text-[8px] tracking-[0.6em] uppercase text-white/5 items-center px-4 text-center">
         <span>Identity Scan: ACTIVE</span>
         <div className="hidden md:block w-24 h-px bg-white/10" />
-        <span className="hidden sm:inline">Jurisdiction selection required for event sync</span>
+        <span className="hidden sm:inline">City selection required to see events</span>
       </div>
     </section>
   );

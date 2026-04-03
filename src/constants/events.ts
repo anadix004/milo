@@ -118,7 +118,7 @@ export const EVENTS: EventData[] = [
   // Bangalore Events (10)
   {
     id: "blr-1",
-    name: "Matrix Hackathon",
+    name: "Tech Hackathon",
     category: "TECH / EXPO",
     image: "https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&q=80&w=800",
     cityId: "blr",
@@ -295,7 +295,7 @@ export const EVENTS: EventData[] = [
   },
   {
     id: "mum-8",
-    name: "Powai Nebula Expo",
+    name: "Powai Tech Expo",
     category: "TECH / EXPO",
     image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=800",
     cityId: "mum",
@@ -328,7 +328,7 @@ export const EVENTS: EventData[] = [
   // Global / Generic
   {
     id: "gen-1",
-    name: "Identity Scan Beta",
+    name: "Profile Check Beta",
     category: "COMMUNITY / TECH",
     image: "https://images.unsplash.com/photo-1614850715649-1d01062939a4?auto=format&fit=crop&q=80&w=800",
     cityId: "all",
@@ -339,7 +339,7 @@ export const EVENTS: EventData[] = [
   },
   {
     id: "gen-2",
-    name: "Event Nebula Expo",
+    name: "Global Event Expo",
     category: "TECH / EXPO",
     image: "https://images.unsplash.com/photo-1540575861501-7c00117ff64b?auto=format&fit=crop&q=80&w=800",
     cityId: "all",

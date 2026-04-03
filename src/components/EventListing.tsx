@@ -61,7 +61,7 @@ export default function EventListing({ selectedCity }: EventListingProps) {
             {selectedCity ? selectedCity : "Global"} <span className="text-white/20 italic">Radar</span>
           </h2>
           <p className="font-[family-name:var(--font-roboto-mono)] text-white/40 text-[10px] md:text-xs uppercase tracking-[0.4em]">
-            Simulating real-time event nebula
+            Exploring live events near you
           </p>
         </div>
 
@@ -152,8 +152,8 @@ export default function EventListing({ selectedCity }: EventListingProps) {
         onClose={() => setIsScanOpen(false)} 
         onVerified={() => {
           setIsScanOpen(false);
-          // Future: Trigger Nebula Map
-          console.log("IDENTITY VERIFIED - OPENING NEBULA");
+          // Future: Trigger City Map
+          console.log("IDENTITY VERIFIED - OPENING MAP");
         }}
       />
     </section>
@@ -309,7 +309,7 @@ function EventDetailView({ event, onClose }: { event: EventData, onClose: () => 
 
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="flex flex-col gap-6 max-w-md w-full">
             <div className="p-8 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-md">
-              <h4 className="text-white/40 text-[10px] tracking-widest uppercase mb-4 font-bold">About Simulation</h4>
+              <h4 className="text-white/40 text-[10px] tracking-widest uppercase mb-4 font-bold">About Event</h4>
               <p className="text-white/80 leading-relaxed font-light font-[family-name:var(--font-roboto-mono)] text-xs md:text-sm">
                 {event.description}
               </p>

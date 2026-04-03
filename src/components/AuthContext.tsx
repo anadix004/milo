@@ -22,7 +22,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
 
   useEffect(() => {
-    // Persistent Simulation: Load from localStorage
+    // Persistent Session: Load from localStorage
     const savedUser = localStorage.getItem("milo_user");
     if (savedUser) {
       setUser(JSON.parse(savedUser));

@@ -122,7 +122,7 @@ export default function ProfileSidebar({ isOpen, onClose }: ProfileSidebarProps)
                   <div className="space-y-4">
                     <h3 className="text-white/40 text-[10px] uppercase tracking-widest px-2">Recent Happenings</h3>
                     {[
-                      { name: "Nebula Sync '26", city: "Delhi", day: "Tomorrow" },
+                      { name: "Milo Festival '26", city: "Delhi", day: "Tomorrow" },
                       { name: "Code & Craft", city: "Mumbai", day: "Sat" }
                     ].map((h, i) => (
                       <div key={i} className="p-4 bg-white/5 rounded-xl border border-white/10 flex justify-between items-center group cursor-pointer hover:border-white/30 transition-all">

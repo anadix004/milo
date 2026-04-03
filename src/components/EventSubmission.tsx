@@ -24,7 +24,7 @@ export default function EventSubmission({ isOpen, onClose, onAuthRedirect }: Eve
     setTimeout(() => {
       setIsSubmitting(false);
       onClose();
-      alert("Event Dispatched to the Radar! 🛰️");
+      alert("Event Added to the Radar! 🛰️");
     }, 2000);
   };
 
@@ -93,14 +93,14 @@ export default function EventSubmission({ isOpen, onClose, onAuthRedirect }: Eve
                       <input 
                         required
                         type="text" 
-                        placeholder="e.g. Nebula Tech Sync" 
+                        placeholder="e.g. Urban Tech Meetup" 
                         className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-sm text-white placeholder:text-white/10 outline-none focus:border-purple-500/50 transition-all"
                         value={formData.title}
                         onChange={(e) => setFormData({...formData, title: e.target.value})}
                       />
                     </div>
                     <div className="space-y-3">
-                      <label className="text-[10px] text-white/30 uppercase tracking-[0.4em] ml-2">City Jurisdiction</label>
+                      <label className="text-[10px] text-white/30 uppercase tracking-[0.4em] ml-2">City</label>
                       <select 
                         className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-sm text-white outline-none focus:border-purple-500/50 transition-all appearance-none cursor-pointer"
                         value={formData.city}
@@ -134,7 +134,7 @@ export default function EventSubmission({ isOpen, onClose, onAuthRedirect }: Eve
                       )}
                     >
                       <span className={clsx("relative z-10", isSubmitting && "animate-pulse")}>
-                        {isSubmitting ? "Synchronizing..." : "Dispatch to Radar"}
+                        {isSubmitting ? "Connecting..." : "Add to Radar"}
                       </span>
                       {/* Button Pulse Glow */}
                       <div className="absolute inset-0 bg-white group-hover:bg-purple-400 opacity-0 group-active:opacity-20 transition-opacity" />

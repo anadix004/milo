@@ -102,7 +102,7 @@ export default function HeroSection() {
     );
   };
 
-  // Intercept the motion value and dispatch rendering loop
+  // Intercept the motion value and update rendering loop
   useMotionValueEvent(frameIndex, "change", (latest) => {
     if (imagesLoaded) {
       // Use requestAnimationFrame mapping for optimized draw
@@ -139,7 +139,7 @@ export default function HeroSection() {
         {!imagesLoaded && (
           <div className="absolute inset-0 w-full h-full flex items-center justify-center z-30 bg-black">
             <p className="text-white/50 animate-pulse font-[family-name:var(--font-roboto-mono)] uppercase tracking-widest text-sm">
-              Loading High-Res Simulation...
+              Loading Experience...
             </p>
           </div>
         )}

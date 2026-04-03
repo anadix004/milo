@@ -80,12 +80,12 @@ export default function IdentityScan({ isOpen, onClose, onVerified }: IdentitySc
                 "font-[family-name:var(--font-lexend)] text-4xl md:text-6xl font-black uppercase tracking-tighter transition-colors duration-500 drop-shadow-[0_0_20px_rgba(255,255,255,0.3)]",
                 status === "verified" ? "text-emerald-400" : "text-white"
               )}>
-                {status === "verified" ? "Identity Verified" : "Identity Scan"}
+                {status === "verified" ? "Verified" : "Profile Check"}
               </h2>
               <p className="font-[family-name:var(--font-roboto-mono)] text-[10px] md:text-xs tracking-[0.5em] text-white/60 uppercase mt-2 drop-shadow-md">
-                {status === "scanning" && "Capturing facial anchors..."}
-                {status === "analyzing" && "Validating neural signature..."}
-                {status === "verified" && "Nebula encryption key acquired."}
+                {status === "scanning" && "Checking credentials..."}
+                {status === "analyzing" && "Verifying account data..."}
+                {status === "verified" && "Security check complete."}
               </p>
             </div>
 
@@ -129,9 +129,9 @@ export default function IdentityScan({ isOpen, onClose, onVerified }: IdentitySc
 
             {/* HUD Floating Data */}
             <div className="flex flex-col gap-2 font-[family-name:var(--font-roboto-mono)] text-[8px] text-emerald-500/60 uppercase tracking-[0.3em] drop-shadow-[0_0_5px_rgba(16,185,129,0.3)]">
-              <p>DNA Link: Active</p>
-              <p>Satellite Sync: 4/4</p>
-              <p>Milo Encryption: V4.2</p>
+              <p>Account Link: Active</p>
+              <p>Network Status: 4/4</p>
+              <p>Milo Security: V4.2</p>
             </div>
           </div>
 
@@ -140,7 +140,7 @@ export default function IdentityScan({ isOpen, onClose, onVerified }: IdentitySc
             onClick={onClose}
             className="absolute bottom-12 px-8 py-3 border border-white/10 rounded-full text-white/40 text-[10px] uppercase tracking-[0.4em] transition-all hover:bg-white hover:text-black hover:border-white"
           >
-            Abort Scan
+            Abort Check
           </button>
         </motion.div>
       )}

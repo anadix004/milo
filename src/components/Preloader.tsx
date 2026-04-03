@@ -80,7 +80,7 @@ export default function Preloader({ progress, isReady }: PreloaderProps) {
               transition={{ duration: 1.5, repeat: Infinity }}
               className="font-[family-name:var(--font-roboto-mono)] text-[8px] tracking-[0.8em] uppercase text-white/20 mt-12 text-center drop-shadow-md"
             >
-              Jurisdictional synchronization in progress...
+              Preparing your city experience...
             </motion.p>
           </div>
 
@@ -91,7 +91,7 @@ export default function Preloader({ progress, isReady }: PreloaderProps) {
           </div>
           <div className="absolute top-12 right-12 font-[family-name:var(--font-roboto-mono)] text-[8px] text-white/10 uppercase tracking-widest hidden md:block text-right leading-loose">
             <p>System: Anti-Gravity V2.4</p>
-            <p className="text-white/20">Jurisdiction: Delhi NCR</p>
+            <p className="text-white/20">City: Delhi NCR</p>
           </div>
         </motion.div>
       )}

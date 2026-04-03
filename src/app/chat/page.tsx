@@ -11,14 +11,14 @@ import Link from "next/link";
 import clsx from "clsx";
 
 const MOCK_FRIENDS = [
-  { id: 1, name: "Neon_Ghost", status: "online", bio: "Syncing in Delhi NCR", type: "friend" },
+  { id: 1, name: "Neon_Ghost", status: "online", bio: "Active in Delhi NCR", type: "friend" },
   { id: 2, name: "Cyber_Dove", status: "away", bio: "Mumbai Tech Coast", type: "friend" },
   { id: 3, name: "Pigeon_Zero", status: "online", bio: "Bangalore Network", type: "friend" },
-  { id: 4, name: "Simulation_Alpha", status: "online", bio: "8 members active", type: "group" }
+  { id: 4, name: "Alpha_Group", status: "online", bio: "8 members active", type: "group" }
 ];
 
 const MOCK_EVENTS = [
-  { id: "e1", name: "Rooftop Nebula Sync", active: 45, icon: "🌌" },
+  { id: "e1", name: "Rooftop Party", active: 45, icon: "🏙️" },
   { id: "e2", name: "Tech Summit Alpha", active: 128, icon: "🛸" },
   { id: "e3", name: "Art District Meetup", active: 22, icon: "🎨" }
 ];
@@ -26,7 +26,7 @@ const MOCK_EVENTS = [
 export default function ChatPage() {
   const [messages, setMessages] = useState([
     { id: 1, text: "Wait, is the Rooftop party in Delhi NCR still on?", user: "CyberNomad", time: "2m ago" },
-    { id: 2, text: "Yes! 🌌 Syncing nebula frames now. See you there.", user: "Milo_Admin", isSystem: true },
+    { id: 2, text: "Yes! 🏙️ Getting everything ready now. See you there.", user: "Milo_Admin", isSystem: true },
     { id: 3, text: "The Tech Summit Alpha starts in 10 minutes.", user: "DataVoyager", time: "Just now" }
   ]);
   const [inputValue, setInputValue] = useState("");
@@ -117,7 +117,7 @@ export default function ChatPage() {
                 <h1 className="text-white text-lg md:text-xl font-black uppercase tracking-widest leading-tight">Milo Hub</h1>
                 <div className="flex items-center gap-2 mt-1">
                   <div className="w-1.5 h-1.5 bg-cyan-500 rounded-full animate-ping" />
-                  <p className="text-[9px] text-white/40 uppercase tracking-[0.4em] font-black">Sync active // Secure Link</p>
+                  <p className="text-[9px] text-white/40 uppercase tracking-[0.4em] font-black">Connected // Secure Link</p>
                 </div>
               </div>
             </div>
@@ -164,7 +164,7 @@ export default function ChatPage() {
             ))}
           </div>
 
-          {/* Dynamic Dispatcher (Input) */}
+          {/* Message Input (Input) */}
           <div className="p-6 md:p-8 bg-white/[0.01] border-t border-white/5">
             <div className="relative group max-w-4xl mx-auto">
               <input 
@@ -172,7 +172,7 @@ export default function ChatPage() {
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSend()}
-                placeholder="Synchronize hub dispatch..." 
+                placeholder="Send a message..." 
                 className="w-full bg-white/5 border border-white/10 rounded-2xl py-6 pl-8 pr-20 text-sm text-white placeholder:text-white/20 outline-none focus:border-white/30 transition-all duration-700 shadow-inner"
               />
               <button 
