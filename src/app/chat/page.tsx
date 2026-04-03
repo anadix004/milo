@@ -1,11 +1,12 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Bird, Send, ShieldCheck, MapPin, Search, Users, ChevronLeft } from "lucide-react";
+import { Send, ShieldCheck, MapPin, Search, Users, ChevronLeft } from "lucide-react";
 import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import ProfileSidebar from "@/components/ProfileSidebar";
 import EventSubmission from "@/components/EventSubmission";
+import PigeonLogo from "@/components/PigeonLogo";
 import Link from "next/link";
 import clsx from "clsx";
 
