@@ -11,9 +11,10 @@ import Link from "next/link";
 import clsx from "clsx";
 
 const MOCK_FRIENDS = [
-  { id: 1, name: "Neon_Ghost", status: "online", bio: "Syncing in Delhi NCR" },
-  { id: 2, name: "Cyber_Dove", status: "away", bio: "Mumbai Tech Coast" },
-  { id: 3, name: "Pigeon_Zero", status: "online", bio: "Bangalore Network" }
+  { id: 1, name: "Neon_Ghost", status: "online", bio: "Syncing in Delhi NCR", type: "friend" },
+  { id: 2, name: "Cyber_Dove", status: "away", bio: "Mumbai Tech Coast", type: "friend" },
+  { id: 3, name: "Pigeon_Zero", status: "online", bio: "Bangalore Network", type: "friend" },
+  { id: 4, name: "Simulation_Alpha", status: "online", bio: "8 members active", type: "group" }
 ];
 
 const MOCK_EVENTS = [
@@ -71,22 +72,27 @@ export default function ChatPage() {
           className="hidden xl:flex flex-col w-72 bg-white/[0.02] border border-white/5 rounded-[2.5rem] p-6 space-y-6"
         >
           <div className="flex items-center justify-between px-2">
-            <h2 className="text-[10px] text-white/40 uppercase tracking-[0.4em] font-black drop-shadow-md">Identity Sync</h2>
+            <h2 className="text-[10px] text-white/40 uppercase tracking-[0.4em] font-black drop-shadow-md">Friends and Groups</h2>
             <Users size={14} className="text-white/20" />
           </div>
           <div className="space-y-4 overflow-y-auto no-scrollbar">
-            {MOCK_FRIENDS.map(friend => (
-              <div key={friend.id} className="group relative flex items-center gap-3 p-3 rounded-2xl hover:bg-white/5 transition-all cursor-pointer border border-transparent hover:border-white/10">
-                <div className="relative w-10 h-10 rounded-full border border-white/10 flex items-center justify-center bg-white/5">
-                  <span className="text-xs text-white/40 group-hover:text-white transition-colors">{friend.name[0]}</span>
+            {MOCK_FRIENDS.map(item => (
+              <div key={item.id} className="group relative flex items-center gap-3 p-3 rounded-2xl hover:bg-white/5 transition-all cursor-pointer border border-transparent hover:border-white/10">
+                <div className={clsx(
+                  "relative w-10 h-10 border border-white/10 flex items-center justify-center bg-white/5",
+                  item.type === "group" ? "rounded-xl" : "rounded-full"
+                )}>
+                  <span className="text-xs text-white/40 group-hover:text-white transition-colors">
+                    {item.type === "group" ? <Users size={16} /> : item.name[0]}
+                  </span>
                   <div className={clsx(
                     "absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-black",
-                    friend.status === "online" ? "bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]" : "bg-orange-500"
+                    item.status === "online" ? "bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]" : "bg-orange-500 text-transparent"
                   )} />
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-white/80 group-hover:text-white drop-shadow-sm">{friend.name}</p>
-                  <p className="text-[9px] text-white/20 uppercase tracking-widest">{friend.bio}</p>
+                  <p className="text-xs font-bold text-white/80 group-hover:text-white drop-shadow-sm">{item.name}</p>
+                  <p className="text-[9px] text-white/20 uppercase tracking-widest">{item.bio}</p>
                 </div>
               </div>
             ))}
@@ -187,7 +193,7 @@ export default function ChatPage() {
           className="hidden lg:flex flex-col w-72 bg-white/[0.02] border border-white/5 rounded-[2.5rem] p-6 space-y-6"
         >
           <div className="flex items-center justify-between px-2">
-            <h2 className="text-[10px] text-white/40 uppercase tracking-[0.4em] font-black drop-shadow-md">Live Streams</h2>
+            <h2 className="text-[10px] text-white/40 uppercase tracking-[0.4em] font-black drop-shadow-md">Events</h2>
             <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse" />
           </div>
           <div className="space-y-4 overflow-y-auto no-scrollbar">
