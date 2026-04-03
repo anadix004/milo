@@ -14,10 +14,14 @@ const CITY_IMAGES = [
   "/city selection/mumbai.png"
 ];
 
+import Header from "@/components/Header";
+import ProfileSidebar from "@/components/ProfileSidebar";
+
 export default function Home() {
   const [selectedCity, setSelectedCity] = useState<string | null>(null);
   const [isReady, setIsReady] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     const allAssets = [...HERO_FRAMES.map(f => `/sequence/frames/${f}`), ...CITY_IMAGES];
@@ -53,9 +57,19 @@ export default function Home() {
     <main className="w-full bg-[#000000]">
       <Preloader progress={progress} isReady={isReady} />
       
+      <Header 
+        onProfileClick={() => setIsSidebarOpen(true)} 
+        isSidebarOpen={isSidebarOpen} 
+      />
+      
+      <ProfileSidebar 
+        isOpen={isSidebarOpen} 
+        onClose={() => setIsSidebarOpen(false)} 
+      />
+
       {/* Show content only when partially ready to avoid flashes, 
           but technically Preloader handles the overlay */}
-      <div className={isReady ? "opacity-100" : "opacity-0"}>
+      <div className={isReady ? "opacity-100" : "opacity-0 transition-opacity duration-1000"}>
         <HeroSection />
         <CitySelector 
           selectedCity={selectedCity} 

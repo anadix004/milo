@@ -125,21 +125,7 @@ export default function HeroSection() {
           <div className="absolute inset-0 bg-black/40 w-full h-full pointer-events-none" />
         </div>
 
-        {/* Navigation & Status UI */}
-        <nav className="absolute inset-x-0 top-0 w-full p-6 md:p-8 flex justify-between items-start z-20 pointer-events-none font-[family-name:var(--font-lexend)] uppercase tracking-[0.2em]">
-          <div className="text-white text-sm md:text-lg font-bold pointer-events-auto mix-blend-difference lowercase">
-            milo
-          </div>
-          
-          <div className="flex gap-4 items-center flex-row pointer-events-auto">
-            <button className="px-6 py-2 rounded-full bg-black/40 backdrop-blur-md text-white/90 text-sm font-medium tracking-wide border border-white/10 hover:bg-black/60 transition-colors">
-              LET&apos;S TALK
-            </button>
-            <button className="px-6 py-2 rounded-full bg-white/10 backdrop-blur-md text-white text-sm font-medium tracking-wide border border-white/20 hover:bg-white/20 transition-colors">
-              MENU
-            </button>
-          </div>
-        </nav>
+        {/* Navigation & Status UI moved to global Header */}
 
         {/* Bottom Annotations UI */}
         <div className="absolute bottom-6 right-6 md:bottom-8 md:right-8 z-20 mix-blend-difference pointer-events-none">
