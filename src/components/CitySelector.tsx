@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import clsx from "clsx";
 
 const CITIES = [
@@ -49,86 +49,112 @@ interface CitySelectorProps {
 }
 
 export default function CitySelector({ selectedCity, onSelect }: CitySelectorProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const selectedCityData = CITIES.find(c => c.id === selectedCity);
+
   return (
     <section className="relative py-12 md:py-20 bg-black flex flex-col items-center justify-center overflow-hidden z-20">
       {/* Background Nebula depth */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.03),transparent_70%)] -z-10" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.03),transparent_70%)] -z-10" />
 
-      {/* The Monument Selection Bar */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        whileInView={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
-        viewport={{ once: true }}
-        className="relative flex flex-col md:flex-row items-center gap-6 md:gap-1 px-4 py-3 bg-white/[0.02] border border-white/[0.05] rounded-[2rem] md:rounded-full backdrop-blur-3xl shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
-      >
-        {CITIES.map((city, idx) => (
-          <div key={city.id} className="flex items-center group/container">
-            {/* Divider Logic */}
-            {idx !== 0 && <div className="hidden md:block w-[1px] h-8 bg-white/10 mx-6" />}
-            
-            <div
-              onClick={() => onSelect(city.id)}
-              className={clsx(
-                "flex items-center gap-4 px-6 py-3 cursor-pointer transition-all duration-700 rounded-full",
-                selectedCity === city.id ? "bg-white/[0.05]" : "hover:bg-white/[0.02]"
-              )}
-            >
-              {/* Monument Icon */}
-              <div className={clsx(
-                "w-10 h-10 md:w-12 md:h-12 transition-all duration-700",
-                selectedCity === city.id ? "text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]" : "text-white/20 group-hover/container:text-white/40"
-              )}>
-                {city.monument}
-              </div>
-
-              <div className="flex items-center gap-3">
-                {/* Selector Trigger (In Front of Name) */}
-                <div className="relative w-4 h-4 flex items-center justify-center">
-                  <div className={clsx(
-                    "absolute inset-0 rounded-full border border-white/20 transition-all",
-                    selectedCity === city.id ? "border-white/60 scale-125" : "group-hover/container:border-white/40"
-                  )} />
-                  <motion.div 
-                    initial={false}
-                    animate={{ 
-                      scale: selectedCity === city.id ? 1 : 0,
-                      opacity: selectedCity === city.id ? 1 : 0 
-                    }}
-                    className="w-2 h-2 bg-white rounded-full shadow-[0_0_10px_rgba(255,255,255,1)]"
-                  />
-                </div>
-
-                <h2 className={clsx(
-                  "font-[family-name:var(--font-lexend)] text-sm md:text-base font-black uppercase tracking-[0.3em] transition-all duration-500",
-                  selectedCity === city.id ? "text-white" : "text-white/30 group-hover/container:text-white/50"
-                )}>
-                  {city.name}
-                </h2>
-              </div>
+      {/* The "Select Your City" Trigger Bar */}
+      <div className="w-full max-w-4xl mx-auto px-6 flex flex-col items-center">
+        <motion.div
+          onClick={() => setIsOpen(!isOpen)}
+          className="relative group w-full max-w-md bg-white/[0.02] border border-white/[0.05] rounded-full px-8 py-4 flex items-center justify-between cursor-pointer backdrop-blur-3xl transition-all duration-500 hover:border-white/20 hover:bg-white/[0.04]"
+        >
+          <div className="flex items-center gap-4">
+            <div className="w-5 h-5 text-white/50 group-hover:text-white transition-colors">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+              </svg>
             </div>
+            <span className="font-[family-name:var(--font-lexend)] text-sm md:text-base font-black uppercase tracking-[0.4em] text-white/80 group-hover:text-white">
+              {selectedCityData ? `JURISDICTION: ${selectedCityData.name}` : "SELECT YOUR CITY"}
+            </span>
           </div>
-        ))}
-        
-        {/* Animated Scanning Line (Aesthetic) */}
-        <motion.div 
-          animate={{ x: ["-100%", "300%"] }}
-          transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-          className="absolute inset-y-0 w-24 bg-gradient-to-r from-transparent via-white/10 to-transparent pointer-events-none -z-10"
-        />
-      </motion.div>
+
+          <motion.div
+            animate={{ rotate: isOpen ? 180 : 0 }}
+            className="text-white/30 group-hover:text-white"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M6 9l6 6 6-6"/>
+            </svg>
+          </motion.div>
+
+          {/* Pulsing indicator if not selected */}
+          {!selectedCity && !isOpen && (
+            <div className="absolute -right-2 -top-2 w-4 h-4 bg-white rounded-full animate-ping opacity-20" />
+          )}
+        </motion.div>
+
+        {/* Expandable Monument Selection Hub */}
+        <AnimatePresence>
+          {isOpen && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+              className="w-full mt-8 overflow-hidden"
+            >
+              <div className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-4 py-8">
+                {CITIES.map((city, idx) => (
+                  <div key={city.id} className="flex items-center group/container">
+                    {/* Compact Separator */}
+                    {idx !== 0 && <div className="hidden md:block w-px h-8 bg-white/10 mx-6" />}
+                    
+                    <div
+                      onClick={() => {
+                        onSelect(city.id);
+                        setTimeout(() => setIsOpen(false), 500);
+                      }}
+                      className={clsx(
+                        "flex items-center gap-6 px-8 py-4 cursor-pointer transition-all duration-700 rounded-full border border-transparent hover:border-white/10 hover:bg-white/[0.03]",
+                        selectedCity === city.id ? "bg-white/[0.05] border-white/20" : "opacity-40 hover:opacity-100"
+                      )}
+                    >
+                      {/* Monument Icon */}
+                      <div className="w-10 h-10 text-white transition-all duration-700 drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]">
+                        {city.monument}
+                      </div>
+
+                      <div className="flex items-center gap-4">
+                        {/* Selector Trigger (In Front of Name) */}
+                        <div className="relative w-4 h-4 flex items-center justify-center">
+                          <div className={clsx(
+                            "absolute inset-0 rounded-full border border-white/20 transition-all",
+                            selectedCity === city.id ? "border-white/60 scale-125" : "group-hover/container:border-white/40"
+                          )} />
+                          <motion.div 
+                            initial={false}
+                            animate={{ 
+                              scale: selectedCity === city.id ? 1 : 0,
+                              opacity: selectedCity === city.id ? 1 : 0 
+                            }}
+                            className="w-2 h-2 bg-white rounded-full shadow-[0_0_10px_rgba(255,255,255,1)]"
+                          />
+                        </div>
+
+                        <h2 className="font-[family-name:var(--font-lexend)] text-sm md:text-base font-black uppercase tracking-[0.3em] text-white">
+                          {city.name}
+                        </h2>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
 
       {/* Technical HUD Details */}
-      <div className="mt-8 flex gap-12 font-[family-name:var(--font-roboto-mono)] text-[8px] tracking-[0.6em] uppercase text-white/10 hidden md:flex">
-        <span>Identity Scan Active</span>
-        <span>Secure Stream [04:NCR:MUM:BLR]</span>
-        <motion.span 
-          animate={{ opacity: [0.2, 1, 0.2] }}
-          transition={{ duration: 0.5, repeat: Infinity }}
-          className="text-white/20"
-        >
-          // Live Selection Hook
-        </motion.span>
+      <div className="mt-12 flex gap-12 font-[family-name:var(--font-roboto-mono)] text-[8px] tracking-[0.6em] uppercase text-white/5 items-center">
+        <span>Identity Scan: ACTIVE</span>
+        <div className="w-24 h-px bg-white/10" />
+        <span>Jurisdiction selection required for event sync</span>
       </div>
     </section>
   );
