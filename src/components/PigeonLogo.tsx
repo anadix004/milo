@@ -13,17 +13,18 @@ export default function PigeonLogo({ className, size = 24, animate = true }: Pig
     <motion.svg
       width={size}
       height={size}
-      viewBox="0 0 100 100"
+      viewBox="0 0 24 24"
       fill="none"
-      xmlns="http://www.w3.org/2000/svg"
+      stroke="white"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
       className={className}
-      whileHover={{ y: -2 }}
+      whileHover={{ scale: 1.1 }}
     >
-      {/* Ultra-Minimalist Solid White Bird Silhouette */}
-      <path
-        d="M82 45C78 44 72 43.5 68 45C64 46.5 61 49 60 53C58.5 58 59 64 61 69C58 67 55.5 63 54 59C51 51 51.5 42 55 35C58.5 28 65 22 72 19C62 23 52 31 48 42C44 53 46 65 53 75C46 68 42 59 42 49C42 39 46 28 53 19C33 29 20 49 20 72C22 65 26 59 33 55C40 51 48 52 56 55C46 52 36 52 26 55C24 69 26 82 33 89C26 81 22 71 20 61C16 59 10 59 4 61"
-        fill="white"
-      />
+      {/* High-Fidelity "Chat Sent" Paper Plane Outline */}
+      <line x1="22" y1="2" x2="11" y2="13" />
+      <polygon points="22 2 15 22 11 13 2 9 22 2" />
     </motion.svg>
   );
 }
