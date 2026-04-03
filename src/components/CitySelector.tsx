@@ -14,7 +14,6 @@ const CITIES = [
         <path d="M38 22H62V25H38V22ZM41 18H59V21H41V18ZM44 14H56V17H44V14Z" opacity="0.6" />
       </svg>
     ),
-    color: "#ffffff"
   },
   {
     id: "mum",
@@ -27,7 +26,6 @@ const CITIES = [
         <path d="M35 25H65V30H35V25ZM40 20H60V24H40V20Z" opacity="0.6" />
       </svg>
     ),
-    color: "#ffffff"
   },
   {
     id: "blr",
@@ -42,7 +40,6 @@ const CITIES = [
         <rect x="25" y="65" width="50" height="5" opacity="0.3" />
       </svg>
     ),
-    color: "#ffffff"
   }
 ];
 
@@ -53,68 +50,86 @@ interface CitySelectorProps {
 
 export default function CitySelector({ selectedCity, onSelect }: CitySelectorProps) {
   return (
-    <section className="relative h-screen bg-black flex flex-col items-center justify-center overflow-hidden z-20">
+    <section className="relative py-12 md:py-20 bg-black flex flex-col items-center justify-center overflow-hidden z-20">
       {/* Background Nebula depth */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.05),transparent_70%)] -z-10" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.03),transparent_70%)] -z-10" />
 
+      {/* The Monument Selection Bar */}
       <motion.div
-        initial={{ opacity: 0, y: 40 }}
-        whileInView={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0, scale: 0.95 }}
+        whileInView={{ opacity: 1, scale: 1 }}
         transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
         viewport={{ once: true }}
-        className="w-full max-w-7xl mx-auto px-6 md:px-12 grid grid-cols-1 md:grid-cols-3 gap-24 md:gap-12"
+        className="relative flex flex-col md:flex-row items-center gap-6 md:gap-1 px-4 py-3 bg-white/[0.02] border border-white/[0.05] rounded-[2rem] md:rounded-full backdrop-blur-3xl shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
       >
-        {CITIES.map((city) => (
-          <div
-            key={city.id}
-            onClick={() => onSelect(city.id)}
-            className={clsx(
-              "group relative flex flex-col items-center cursor-pointer transition-all duration-1000",
-              selectedCity && selectedCity !== city.id ? "opacity-20 grayscale scale-95" : "opacity-100"
-            )}
-          >
-            {/* Monument Silhouette Card */}
-            <motion.div 
-              whileHover={{ y: -10 }}
-              className="relative w-48 h-48 md:w-64 md:h-64 mb-12 flex items-center justify-center"
+        {CITIES.map((city, idx) => (
+          <div key={city.id} className="flex items-center group/container">
+            {/* Divider Logic */}
+            {idx !== 0 && <div className="hidden md:block w-[1px] h-8 bg-white/10 mx-6" />}
+            
+            <div
+              onClick={() => onSelect(city.id)}
+              className={clsx(
+                "flex items-center gap-4 px-6 py-3 cursor-pointer transition-all duration-700 rounded-full",
+                selectedCity === city.id ? "bg-white/[0.05]" : "hover:bg-white/[0.02]"
+              )}
             >
-              <div className="absolute inset-0 bg-white/[0.02] rounded-[3rem] border border-white/[0.05] group-hover:border-white/20 transition-all duration-700" />
-              <div className="relative w-2/3 h-2/3 text-white/40 group-hover:text-white transition-all duration-700 drop-shadow-[0_0_20px_rgba(255,255,255,0.1)] group-hover:drop-shadow-[0_0_30px_rgba(255,255,255,0.3)]">
+              {/* Monument Icon */}
+              <div className={clsx(
+                "w-10 h-10 md:w-12 md:h-12 transition-all duration-700",
+                selectedCity === city.id ? "text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]" : "text-white/20 group-hover/container:text-white/40"
+              )}>
                 {city.monument}
               </div>
-            </motion.div>
 
-            {/* Selection Row: Circle + Name */}
-            <div className="flex items-center gap-6 group/name px-8 py-3 rounded-full border border-transparent group-hover:border-white/10 group-hover:bg-white/[0.03] transition-all duration-700">
-              {/* Selector Circle */}
-              <div className="relative w-6 h-6 flex items-center justify-center">
-                <div className="absolute inset-0 rounded-full border-2 border-white/20 group-hover:border-white/50 transition-colors" />
-                <motion.div 
-                  initial={false}
-                  animate={{ 
-                    scale: selectedCity === city.id ? 1 : 0,
-                    opacity: selectedCity === city.id ? 1 : 0 
-                  }}
-                  className="w-3 h-3 bg-white rounded-full shadow-[0_0_15px_rgba(255,255,255,1)]"
-                />
+              <div className="flex items-center gap-3">
+                {/* Selector Trigger (In Front of Name) */}
+                <div className="relative w-4 h-4 flex items-center justify-center">
+                  <div className={clsx(
+                    "absolute inset-0 rounded-full border border-white/20 transition-all",
+                    selectedCity === city.id ? "border-white/60 scale-125" : "group-hover/container:border-white/40"
+                  )} />
+                  <motion.div 
+                    initial={false}
+                    animate={{ 
+                      scale: selectedCity === city.id ? 1 : 0,
+                      opacity: selectedCity === city.id ? 1 : 0 
+                    }}
+                    className="w-2 h-2 bg-white rounded-full shadow-[0_0_10px_rgba(255,255,255,1)]"
+                  />
+                </div>
+
+                <h2 className={clsx(
+                  "font-[family-name:var(--font-lexend)] text-sm md:text-base font-black uppercase tracking-[0.3em] transition-all duration-500",
+                  selectedCity === city.id ? "text-white" : "text-white/30 group-hover/container:text-white/50"
+                )}>
+                  {city.name}
+                </h2>
               </div>
-
-              <h2 className="font-[family-name:var(--font-lexend)] text-xl md:text-2xl font-black uppercase tracking-[0.4em] text-white/40 group-hover:text-white transition-all duration-500">
-                {city.name}
-              </h2>
             </div>
           </div>
         ))}
+        
+        {/* Animated Scanning Line (Aesthetic) */}
+        <motion.div 
+          animate={{ x: ["-100%", "300%"] }}
+          transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+          className="absolute inset-y-0 w-24 bg-gradient-to-r from-transparent via-white/10 to-transparent pointer-events-none -z-10"
+        />
       </motion.div>
 
-      {/* Identity Scan Footer Text */}
-      <motion.p 
-        animate={{ opacity: [0.2, 0.5, 0.2] }}
-        transition={{ duration: 3, repeat: Infinity }}
-        className="absolute bottom-12 font-[family-name:var(--font-roboto-mono)] text-[10px] tracking-[0.8em] uppercase text-white/20"
-      >
-        Select jurisdictional center for event synchronization
-      </motion.p>
+      {/* Technical HUD Details */}
+      <div className="mt-8 flex gap-12 font-[family-name:var(--font-roboto-mono)] text-[8px] tracking-[0.6em] uppercase text-white/10 hidden md:flex">
+        <span>Identity Scan Active</span>
+        <span>Secure Stream [04:NCR:MUM:BLR]</span>
+        <motion.span 
+          animate={{ opacity: [0.2, 1, 0.2] }}
+          transition={{ duration: 0.5, repeat: Infinity }}
+          className="text-white/20"
+        >
+          // Live Selection Hook
+        </motion.span>
+      </div>
     </section>
   );
 }
