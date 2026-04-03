@@ -161,13 +161,14 @@ export default function HeroSection() {
                 "font-[family-name:var(--font-lexend)]",
                 "text-[28vw] md:text-[24vw]",
                 "font-extrabold text-white lowercase text-left",
-                "leading-[0.7] tracking-[-0.05em] m-0 p-0"
+                "leading-[0.7] tracking-[-0.05em] m-0 p-0",
+                "drop-shadow-[0_0_40px_rgba(255,255,255,0.2)]"
               )}
               style={{ WebkitFontSmoothing: "antialiased" }}
             >
               milo
             </h1>
-            <p className="font-[family-name:var(--font-lexend)] text-white/90 text-[10px] md:text-sm uppercase tracking-[0.4em] ml-1 mt-2 md:mt-4 opacity-80">
+            <p className="font-[family-name:var(--font-lexend)] text-white/90 text-[10px] md:text-sm uppercase tracking-[0.4em] ml-1 mt-2 md:mt-4 opacity-80 drop-shadow-lg">
               your local city event radar
             </p>
           </motion.div>

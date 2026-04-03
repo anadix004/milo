@@ -77,12 +77,12 @@ export default function IdentityScan({ isOpen, onClose, onVerified }: IdentitySc
                 )}
               />
               <h2 className={clsx(
-                "font-[family-name:var(--font-lexend)] text-4xl md:text-6xl font-black uppercase tracking-tighter transition-colors duration-500",
+                "font-[family-name:var(--font-lexend)] text-4xl md:text-6xl font-black uppercase tracking-tighter transition-colors duration-500 drop-shadow-[0_0_20px_rgba(255,255,255,0.3)]",
                 status === "verified" ? "text-emerald-400" : "text-white"
               )}>
                 {status === "verified" ? "Identity Verified" : "Identity Scan"}
               </h2>
-              <p className="font-[family-name:var(--font-roboto-mono)] text-[10px] md:text-xs tracking-[0.5em] text-white/40 uppercase mt-2">
+              <p className="font-[family-name:var(--font-roboto-mono)] text-[10px] md:text-xs tracking-[0.5em] text-white/60 uppercase mt-2 drop-shadow-md">
                 {status === "scanning" && "Capturing facial anchors..."}
                 {status === "analyzing" && "Validating neural signature..."}
                 {status === "verified" && "Nebula encryption key acquired."}
@@ -128,7 +128,7 @@ export default function IdentityScan({ isOpen, onClose, onVerified }: IdentitySc
             </div>
 
             {/* HUD Floating Data */}
-            <div className="flex flex-col gap-2 font-[family-name:var(--font-roboto-mono)] text-[8px] text-emerald-500/30 uppercase tracking-[0.3em]">
+            <div className="flex flex-col gap-2 font-[family-name:var(--font-roboto-mono)] text-[8px] text-emerald-500/60 uppercase tracking-[0.3em] drop-shadow-[0_0_5px_rgba(16,185,129,0.3)]">
               <p>DNA Link: Active</p>
               <p>Satellite Sync: 4/4</p>
               <p>Milo Encryption: V4.2</p>

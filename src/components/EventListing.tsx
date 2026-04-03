@@ -195,10 +195,10 @@ function FeaturedCarousel({ items, onExpand }: { items: EventData[], onExpand: (
             
             <div className="absolute inset-x-0 bottom-0 p-8 flex justify-between items-end">
               <div>
-                <span className="font-[family-name:var(--font-roboto-mono)] text-[10px] tracking-[0.3em] text-white/60 uppercase mb-2 block font-bold">
+                <span className="font-[family-name:var(--font-roboto-mono)] text-[10px] tracking-[0.3em] text-white/70 uppercase mb-2 block font-bold drop-shadow-md">
                   {item.category}
                 </span>
-                <h3 className="font-[family-name:var(--font-lexend)] text-2xl md:text-5xl font-black text-white uppercase tracking-tight">
+                <h3 className="font-[family-name:var(--font-lexend)] text-2xl md:text-5xl font-black text-white uppercase tracking-tight drop-shadow-xl">
                   {item.name}
                 </h3>
               </div>
@@ -255,14 +255,14 @@ function EventGridCard({ event, onExpand }: { event: EventData, onExpand: (e: Ev
       <img src={event.image} alt={event.name} className="absolute inset-0 w-full h-full object-cover grayscale transition-all duration-700 group-hover:grayscale-0 group-hover:scale-105" />
       <div className="absolute inset-0 bg-black/60 group-hover:bg-black/40 transition-colors" />
       
-      <div className="absolute inset-x-0 bottom-0 p-8 flex flex-col items-start z-10">
-        <span className="font-[family-name:var(--font-roboto-mono)] text-[10px] tracking-[0.2em] text-white/40 uppercase mb-2 font-bold">
+      <div className="absolute inset-x-0 bottom-0 p-8 flex flex-col items-start z-10 transition-transform group-hover:-translate-y-2 duration-500">
+        <span className="font-[family-name:var(--font-roboto-mono)] text-[10px] tracking-[0.2em] text-white/60 uppercase mb-2 font-black drop-shadow-md">
           {event.category}
         </span>
-        <h3 className="font-[family-name:var(--font-lexend)] text-xl md:text-3xl font-black text-white uppercase tracking-tight leading-tight mb-2">
+        <h3 className="font-[family-name:var(--font-lexend)] text-xl md:text-3xl font-black text-white uppercase tracking-tight leading-tight mb-2 drop-shadow-xl">
           {event.name}
         </h3>
-        <p className="font-[family-name:var(--font-lexend)] text-white/60 text-xs md:text-sm font-light">
+        <p className="font-[family-name:var(--font-lexend)] text-white/80 text-xs md:text-sm font-bold tracking-wide drop-shadow-sm">
           Starting {event.price}
         </p>
       </div>
@@ -299,10 +299,10 @@ function EventDetailView({ event, onClose }: { event: EventData, onClose: () => 
 
         <div className="w-full md:w-1/2 h-full p-8 md:p-24 flex flex-col justify-center items-start z-10 gap-8">
           <motion.div initial={{ opacity: 0, x: -50 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3 }}>
-            <span className="font-[family-name:var(--font-roboto-mono)] text-[10px] md:text-xs text-white/40 tracking-[0.4em] mb-4 block uppercase font-bold">
+            <span className="font-[family-name:var(--font-roboto-mono)] text-[10px] md:text-xs text-white/60 tracking-[0.4em] mb-4 block uppercase font-black drop-shadow-md">
               {event.category}
             </span>
-            <h2 className="font-[family-name:var(--font-lexend)] text-4xl md:text-7xl font-black text-white uppercase tracking-tight leading-[0.9] mb-12">
+            <h2 className="font-[family-name:var(--font-lexend)] text-4xl md:text-7xl font-black text-white uppercase tracking-tight leading-[0.9] mb-12 drop-shadow-xl">
               {event.name}
             </h2>
           </motion.div>

@@ -10,18 +10,23 @@ import PigeonLogo from "@/components/PigeonLogo";
 import Link from "next/link";
 import clsx from "clsx";
 
-const CITY_CHANNELS = [
-  { id: "del", name: "Delhi NCR Hub", active: 124, color: "text-purple-500" },
-  { id: "mum", name: "Mumbai Tech Coast", active: 89, color: "text-cyan-500" },
-  { id: "blr", name: "Bangalore Network", active: 203, color: "text-green-500" }
+const MOCK_FRIENDS = [
+  { id: 1, name: "Neon_Ghost", status: "online", bio: "Syncing in Delhi NCR" },
+  { id: 2, name: "Cyber_Dove", status: "away", bio: "Mumbai Tech Coast" },
+  { id: 3, name: "Pigeon_Zero", status: "online", bio: "Bangalore Network" }
+];
+
+const MOCK_EVENTS = [
+  { id: "e1", name: "Rooftop Nebula Sync", active: 45, icon: "🌌" },
+  { id: "e2", name: "Tech Summit Alpha", active: 128, icon: "🛸" },
+  { id: "e3", name: "Art District Meetup", active: 22, icon: "🎨" }
 ];
 
 export default function ChatPage() {
-  const [activeChannel, setActiveChannel] = useState("del");
   const [messages, setMessages] = useState([
     { id: 1, text: "Wait, is the Rooftop party in Delhi NCR still on?", user: "CyberNomad", time: "2m ago" },
     { id: 2, text: "Yes! 🌌 Syncing nebula frames now. See you there.", user: "Milo_Admin", isSystem: true },
-    { id: 3, text: "Has anyone seen the Mumbai Tech Coast lineup?", user: "DataVoyager", time: "Just now" }
+    { id: 3, text: "The Tech Summit Alpha starts in 10 minutes.", user: "DataVoyager", time: "Just now" }
   ]);
   const [inputValue, setInputValue] = useState("");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -34,10 +39,10 @@ export default function ChatPage() {
   };
 
   return (
-    <main className="min-h-screen bg-black text-white font-[family-name:var(--font-lexend)] overflow-hidden flex flex-col pt-24 pb-8 px-6 md:px-12">
+    <main className="min-h-screen bg-black text-white font-[family-name:var(--font-lexend)] overflow-hidden flex flex-col pt-24 pb-8">
       {/* Cinematic Background Fix */}
-      <div className="fixed inset-0 bg-[#0a0a0a] -z-10" />
-      <div className="fixed inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(168,85,247,0.1),transparent_50%)] -z-10" />
+      <div className="fixed inset-0 bg-[#050505] -z-10" />
+      <div className="fixed inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.05),transparent_50%)] -z-10" />
 
       <Header 
         onProfileClick={() => setIsSidebarOpen(true)}
@@ -57,106 +62,82 @@ export default function ChatPage() {
         onAuthRedirect={() => setIsSidebarOpen(true)}
       />
 
-      <div className="flex-1 max-w-7xl mx-auto w-full flex gap-8 overflow-hidden">
-        {/* Left Sidebar: City Channels */}
+      <div className="flex-1 w-full max-w-[1800px] mx-auto flex gap-6 px-6 h-[calc(100vh-160px)] overflow-hidden">
+        
+        {/* LEFT COLUMN: FRIENDS SECTION */}
         <motion.div 
           initial={{ x: -20, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
-          transition={{ duration: 0.8 }}
-          className="hidden lg:flex flex-col w-80 space-y-8"
+          className="hidden xl:flex flex-col w-72 bg-white/[0.02] border border-white/5 rounded-[2.5rem] p-6 space-y-6"
         >
-          <div className="space-y-4">
-            <h2 className="text-[10px] text-white/30 uppercase tracking-[0.4em] font-black px-2">City Jurisdictions</h2>
-            <div className="space-y-2">
-              {CITY_CHANNELS.map((c) => (
-                <button
-                  key={c.id}
-                  onClick={() => setActiveChannel(c.id)}
-                  className={clsx(
-                    "w-full p-4 rounded-2xl flex items-center justify-between border transition-all duration-500 group",
-                    activeChannel === c.id 
-                      ? "bg-white/10 border-white/20" 
-                      : "bg-transparent border-transparent hover:bg-white/5"
-                  )}
-                >
-                  <div className="flex items-center gap-3">
-                    <MapPin size={16} className={clsx(activeChannel === c.id ? c.color : "text-white/20")} />
-                    <span className={clsx("text-sm font-bold tracking-wide", activeChannel === c.id ? "text-white" : "text-white/50")}>
-                      {c.name}
-                    </span>
-                  </div>
-                  <span className="text-[9px] text-white/20 font-mono group-hover:text-white/40 transition-colors uppercase">
-                    {c.active} Pigeons
-                  </span>
-                </button>
-              ))}
-            </div>
+          <div className="flex items-center justify-between px-2">
+            <h2 className="text-[10px] text-white/40 uppercase tracking-[0.4em] font-black drop-shadow-md">Identity Sync</h2>
+            <Users size={14} className="text-white/20" />
           </div>
-
-          <div className="p-6 bg-white/5 rounded-3xl border border-white/10 flex-1 relative overflow-hidden group">
-            <div className="relative z-10 space-y-4">
-              <h3 className="text-sm font-black uppercase tracking-widest text-cyan-500">Global Scan</h3>
-              <p className="text-xs text-white/40 leading-relaxed">Identity verification active. All pigeons dispatches are ephemeral and encrypted.</p>
-              <div className="flex -space-x-2 pt-2">
-                {[1,2,3,4].map(i => (
-                  <div key={i} className="w-8 h-8 rounded-full border-2 border-black bg-white/10 flex items-center justify-center">
-                    <Users size={12} className="text-white/30" />
-                  </div>
-                ))}
-                <div className="w-8 h-8 rounded-full border-2 border-black bg-white/5 flex items-center justify-center text-[10px] text-white/40">+12</div>
+          <div className="space-y-4 overflow-y-auto no-scrollbar">
+            {MOCK_FRIENDS.map(friend => (
+              <div key={friend.id} className="group relative flex items-center gap-3 p-3 rounded-2xl hover:bg-white/5 transition-all cursor-pointer border border-transparent hover:border-white/10">
+                <div className="relative w-10 h-10 rounded-full border border-white/10 flex items-center justify-center bg-white/5">
+                  <span className="text-xs text-white/40 group-hover:text-white transition-colors">{friend.name[0]}</span>
+                  <div className={clsx(
+                    "absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-black",
+                    friend.status === "online" ? "bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]" : "bg-orange-500"
+                  )} />
+                </div>
+                <div>
+                  <p className="text-xs font-bold text-white/80 group-hover:text-white drop-shadow-sm">{friend.name}</p>
+                  <p className="text-[9px] text-white/20 uppercase tracking-widest">{friend.bio}</p>
+                </div>
               </div>
-            </div>
-            <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-cyan-500/10 to-transparent group-hover:h-full transition-all duration-1000" />
+            ))}
           </div>
         </motion.div>
 
-        {/* Main Feed: The Pigeon Hub */}
+        {/* CENTER COLUMN: MAIN HUB */}
         <motion.div 
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          className="flex-1 flex flex-col bg-black/40 backdrop-blur-3xl border border-white/10 rounded-[2.5rem] overflow-hidden shadow-[0_0_100px_rgba(0,0,0,0.5)]"
+          transition={{ duration: 0.8 }}
+          className="flex-1 flex flex-col bg-black/40 backdrop-blur-3xl border border-white/10 rounded-[3rem] overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,0.8)]"
         >
           {/* Dashboard Header */}
-          <div className="p-8 border-b border-white/10 flex justify-between items-center bg-white/[0.02]">
+          <div className="p-6 md:p-8 border-b border-white/5 flex justify-between items-center bg-white/[0.02]">
             <div className="flex items-center gap-4">
-              <Link href="/" className="lg:hidden p-2 text-white/30 hover:text-white transition-colors">
-                <ChevronLeft size={24} />
-              </Link>
-              <div className="relative group p-2">
-                <PigeonLogo size={48} animate={true} className="drop-shadow-[0_0_15px_rgba(34,211,238,0.4)]" />
-                <div className="absolute inset-0 bg-cyan-400/10 rounded-full animate-ping -z-10" />
+              <div className="relative p-2">
+                <PigeonLogo size={42} className="drop-shadow-[0_0_20px_rgba(255,255,255,0.4)]" />
+                <div className="absolute inset-0 bg-white/5 rounded-full animate-pulse -z-10" />
               </div>
-              <div>
-                <h1 className="text-white text-xl font-black uppercase tracking-widest leading-tight">
-                  {CITY_CHANNELS.find(c => c.id === activeChannel)?.name}
-                </h1>
-                <p className="text-[10px] text-cyan-500 uppercase tracking-[0.4em] mt-1 flex items-center gap-1 font-bold">
-                  <ShieldCheck size={10} /> Sync active // Local Time {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit'})}
-                </p>
+              <div className="drop-shadow-lg">
+                <h1 className="text-white text-lg md:text-xl font-black uppercase tracking-widest leading-tight">Milo Hub</h1>
+                <div className="flex items-center gap-2 mt-1">
+                  <div className="w-1.5 h-1.5 bg-cyan-500 rounded-full animate-ping" />
+                  <p className="text-[9px] text-white/40 uppercase tracking-[0.4em] font-black">Sync active // Secure Link</p>
+                </div>
               </div>
             </div>
-            <div className="hidden md:flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full text-white/30 hover:text-white transition-colors cursor-pointer ring-purple-500/20 hover:ring-4">
-              <Search size={14} />
-              <span className="text-[10px] uppercase tracking-widest font-bold">Search Hub</span>
+            <div className="hidden md:flex items-center gap-6">
+              <div className="px-4 py-2 bg-white/5 border border-white/10 rounded-full flex items-center gap-2 text-white/30 hover:text-white transition-all cursor-pointer">
+                <Search size={14} />
+                <span className="text-[9px] font-black uppercase tracking-widest">Search Hub</span>
+              </div>
             </div>
           </div>
 
           {/* Message Feed */}
-          <div className="flex-1 overflow-y-auto p-8 md:p-12 space-y-8 no-scrollbar">
+          <div className="flex-1 overflow-y-auto p-6 md:p-10 space-y-8 no-scrollbar scroll-smooth">
             {messages.map((m) => (
               <motion.div 
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 key={m.id} 
                 className={clsx(
-                  "flex flex-col max-w-[80%]",
+                  "flex flex-col max-w-[85%] md:max-w-[70%]",
                   m.user === "You" ? "ml-auto items-end text-right" : "items-start text-left"
                 )}
               >
                 <div className="flex items-center gap-3 mb-2 px-2">
                   <span className={clsx(
-                    "text-[10px] font-black uppercase tracking-[0.2em]",
+                    "text-[10px] font-black uppercase tracking-[0.2em] drop-shadow-md",
                     m.isSystem ? "text-cyan-500" : "text-white/40"
                   )}>
                     {m.user}
@@ -164,12 +145,12 @@ export default function ChatPage() {
                   {m.time && <span className="text-[9px] text-white/20 font-mono tracking-widest">{m.time}</span>}
                 </div>
                 <div className={clsx(
-                  "p-6 rounded-[2rem] text-sm md:text-base leading-relaxed shadow-lg",
+                  "p-5 md:p-6 rounded-[1.5rem] md:rounded-[2rem] text-sm md:text-base leading-relaxed shadow-2xl backdrop-blur-md",
                   m.user === "You" 
-                    ? "bg-white text-black font-medium rounded-tr-none" 
+                    ? "bg-white text-black font-semibold rounded-tr-none shadow-white/5" 
                     : m.isSystem 
                       ? "bg-cyan-500/10 border border-cyan-500/20 text-cyan-100 rounded-tl-none" 
-                      : "bg-white/5 border border-white/10 text-white rounded-tl-none font-light"
+                      : "bg-white/[0.05] border border-white/10 text-white rounded-tl-none font-light"
                 )}>
                   {m.text}
                 </div>
@@ -178,24 +159,58 @@ export default function ChatPage() {
           </div>
 
           {/* Dynamic Dispatcher (Input) */}
-          <div className="p-8 bg-white/[0.02] border-t border-white/10">
+          <div className="p-6 md:p-8 bg-white/[0.01] border-t border-white/5">
             <div className="relative group max-w-4xl mx-auto">
               <input 
                 type="text" 
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSend()}
-                placeholder="Synchronize pigeon dispatch..." 
-                className="w-full bg-white/5 border border-white/10 rounded-3xl py-6 pl-8 pr-20 text-sm md:text-base text-white placeholder:text-white/10 outline-none focus:border-cyan-500/50 transition-all duration-1000 shadow-inner"
+                placeholder="Synchronize hub dispatch..." 
+                className="w-full bg-white/5 border border-white/10 rounded-2xl py-6 pl-8 pr-20 text-sm text-white placeholder:text-white/20 outline-none focus:border-white/30 transition-all duration-700 shadow-inner"
               />
               <button 
                 onClick={handleSend}
-                className="absolute right-3 top-1/2 -translate-y-1/2 w-14 h-14 bg-white text-black rounded-2xl flex items-center justify-center hover:bg-cyan-500 hover:text-white transition-all transform active:scale-90 shadow-xl"
+                className="absolute right-2 top-1/2 -translate-y-1/2 w-12 h-12 bg-white text-black rounded-xl flex items-center justify-center hover:bg-cyan-500 hover:text-white transition-all transform active:scale-95 shadow-xl"
               >
-                <Send size={20} />
+                <Send size={18} />
               </button>
             </div>
-            <p className="text-center mt-4 text-[9px] text-white/10 uppercase tracking-[0.5em] font-black">Secure neural channel active. All data is ephemeral.</p>
+            <p className="text-center mt-4 text-[9px] text-white/10 uppercase tracking-[0.5em] font-black drop-shadow-sm">Secure channel active // No pigeon was harmed</p>
+          </div>
+        </motion.div>
+
+        {/* RIGHT COLUMN: EVENT CHATS */}
+        <motion.div 
+          initial={{ x: 20, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          className="hidden lg:flex flex-col w-72 bg-white/[0.02] border border-white/5 rounded-[2.5rem] p-6 space-y-6"
+        >
+          <div className="flex items-center justify-between px-2">
+            <h2 className="text-[10px] text-white/40 uppercase tracking-[0.4em] font-black drop-shadow-md">Live Streams</h2>
+            <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse" />
+          </div>
+          <div className="space-y-4 overflow-y-auto no-scrollbar">
+            {MOCK_EVENTS.map(event => (
+              <div key={event.id} className="group p-4 rounded-2xl border border-white/5 bg-white/0 hover:bg-white/5 transition-all cursor-pointer relative overflow-hidden">
+                <div className="relative z-10 flex flex-col gap-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-black text-white/60 group-hover:text-white transition-colors leading-tight drop-shadow-sm">{event.name}</span>
+                    <span className="text-[14px]">{event.icon}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-1 h-1 bg-cyan-400 rounded-full" />
+                    <span className="text-[9px] text-white/30 uppercase tracking-widest">{event.active} active</span>
+                  </div>
+                </div>
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.03] to-transparent -translate-x-full group-hover:translate-x-full transition-all duration-1000" />
+              </div>
+            ))}
+          </div>
+          
+          <div className="p-6 bg-white/5 rounded-3xl border border-white/5 mt-auto">
+            <p className="text-[9px] text-white/40 font-black uppercase tracking-widest mb-2 drop-shadow-md">Global Scan status</p>
+            <p className="text-[10px] text-white/20 leading-relaxed font-medium">Click any active event stream to join the community identification cycle.</p>
           </div>
         </motion.div>
       </div>

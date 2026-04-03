@@ -18,6 +18,11 @@ export default function Preloader({ progress, isReady }: PreloaderProps) {
     }
   }, [isReady]);
 
+  // SVG Circle Constants for the "O" loader
+  const radius = 40;
+  const circumference = 2 * Math.PI * radius;
+  const strokeDashoffset = circumference - (progress / 100) * circumference;
+
   return (
     <AnimatePresence>
       {show && (
@@ -31,59 +36,62 @@ export default function Preloader({ progress, isReady }: PreloaderProps) {
           <div className="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[length:100%_2px,3px_100%] pointer-events-none opacity-20" />
           
           <div className="relative flex flex-col items-center">
-            {/* Pulsing Brand Logo */}
-            <motion.div
-              animate={{ 
-                scale: [1, 1.05, 1],
-                opacity: [0.3, 0.6, 0.3]
-              }}
-              transition={{ 
-                duration: 2,
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
-              className="mb-12"
-            >
-              <h1 className="font-[family-name:var(--font-lexend)] text-white text-6xl md:text-8xl font-black uppercase tracking-[0.2em] italic opacity-40">
-                milo
-              </h1>
-            </motion.div>
-
-            {/* Technical HUD Elements */}
-            <div className="flex flex-col items-center gap-4">
-              <div className="w-64 h-[1px] bg-white/10 relative overflow-hidden">
-                <motion.div 
-                  className="absolute inset-y-0 left-0 bg-white"
-                  initial={{ width: 0 }}
-                  animate={{ width: `${progress}%` }}
-                />
+            {/* The "milo" title with the O-Loading Engine */}
+            <div className="flex items-center font-[family-name:var(--font-lexend)] text-6xl md:text-8xl font-black uppercase tracking-[0.1em] italic">
+              <span className="text-white/40">mil</span>
+              
+              {/* The Dynamic "O" Loading Engine */}
+              <div className="relative w-[1.2em] h-[1.2em] flex items-center justify-center ml-[-0.1em]">
+                <svg viewBox="0 0 100 100" className="w-full h-full transform -rotate-90">
+                  {/* Background Track */}
+                  <circle
+                    cx="50"
+                    cy="50"
+                    r={radius}
+                    stroke="rgba(255, 255, 255, 0.05)"
+                    strokeWidth="12"
+                    fill="none"
+                  />
+                  {/* Progress Fill */}
+                  <motion.circle
+                    cx="50"
+                    cy="50"
+                    r={radius}
+                    stroke="white"
+                    strokeWidth="12"
+                    fill="none"
+                    strokeDasharray={circumference}
+                    animate={{ strokeDashoffset }}
+                    transition={{ duration: 0.5, ease: "easeOut" }}
+                    strokeLinecap="round"
+                    className="drop-shadow-[0_0_15px_rgba(255,255,255,0.5)]"
+                  />
+                </svg>
+                {/* Percentage readout (Minimalist) */}
+                <div className="absolute inset-0 flex items-center justify-center text-[10px] md:text-sm font-black not-italic tracking-normal text-white drop-shadow-[0_0_5px_rgba(0,0,0,1)]">
+                  {Math.round(progress)}
+                </div>
               </div>
-
-              <div className="flex justify-between w-64 font-[family-name:var(--font-roboto-mono)] text-[10px] tracking-[0.3em] uppercase text-white/40">
-                <span>Nebula Sync</span>
-                <motion.span>
-                  {Math.round(progress)}%
-                </motion.span>
-              </div>
-
-              <motion.p 
-                animate={{ opacity: [0.2, 0.5, 0.2] }}
-                transition={{ duration: 1.5, repeat: Infinity }}
-                className="font-[family-name:var(--font-roboto-mono)] text-[8px] tracking-[0.5em] uppercase text-white/20 mt-8"
-              >
-                Initializing simulation matrix...
-              </motion.p>
             </div>
+
+            {/* Technical Detail Footer */}
+            <motion.p 
+              animate={{ opacity: [0.2, 0.5, 0.2] }}
+              transition={{ duration: 1.5, repeat: Infinity }}
+              className="font-[family-name:var(--font-roboto-mono)] text-[8px] tracking-[0.8em] uppercase text-white/10 mt-12 text-center"
+            >
+              Initializing jurisdictional synchronization...
+            </motion.p>
           </div>
 
           {/* Corner HUD Data */}
-          <div className="absolute bottom-12 left-12 font-[family-name:var(--font-roboto-mono)] text-[8px] text-white/10 uppercase tracking-widest hidden md:block">
-            <p>Lat: 28.6139° N</p>
-            <p>Long: 77.2090° E</p>
+          <div className="absolute bottom-12 left-12 font-[family-name:var(--font-roboto-mono)] text-[8px] text-white/10 uppercase tracking-widest hidden md:block leading-loose">
+            <p className="flex items-center gap-2"><span className="w-1 h-1 bg-white/20 rounded-full" /> Lat: 28.6139° N</p>
+            <p className="flex items-center gap-2"><span className="w-1 h-1 bg-white/20 rounded-full" /> Long: 77.2090° E</p>
           </div>
-          <div className="absolute top-12 right-12 font-[family-name:var(--font-roboto-mono)] text-[8px] text-white/10 uppercase tracking-widest hidden md:block">
-            <p>Status: Pre-Loading</p>
-            <p>System: Anti-Gravity V2</p>
+          <div className="absolute top-12 right-12 font-[family-name:var(--font-roboto-mono)] text-[8px] text-white/10 uppercase tracking-widest hidden md:block text-right leading-loose">
+            <p>System: Anti-Gravity V2.4</p>
+            <p className="text-white/20">Jurisdiction: Delhi NCR</p>
           </div>
         </motion.div>
       )}
