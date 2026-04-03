@@ -16,14 +16,13 @@ const CITY_IMAGES = [
 
 import Header from "@/components/Header";
 import ProfileSidebar from "@/components/ProfileSidebar";
-import ChatHub from "@/components/ChatHub";
 import EventSubmission from "@/components/EventSubmission";
 
 export default function Home() {
   const [selectedCity, setSelectedCity] = useState<string | null>(null);
   const [isReady, setIsReady] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [activeModal, setActiveModal] = useState<"profile" | "chat" | "event" | null>(null);
+  const [activeModal, setActiveModal] = useState<"profile" | "event" | null>(null);
 
   useEffect(() => {
     const allAssets = [...HERO_FRAMES.map(f => `/sequence/frames/${f}`), ...CITY_IMAGES];
@@ -63,7 +62,6 @@ export default function Home() {
       
       <Header 
         onProfileClick={() => setActiveModal("profile")}
-        onChatClick={() => setActiveModal("chat")}
         onEventClick={() => setActiveModal("event")}
         isSidebarOpen={activeModal === "profile"} 
       />
@@ -71,11 +69,6 @@ export default function Home() {
       <ProfileSidebar 
         isOpen={activeModal === "profile"} 
         onClose={closeModals} 
-      />
-
-      <ChatHub 
-        isOpen={activeModal === "chat"}
-        onClose={closeModals}
       />
 
       <EventSubmission 
