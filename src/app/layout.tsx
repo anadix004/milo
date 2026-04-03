@@ -18,6 +18,7 @@ export const metadata: Metadata = {
   description: "High-end, immersive city event discovery.",
 };
 
+import { AuthProvider } from "@/components/AuthContext";
 import SmoothScroll from "@/components/SmoothScroll";
 
 export default function RootLayout({
@@ -30,9 +31,11 @@ export default function RootLayout({
       <body
         className={`${lexend.variable} ${robotoMono.variable} antialiased bg-black text-white selection:bg-white selection:text-black overflow-x-hidden`}
       >
-        <SmoothScroll>
-          {children}
-        </SmoothScroll>
+        <AuthProvider>
+          <SmoothScroll>
+            {children}
+          </SmoothScroll>
+        </AuthProvider>
       </body>
     </html>
   );

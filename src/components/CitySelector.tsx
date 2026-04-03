@@ -7,7 +7,7 @@ import clsx from "clsx";
 const CITIES = [
   {
     id: "del",
-    name: "Delhi",
+    name: "Delhi NCR",
     image: "/city selection/delhi.png",
     color: "#a855f7", // Electric Purple
     accentClass: "text-purple-500",

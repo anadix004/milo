@@ -16,12 +16,14 @@ const CITY_IMAGES = [
 
 import Header from "@/components/Header";
 import ProfileSidebar from "@/components/ProfileSidebar";
+import ChatHub from "@/components/ChatHub";
+import EventSubmission from "@/components/EventSubmission";
 
 export default function Home() {
   const [selectedCity, setSelectedCity] = useState<string | null>(null);
   const [isReady, setIsReady] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [activeModal, setActiveModal] = useState<"profile" | "chat" | "event" | null>(null);
 
   useEffect(() => {
     const allAssets = [...HERO_FRAMES.map(f => `/sequence/frames/${f}`), ...CITY_IMAGES];
@@ -53,18 +55,33 @@ export default function Home() {
     preload();
   }, []);
 
+  const closeModals = () => setActiveModal(null);
+
   return (
     <main className="w-full bg-[#000000]">
       <Preloader progress={progress} isReady={isReady} />
       
       <Header 
-        onProfileClick={() => setIsSidebarOpen(true)} 
-        isSidebarOpen={isSidebarOpen} 
+        onProfileClick={() => setActiveModal("profile")}
+        onChatClick={() => setActiveModal("chat")}
+        onEventClick={() => setActiveModal("event")}
+        isSidebarOpen={activeModal === "profile"} 
       />
       
       <ProfileSidebar 
-        isOpen={isSidebarOpen} 
-        onClose={() => setIsSidebarOpen(false)} 
+        isOpen={activeModal === "profile"} 
+        onClose={closeModals} 
+      />
+
+      <ChatHub 
+        isOpen={activeModal === "chat"}
+        onClose={closeModals}
+      />
+
+      <EventSubmission 
+        isOpen={activeModal === "event"}
+        onClose={closeModals}
+        onAuthRedirect={() => setActiveModal("profile")}
       />
 
       {/* Show content only when partially ready to avoid flashes, 
