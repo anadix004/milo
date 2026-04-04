@@ -22,6 +22,7 @@ interface AuthContextType {
   isLoading: boolean;
   login: (email: string, pass: string) => Promise<void>;
   signUp: (email: string, pass: string, name: string) => Promise<void>;
+  loginWithGoogle: () => Promise<void>;
   logout: () => Promise<void>;
   isAuthenticated: boolean;
   refreshProfile: () => Promise<void>;
@@ -143,6 +144,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const loginWithGoogle = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: window.location.origin,
+      },
+    });
+    if (error) addNotification("system", `Google Auth failed: ${error.message}`);
+  };
+
   const logout = async () => {
     await supabase.auth.signOut();
     localStorage.removeItem("milo_user");
@@ -172,6 +183,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       isLoading, 
       login, 
       signUp,
+      loginWithGoogle,
       logout, 
       isAuthenticated: !!session?.user,
       refreshProfile,
