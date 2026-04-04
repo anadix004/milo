@@ -88,10 +88,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         
         if (_event === "SIGNED_IN") {
           if (hasProfile) {
-            addNotification("session", "Identity verified. Redirecting to Live Radar.");
+            addNotification("session", "Welcome back. Redirecting to your radar.");
             router.push("/");
           } else {
-             addNotification("session", "Identity established. Please complete onboarding.");
+             addNotification("session", "Account initialized. Let's set up your profile.");
           }
         }
       } else {
@@ -108,7 +108,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (error) {
       addNotification("system", `Login failed: ${error.message}`);
     } else {
-       addNotification("session", "Identity mission pulse synchronized.");
+       addNotification("session", "Login successful. Welcome back.");
     }
   };
 
@@ -123,7 +123,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       // If no pre-authorized identity exists AND it's not the owner
       if ((profileError || !profile) && email !== "milo.anadi@gmail.com") {
-        addNotification("system", "Gatekeeper Error: Identity not pre-authorized in Team Nexus.");
+        addNotification("system", "Access denied: This email is not on the authorized list.");
         return;
       }
 
@@ -135,12 +135,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
       
       if (error) {
-        addNotification("system", `Mission failed: ${error.message}`);
+        addNotification("system", `Signup failed: ${error.message}`);
       } else {
-         addNotification("session", "Identity established. Check email for verification pulse.");
+         addNotification("session", "Account created. Please verify your email.");
       }
     } catch (err) {
-       addNotification("system", "Nexus Hub Error: Gatekeeper synchronization failure.");
+       addNotification("system", "Authentication error: Connection failed.");
     }
   };
 
@@ -169,7 +169,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (error) {
        addNotification("system", `Recovery failed: ${error.message}`);
     } else {
-       addNotification("session", "Recovery mission pulse dispatched to your identity email.");
+       addNotification("session", "Password reset link sent to your email.");
     }
   };
 

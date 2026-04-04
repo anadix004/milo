@@ -7,6 +7,7 @@ import EventListing from "@/components/EventListing";
 import FinalCTA from "@/components/FinalCTA";
 import Preloader from "@/components/Preloader";
 import { HERO_FRAMES } from "@/constants/frames";
+import { useAuth } from "@/components/AuthContext";
 
 const CITY_IMAGES = [
   "/city selection/delhi.png",
@@ -17,12 +18,14 @@ const CITY_IMAGES = [
 import Header from "@/components/Header";
 import ProfileSidebar from "@/components/ProfileSidebar";
 import EventSubmission from "@/components/EventSubmission";
+import AuthModal from "@/components/AuthModal";
 
 export default function Home() {
+  const { isAuthenticated } = useAuth();
   const [selectedCity, setSelectedCity] = useState<string | null>(null);
   const [isReady, setIsReady] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [activeModal, setActiveModal] = useState<"profile" | "event" | null>(null);
+  const [activeModal, setActiveModal] = useState<"profile" | "event" | "auth" | null>(null);
 
   useEffect(() => {
     const allAssets = [...HERO_FRAMES.map(f => `/sequence/frames/${f}`), ...CITY_IMAGES];
@@ -56,13 +59,21 @@ export default function Home() {
 
   const closeModals = () => setActiveModal(null);
 
+  const handleAuthGate = (callback: () => void) => {
+    if (isAuthenticated) {
+      callback();
+    } else {
+      setActiveModal("auth");
+    }
+  };
+
   return (
     <main className="w-full bg-[#000000]">
       <Preloader progress={progress} isReady={isReady} />
       
       <Header 
         onProfileClick={() => setActiveModal("profile")}
-        onEventClick={() => setActiveModal("event")}
+        onEventClick={() => handleAuthGate(() => setActiveModal("event"))}
         isSidebarOpen={activeModal === "profile"} 
       />
       
@@ -74,7 +85,12 @@ export default function Home() {
       <EventSubmission 
         isOpen={activeModal === "event"}
         onClose={closeModals}
-        onAuthRedirect={() => setActiveModal("profile")}
+        onAuthRedirect={() => setActiveModal("auth")}
+      />
+
+      <AuthModal 
+        isOpen={activeModal === "auth"}
+        onClose={() => setActiveModal(null)}
       />
 
       {/* Show content only when partially ready to avoid flashes, 
@@ -85,7 +101,10 @@ export default function Home() {
           selectedCity={selectedCity} 
           onSelect={setSelectedCity} 
         />
-        <EventListing selectedCity={selectedCity} />
+        <EventListing 
+          selectedCity={selectedCity} 
+          onAuthRequired={() => setActiveModal("auth")}
+        />
         <FinalCTA selectedCity={selectedCity} />
       </div>
     </main>

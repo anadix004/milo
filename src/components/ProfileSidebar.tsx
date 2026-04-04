@@ -50,7 +50,7 @@ export default function ProfileSidebar({ isOpen, onClose }: ProfileSidebarProps)
           >
             {/* Header */}
             <div className="flex justify-between items-center mb-12">
-              <h2 className="text-white text-xl font-black uppercase tracking-[0.2em]">Identity Hub</h2>
+              <h2 className="text-white text-xl font-black uppercase tracking-[0.2em]">My Profile</h2>
               <button onClick={onClose} className="p-2 text-white/50 hover:text-white transition-colors">
                 <X size={24} />
               </button>
@@ -71,7 +71,7 @@ export default function ProfileSidebar({ isOpen, onClose }: ProfileSidebarProps)
                 </div>
               </div>
               <p className="mt-4 text-[9px] font-mono text-white/40 uppercase tracking-[0.3em] font-black">
-                {isAuthenticated ? (user?.full_name || user?.email) : "Unidentified biometric data source"}
+                {isAuthenticated ? (user?.full_name || user?.email) : "Log in to view ID"}
               </p>
             </div>
 
@@ -81,8 +81,7 @@ export default function ProfileSidebar({ isOpen, onClose }: ProfileSidebarProps)
                 /* Auth Flow */
                 <div className="space-y-6">
                    <div className="text-center p-6 border border-white/5 bg-white/[0.02] rounded-[2rem] space-y-2">
-                      <p className="font-mono text-[8px] text-white/20 uppercase tracking-widest font-black">Access required</p>
-                      <p className="text-[10px] text-white/60 uppercase tracking-widest font-black">Please initialize mission at Home Hub</p>
+                      <p className="text-[10px] text-white/60 uppercase tracking-widest font-black">Please log in to continue</p>
                    </div>
                 </div>
               ) : (
@@ -102,7 +101,7 @@ export default function ProfileSidebar({ isOpen, onClose }: ProfileSidebarProps)
                     >
                       <div className="flex items-center gap-4">
                         <QrCode size={20} className={showPass ? "text-black" : "text-purple-500"} />
-                        <span className="font-black text-[10px] tracking-widest uppercase">Milo Pass Hub</span>
+                        <span className="font-black text-[10px] tracking-widest uppercase">Milo Pass</span>
                       </div>
                       <ChevronRight size={16} className={clsx("transition-transform duration-500", showPass && "rotate-90")} />
                     </button>
@@ -120,7 +119,7 @@ export default function ProfileSidebar({ isOpen, onClose }: ProfileSidebarProps)
                             <div className="w-full aspect-square bg-[radial-gradient(circle_at_50%_50%,#000_20%,transparent_0%),radial-gradient(circle_at_50%_50%,#000_10%,transparent_0%)] bg-[length:12px_12px] opacity-90 rounded-2xl" />
                             <div className="flex flex-col items-center gap-2">
                                <ShieldCheck className="text-black" size={24} />
-                               <p className="text-[8px] font-mono text-black font-black uppercase tracking-[0.4em]">Identity Verified // Active Pulse</p>
+                               <p className="text-[8px] font-mono text-black font-black uppercase tracking-[0.4em]">Verified // Active</p>
                             </div>
                           </div>
                         </motion.div>
@@ -141,7 +140,7 @@ export default function ProfileSidebar({ isOpen, onClose }: ProfileSidebarProps)
                     >
                       <div className="flex flex-col items-start gap-1">
                          <span className={clsx("text-[10px] font-black tracking-widest uppercase", isGhostMode ? "text-black" : "text-white")}>Ghost Mode</span>
-                         <span className={clsx("text-[8px] uppercase tracking-widest", isGhostMode ? "text-black/40" : "text-white/20")}>Cloaked identification</span>
+                         <span className={clsx("text-[8px] uppercase tracking-widest", isGhostMode ? "text-black/40" : "text-white/20")}>Private Mode</span>
                       </div>
                       <div className={clsx(
                         "px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest transition-all",
@@ -153,7 +152,7 @@ export default function ProfileSidebar({ isOpen, onClose }: ProfileSidebarProps)
                   </div>
 
                   <div className="space-y-4">
-                    <h3 className="text-white/40 text-[9px] uppercase tracking-widest px-2 font-black font-mono">Recent Telemetry</h3>
+                    <h3 className="text-white/40 text-[9px] uppercase tracking-widest px-2 font-black font-mono">Recent Activity</h3>
                     {[
                       { name: "Milo Festival '26", city: "Delhi", day: "Tomorrow" },
                       { name: "Code & Craft", city: "Mumbai", day: "Sat" }

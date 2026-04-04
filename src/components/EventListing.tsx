@@ -6,8 +6,8 @@ import { Search, MapPin, Calendar, Clock, Filter, Star, ChevronRight, X, Music, 
 import clsx from "clsx";
 import { supabase } from "@/utils/supabase";
 import { useNotifications } from "./NotificationContext";
+import { useAuth } from "./AuthContext";
 import { parsePrice } from "@/utils/price";
-import IdentityScan from "@/components/IdentityScan";
 import Comments from "@/components/events/Comments";
 
 // --- SPRING CONFIG SYNC ---
@@ -120,7 +120,8 @@ function Dropdown({ label, value, options, onChange, icon }: DropdownProps) {
   );
 }
 
-export default function EventListing({ selectedCity }: { selectedCity: string | null }) {
+export default function EventListing({ selectedCity, onAuthRequired }: { selectedCity: string | null; onAuthRequired: () => void }) {
+  const { isAuthenticated } = useAuth();
   const { addNotification } = useNotifications();
   const [events, setEvents] = useState<EventData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -144,7 +145,7 @@ export default function EventListing({ selectedCity }: { selectedCity: string | 
       const mapped = (data || []).map(e => ({ ...e, name: e.title }));
       setEvents(mapped);
     } catch (err: any) {
-      addNotification("system", `Radar sync failed: ${err.message}`);
+      addNotification("system", `Failed to load events: ${err.message}`);
     } finally {
       setIsLoading(false);
     }
@@ -183,9 +184,13 @@ export default function EventListing({ selectedCity }: { selectedCity: string | 
 
   const isJoined = (id: string) => joinedEvents.has(id);
   const joinEvent = (id: string) => {
+    if (!isAuthenticated) {
+      onAuthRequired();
+      return;
+    }
     setJoinedEvents((prev) => new Set(prev).add(id));
     const event = events.find(e => e.id === id);
-    if (event) addNotification("radar", `Plan synchronised: ${event.name} identification added.`);
+    if (event) addNotification("radar", `Plan joined: ${event.name} added to your list.`);
   };
 
   const todayStr = new Date().toISOString().split("T")[0];
@@ -215,6 +220,14 @@ export default function EventListing({ selectedCity }: { selectedCity: string | 
   const featuredEvents = useMemo(() => filteredEvents.filter(e => e.featured), [filteredEvents]);
   const standardEvents = useMemo(() => filteredEvents.filter(e => !e.featured), [filteredEvents]);
 
+  const handleEventClick = (event: EventData) => {
+    if (!isAuthenticated) {
+      onAuthRequired();
+    } else {
+      setExpandedEvent(event);
+    }
+  };
+
   return (
     <section className="relative w-full bg-black py-20 z-30">
       <div className="absolute top-0 inset-x-0 h-48 bg-gradient-to-b from-black to-transparent pointer-events-none z-10" />
@@ -223,10 +236,10 @@ export default function EventListing({ selectedCity }: { selectedCity: string | 
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-12">
           <div>
             <h2 className="font-[family-name:var(--font-lexend)] text-white text-3xl md:text-5xl font-black uppercase tracking-tight mb-2">
-              {selectedCity ? selectedCity : "Global"} <span className="text-white/50 italic">Radar</span>
+              {selectedCity ? selectedCity : "Global"} <span className="text-white/50 italic">Events</span>
             </h2>
             <p className="font-[family-name:var(--font-roboto-mono)] text-white/80 text-[10px] md:text-xs uppercase tracking-[0.4em]">
-              Exploring live events near you
+              Explore what's happening near you
             </p>
           </div>
         </div>
@@ -238,7 +251,7 @@ export default function EventListing({ selectedCity }: { selectedCity: string | 
             </div>
             <input 
               type="text"
-              placeholder="SEARCH RADAR..."
+              placeholder="SEARCH EVENTS..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full bg-white/10 border border-white/60 rounded-full py-5 pl-16 pr-8 text-white placeholder:text-white/60 outline-none focus:border-white transition-all font-black tracking-widest text-sm mix-blend-difference"
@@ -246,9 +259,9 @@ export default function EventListing({ selectedCity }: { selectedCity: string | 
           </div>
 
           <div className="flex flex-wrap md:flex-nowrap items-center gap-4 w-full lg:w-auto">
-            <Dropdown label="Identify Category" value={selectedCat} options={ALL_CATEGORIES} onChange={setSelectedCat} icon={<Filter size={14} />} />
-            <Dropdown label="Temporal Sync" value={timeFilter} options={["All", "Today", "Tomorrow", "Week", "Month"]} onChange={setTimeFilter} icon={<Calendar size={14} />} />
-            <Dropdown label="Sort Radar" value={sortOrder === "featured" ? "Featured" : sortOrder === "price-low" ? "Price: Low" : "Price: High"} options={["Featured", "Price: Low", "Price: High"]} onChange={(val) => setSortOrder(val === "Featured" ? "featured" : val === "Price: Low" ? "price-low" : "price-high")} />
+            <Dropdown label="Categories" value={selectedCat} options={ALL_CATEGORIES} onChange={setSelectedCat} icon={<Filter size={14} />} />
+            <Dropdown label="Timeframe" value={timeFilter} options={["All", "Today", "Tomorrow", "Week", "Month"]} onChange={setTimeFilter} icon={<Calendar size={14} />} />
+            <Dropdown label="Sort By" value={sortOrder === "featured" ? "Featured" : sortOrder === "price-low" ? "Price: Low" : "Price: High"} options={["Featured", "Price: Low", "Price: High"]} onChange={(val) => setSortOrder(val === "Featured" ? "featured" : val === "Price: Low" ? "price-low" : "price-high")} />
           </div>
         </div>
       </div>
@@ -261,7 +274,7 @@ export default function EventListing({ selectedCity }: { selectedCity: string | 
         <>
           {featuredEvents.length > 0 && (
             <div className="mb-24 scale-in overflow-hidden">
-               <FeaturedCarousel items={featuredEvents} onExpand={setExpandedEvent} />
+               <FeaturedCarousel items={featuredEvents} onExpand={handleEventClick} />
             </div>
           )}
 
@@ -276,7 +289,7 @@ export default function EventListing({ selectedCity }: { selectedCity: string | 
                 className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12"
               >
                 {standardEvents.map((event) => (
-                  <EventGridCard key={event.id} event={event} onExpand={setExpandedEvent} />
+                  <EventGridCard key={event.id} event={event} onExpand={handleEventClick} />
                 ))}
               </motion.div>
             </AnimatePresence>
@@ -295,7 +308,6 @@ export default function EventListing({ selectedCity }: { selectedCity: string | 
         )}
       </AnimatePresence>
 
-      <IdentityScan isOpen={isScanOpen} onClose={() => setIsScanOpen(false)} />
     </section>
   );
 }

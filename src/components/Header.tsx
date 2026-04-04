@@ -8,7 +8,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import clsx from "clsx";
-import { Bell, User, PlusCircle, Menu } from "lucide-react";
+import { Bell, User, PlusCircle } from "lucide-react";
 import NotificationSidebar from "./NotificationSidebar";
 
 interface HeaderProps {
@@ -19,7 +19,7 @@ interface HeaderProps {
 }
 
 export default function Header({ onProfileClick, onChatClick, onEventClick, isSidebarOpen }: HeaderProps) {
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const { unreadCount } = useNotifications();
   const pathname = usePathname();
   const isChatPage = pathname === "/chat";
@@ -33,26 +33,26 @@ export default function Header({ onProfileClick, onChatClick, onEventClick, isSi
 
   return (
     <header className="fixed top-0 inset-x-0 w-full pt-4 pl-4 pr-2 md:pt-6 md:pl-8 md:pr-4 flex justify-between items-start z-[100] pointer-events-none mix-blend-screen">
-      {/* Top Left: Profile (Leftmost) & Logo (Beside Avatar) */}
+      {/* Top Left: Profile & Logo */}
       <div className="flex items-center gap-6 pointer-events-auto">
-        {/* Profile Avatar - Leftmost */}
         <button 
           onClick={onProfileClick}
           className={clsx(
-            "relative w-10 h-10 rounded-full flex items-center justify-center border border-white/10 backdrop-blur-md transition-all duration-500",
+            "relative px-4 py-2 rounded-full flex items-center justify-center gap-2 border border-white/10 backdrop-blur-md transition-all duration-500",
             isSidebarOpen ? "bg-white text-black border-white" : "bg-black/20 text-white hover:bg-white/10"
           )}
         >
-          <User size={18} />
+          <User size={16} />
+          {!isAuthenticated && (
+            <span className="text-[10px] font-black uppercase tracking-widest hidden md:block">Log In</span>
+          )}
         </button>
 
-        {/* Milo Logo - Home Anchor */}
         <Link 
           href="/" 
           onClick={scrollToTop}
           className="relative group flex items-center justify-center cursor-pointer"
         >
-          {/* Circular Orbit Highlight */}
           <motion.div
             animate={{ 
               scale: [1, 1.2, 1],
@@ -73,7 +73,7 @@ export default function Header({ onProfileClick, onChatClick, onEventClick, isSi
       </div>
 
       <div className="flex gap-2 md:gap-4 items-center flex-row pointer-events-auto">
-        {/* Pigeon Chat Hub Link */}
+        {/* Pigeon Chat */}
         <Link 
           href="/chat"
           className={clsx(
@@ -84,25 +84,23 @@ export default function Header({ onProfileClick, onChatClick, onEventClick, isSi
           )}
         >
           <PigeonLogo size={20} animate={!isChatPage} />
-          
-          {/* Pulsing Pigeon Notification (only hide on chat page) */}
           {!isChatPage && (
             <span className="absolute -top-1 -right-1 w-3 h-3 bg-cyan-500 rounded-full blur-[2px] opacity-60 animate-pulse" />
           )}
         </Link>
 
-        {/* Event Submission Hub */}
+        {/* Create Event */}
         <button 
           onClick={onEventClick}
-          className="relative w-10 h-10 rounded-full flex items-center justify-center bg-black/20 border border-white/10 backdrop-blur-md text-white/70 hover:text-white hover:bg-white/10 transition-all font-black"
+          className="relative w-10 h-10 rounded-full flex items-center justify-center bg-black/20 border border-white/10 backdrop-blur-md text-white/70 hover:text-white hover:bg-white/10 transition-all"
         >
           <PlusCircle size={18} />
         </button>
 
-        {/* NOTIFICATION NEXUS HUB */}
+        {/* Notifications */}
         <button 
           onClick={() => setIsNotificationsOpen(true)}
-          className="relative w-10 h-10 rounded-full flex items-center justify-center bg-black/20 border border-white/10 backdrop-blur-md text-white/70 hover:text-white hover:bg-white/10 transition-all"
+          className="relative w-10 h-10 rounded-full flex items-center justify-center bg-black/20 border border-white/10 backdrop-blur-md text-white/70 hover:text-white hover:bg-white/10 transition-all font-black"
         >
           <Bell size={18} />
           {unreadCount > 0 && (
@@ -118,7 +116,7 @@ export default function Header({ onProfileClick, onChatClick, onEventClick, isSi
         
         <Link 
           href="/admin"
-          className="ml-2 md:ml-4 text-[10px] font-mono text-white/5 uppercase tracking-[0.4em] hover:text-white/40 transition-colors pointer-events-auto"
+          className="ml-2 md:ml-4 text-[10px] font-mono text-white/10 uppercase tracking-[0.4em] hover:text-white/40 transition-colors pointer-events-auto"
         >
           TEAM
         </Link>
