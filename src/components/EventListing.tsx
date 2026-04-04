@@ -114,7 +114,7 @@ export default function EventListing({ selectedCity }: EventListingProps) {
 
           {/* Cinematic Search Hub */}
           <div className="flex-1 max-w-md relative group">
-            <div className="absolute inset-y-0 left-6 flex items-center pointer-events-none text-white/60 group-focus-within:text-white transition-colors">
+            <div className="absolute inset-y-0 left-6 flex items-center pointer-events-none text-white/90 group-focus-within:text-white transition-colors">
               <Search size={18} />
             </div>
             <input 
@@ -122,7 +122,7 @@ export default function EventListing({ selectedCity }: EventListingProps) {
               placeholder="SEARCH RADAR..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-white/10 border border-white/30 rounded-full py-4 pl-16 pr-8 text-white placeholder:text-white/30 outline-none focus:border-white/50 backdrop-blur-3xl transition-all font-black tracking-widest text-sm mix-blend-difference"
+              className="w-full bg-white/10 border border-white/60 rounded-full py-4 pl-16 pr-8 text-white placeholder:text-white/60 outline-none focus:border-white transition-all font-black tracking-widest text-sm mix-blend-difference"
             />
           </div>
         </div>
