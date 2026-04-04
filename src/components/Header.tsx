@@ -32,7 +32,7 @@ export default function Header({ onProfileClick, onChatClick, onEventClick, isSi
   };
 
   return (
-    <header className="fixed top-0 inset-x-0 w-full pt-4 px-4 md:pt-6 md:px-8 flex justify-between items-start z-[100] pointer-events-none mix-blend-screen">
+    <header className="fixed top-0 inset-x-0 w-full pt-4 pl-4 pr-2 md:pt-6 md:pl-8 md:pr-4 flex justify-between items-start z-[100] pointer-events-none mix-blend-screen">
       {/* Top Left: Profile (Leftmost) & Logo (Beside Avatar) */}
       <div className="flex items-center gap-6 pointer-events-auto">
         {/* Profile Avatar - Leftmost */}
