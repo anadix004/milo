@@ -128,20 +128,21 @@ export default function EventListing({ selectedCity }: EventListingProps) {
         </div>
 
         {/* Premium Filter, Sort & Time Hub */}
-        <div className="flex flex-col gap-6 bg-white/[0.02] border border-white/5 p-4 rounded-[2.5rem] backdrop-blur-3xl shadow-2xl">
-          <div className="flex flex-col xl:flex-row items-stretch xl:items-center gap-6">
+        <div className="bg-white/[0.02] border border-white/5 p-2 md:p-3 rounded-[3rem] backdrop-blur-3xl shadow-2xl overflow-hidden">
+          <div className="flex flex-col lg:flex-row items-stretch lg:items-center gap-4 md:gap-6">
+            
             {/* Categories */}
-            <div className="flex items-center gap-4 px-4 py-2 bg-white/5 rounded-full border border-white/5">
-              <Filter size={14} className="text-white/20 whitespace-nowrap" />
-              <div className="flex gap-2 overflow-x-auto no-scrollbar py-1">
+            <div className="flex items-center gap-4 px-6 py-3 bg-white/5 rounded-full border border-white/5 min-w-0 flex-1">
+              <Filter size={14} className="text-white/30 whitespace-nowrap shrink-0" />
+              <div className="flex gap-3 overflow-x-auto no-scrollbar items-center py-1">
                 {CATEGORIES.map((cat) => (
                   <button
                     key={cat}
                     onClick={() => setSelectedCat(cat)}
                     className={clsx(
-                      "px-4 py-1.5 rounded-full text-[10px] uppercase font-bold tracking-[0.2em] transition-all whitespace-nowrap font-[family-name:var(--font-jakarta)]",
+                      "px-5 py-2 rounded-full text-[10px] uppercase font-black tracking-[0.2em] transition-all whitespace-nowrap font-[family-name:var(--font-jakarta)]",
                       selectedCat === cat 
-                        ? "bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.4)]" 
+                        ? "bg-white text-black shadow-[0_0_25px_rgba(255,255,255,0.5)] scale-105" 
                         : "text-white/40 hover:text-white/80 hover:bg-white/5"
                     )}
                   >
@@ -151,39 +152,35 @@ export default function EventListing({ selectedCity }: EventListingProps) {
               </div>
             </div>
 
-            <div className="hidden xl:block w-px h-8 bg-white/10" />
-
             {/* Time Navigation */}
-            <div className="flex items-center gap-4 px-4 py-2 bg-white/5 rounded-full border border-white/5">
-              <Calendar size={14} className="text-white/20 whitespace-nowrap" />
-              <div className="flex gap-4">
+            <div className="flex items-center gap-6 px-8 py-4 bg-white/5 rounded-full border border-white/5 shrink-0">
+              <Calendar size={14} className="text-white/30 whitespace-nowrap" />
+              <div className="flex gap-6">
                 {["All", "Today", "Tomorrow", "Week"].map((t) => (
                   <button
                     key={t}
                     onClick={() => setTimeFilter(t as any)}
                     className={clsx(
-                      "text-[10px] uppercase font-bold tracking-widest transition-all font-[family-name:var(--font-jakarta)] whitespace-nowrap relative group",
+                      "text-[11px] uppercase font-black tracking-[0.2em] transition-all font-[family-name:var(--font-jakarta)] whitespace-nowrap relative group",
                       timeFilter === t ? "text-white" : "text-white/30 hover:text-white/60"
                     )}
                   >
                     {t}
                     {timeFilter === t && (
-                      <motion.div layoutId="timeUnderline" className="absolute -bottom-1 left-0 right-0 h-0.5 bg-white rounded-full" />
+                      <motion.div layoutId="timeUnderline" className="absolute -bottom-1 left-0 right-0 h-[2px] bg-white rounded-full shadow-[0_0_10px_white]" />
                     )}
                   </button>
                 ))}
               </div>
             </div>
 
-            <div className="hidden xl:block w-px h-8 bg-white/10" />
-
             {/* Sorting */}
-            <div className="flex items-center gap-4 px-4 py-2">
-              <div className="flex items-center gap-2 text-white/20">
+            <div className="flex items-center gap-6 px-8 py-4 bg-white/5 lg:bg-transparent rounded-full border border-white/5 lg:border-none shrink-0">
+              <div className="flex items-center gap-3 text-white/20">
                 <ArrowUpDown size={14} />
-                <span className="text-[9px] uppercase tracking-[0.3em] font-black font-[family-name:var(--font-jakarta)] whitespace-nowrap">Sort by:</span>
+                <span className="text-[10px] uppercase tracking-[0.3em] font-black font-[family-name:var(--font-jakarta)] whitespace-nowrap">Sort:</span>
               </div>
-              <div className="flex gap-4">
+              <div className="flex gap-6">
                 {[
                   { id: "featured", label: "Featured" },
                   { id: "price-low", label: "Price: Low" },
@@ -193,13 +190,13 @@ export default function EventListing({ selectedCity }: EventListingProps) {
                     key={sort.id}
                     onClick={() => setSortOrder(sort.id as any)}
                     className={clsx(
-                      "text-[10px] uppercase font-bold tracking-widest transition-all font-[family-name:var(--font-jakarta)] whitespace-nowrap relative group",
+                      "text-[10px] uppercase font-black tracking-[0.2em] transition-all font-[family-name:var(--font-jakarta)] whitespace-nowrap relative group",
                       sortOrder === sort.id ? "text-white" : "text-white/30 hover:text-white/60"
                     )}
                   >
                     {sort.label}
                     {sortOrder === sort.id && (
-                      <motion.div layoutId="sortUnderline" className="absolute -bottom-1 left-0 right-0 h-0.5 bg-white rounded-full" />
+                      <motion.div layoutId="sortUnderline" className="absolute -bottom-1 left-0 right-0 h-[2px] bg-white rounded-full shadow-[0_0_10px_white]" />
                     )}
                   </button>
                 ))}
