@@ -10,6 +10,7 @@ import {
   LogOut, 
   CheckCircle2, 
   XCircle, 
+  Video,
   Image as ImageIcon,
   Loader2,
   Users,
