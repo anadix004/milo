@@ -2,12 +2,15 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
+import { Shield, ChevronRight, Loader2 } from "lucide-react";
 import clsx from "clsx";
+
+const SPRING_CONFIG = { stiffness: 70, damping: 15 };
 
 interface IdentityScanProps {
   isOpen: boolean;
   onClose: () => void;
-  onVerified: () => void;
+  onVerified?: () => void;
 }
 
 export default function IdentityScan({ isOpen, onClose, onVerified }: IdentityScanProps) {
@@ -16,7 +19,9 @@ export default function IdentityScan({ isOpen, onClose, onVerified }: IdentitySc
 
   useEffect(() => {
     if (isOpen) {
-      // Start the fake scan sequence
+      setStatus("scanning");
+      setProgress(0);
+      
       const interval = setInterval(() => {
         setProgress(prev => {
           if (prev >= 100) {
@@ -27,122 +32,93 @@ export default function IdentityScan({ isOpen, onClose, onVerified }: IdentitySc
         });
       }, 30);
 
-      const statusTimer = setTimeout(() => setStatus("analyzing"), 2000);
-      const verifiedTimer = setTimeout(() => {
-        setStatus("verified");
-        setTimeout(() => {
-          onVerified();
-        }, 1500);
-      }, 4000);
-
-      return () => {
-        clearInterval(interval);
-        clearTimeout(statusTimer);
-        clearTimeout(verifiedTimer);
-      };
+      return () => clearInterval(interval);
     }
-  }, [isOpen, onVerified]);
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (progress === 100) {
+      setStatus("verified");
+      // Execute verified trigger pulse
+      onVerified?.();
+      // Auto-close portal after cinematic pause
+      const timer = setTimeout(onClose, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [progress, onVerified, onClose]);
 
   return (
     <AnimatePresence>
       {isOpen && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[2000] bg-black/95 backdrop-blur-md flex items-center justify-center overflow-hidden"
-        >
-          {/* Cyberpunk Grid Background */}
-          <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
-
-          {/* Simulated Camera Feed / Abstract Blur */}
-          <div className="absolute inset-x-0 top-0 h-[60vh] bg-gradient-to-b from-emerald-500/10 to-transparent opacity-20 blur-3xl pointer-events-none" />
-
-          {/* Laser Sweep Line */}
+        <div className="fixed inset-0 z-[250] flex items-center justify-center p-6">
           <motion.div 
-            animate={{ top: ["0%", "100%", "0%"] }}
-            transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-            className="absolute left-0 right-0 h-[2px] bg-emerald-500 shadow-[0_0_20px_#10b981] z-50 opacity-40"
+            initial={{ opacity: 0 }} 
+            animate={{ opacity: 1 }} 
+            exit={{ opacity: 0 }} 
+            onClick={onClose} 
+            className="absolute inset-0 bg-black/95 backdrop-blur-3xl" 
           />
-
-          <div className="relative flex flex-col items-center gap-8 px-6 text-center">
-            {/* Status Indicator */}
-            <div className="flex flex-col items-center gap-2">
-              <motion.div 
-                animate={{ scale: [1, 1.1, 1], opacity: [0.5, 1, 0.5] }}
-                transition={{ duration: 1, repeat: Infinity }}
-                className={clsx(
-                  "w-3 h-3 rounded-full mb-4 shadow-[0_0_15px_currentcolor]",
-                  status === "verified" ? "text-emerald-500" : "text-amber-500"
-                )}
-              />
-              <h2 className={clsx(
-                "font-[family-name:var(--font-lexend)] text-4xl md:text-6xl font-black uppercase tracking-tighter transition-colors duration-500 drop-shadow-[0_0_20px_rgba(255,255,255,0.3)]",
-                status === "verified" ? "text-emerald-400" : "text-white"
-              )}>
-                {status === "verified" ? "Verified" : "Profile Check"}
-              </h2>
-              <p className="font-[family-name:var(--font-roboto-mono)] text-[10px] md:text-xs tracking-[0.5em] text-white/60 uppercase mt-2 drop-shadow-md">
-                {status === "scanning" && "Checking credentials..."}
-                {status === "analyzing" && "Verifying account data..."}
-                {status === "verified" && "Security check complete."}
-              </p>
-            </div>
-
-            {/* Scanning HUD Ring */}
-            <div className="relative w-64 h-64 md:w-80 md:h-80 flex items-center justify-center">
-              <motion.div 
-                animate={{ rotate: 360 }}
-                transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-                className="absolute inset-0 border border-emerald-500/20 rounded-full border-dashed"
-              />
-              <motion.div 
-                animate={{ rotate: -360 }}
-                transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
-                className="absolute inset-4 border border-emerald-500/40 rounded-full border-dotted"
-              />
-              
-              {/* Central Progress Circle */}
-              <svg className="w-48 h-48 md:w-64 md:h-64 rotate-[-90deg]">
-                <circle
-                  cx="50%"
-                  cy="50%"
-                  r="48%"
-                  className="fill-none stroke-white/5 stroke-2"
-                />
-                <motion.circle
-                  cx="50%"
-                  cy="50%"
-                  r="48%"
-                  className="fill-none stroke-emerald-500 stroke-2"
-                  strokeDasharray="100"
-                  animate={{ strokeDashoffset: 100 - progress }}
-                />
-              </svg>
-
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="font-[family-name:var(--font-roboto-mono)] text-4xl font-light text-white opacity-40">
-                  {progress}%
-                </span>
-              </div>
-            </div>
-
-            {/* HUD Floating Data */}
-            <div className="flex flex-col gap-2 font-[family-name:var(--font-roboto-mono)] text-[8px] text-emerald-500/60 uppercase tracking-[0.3em] drop-shadow-[0_0_5px_rgba(16,185,129,0.3)]">
-              <p>Account Link: Active</p>
-              <p>Network Status: 4/4</p>
-              <p>Milo Security: V4.2</p>
-            </div>
-          </div>
-
-          {/* Close Trigger (Bottom) */}
-          <button 
-            onClick={onClose}
-            className="absolute bottom-12 px-8 py-3 border border-white/10 rounded-full text-white/40 text-[10px] uppercase tracking-[0.4em] transition-all hover:bg-white hover:text-black hover:border-white"
+          
+          <motion.div 
+            initial={{ scale: 0.8, opacity: 0, y: 40 }} 
+            animate={{ scale: 1, opacity: 1, y: 0 }} 
+            exit={{ scale: 0.8, opacity: 0, y: 40 }} 
+            transition={SPRING_CONFIG} 
+            className="relative w-full max-w-lg bg-neutral-950 border border-white/10 rounded-[3rem] p-12 overflow-hidden shadow-2xl"
           >
-            Abort Check
-          </button>
-        </motion.div>
+            {/* Cinematic Background Pulse */}
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.03),transparent_70%)] pointer-events-none" />
+
+            <div className="relative z-10 space-y-12 text-center">
+               <div className="space-y-4">
+                  <div className="relative w-24 h-24 mx-auto">
+                     <motion.div 
+                        animate={{ 
+                          rotate: 360,
+                          borderColor: ["rgba(255,255,255,0.1)", "rgba(168,85,247,0.4)", "rgba(255,255,255,0.1)"]
+                        }}
+                        transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+                        className="absolute inset-0 border-2 border-dashed rounded-full" 
+                     />
+                     <div className="absolute inset-0 flex items-center justify-center">
+                        {status === "verified" ? (
+                          <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={SPRING_CONFIG}>
+                             <Shield className="text-emerald-400" size={40} />
+                          </motion.div>
+                        ) : (
+                          <Loader2 className="text-purple-400 animate-spin" size={40} />
+                        )}
+                     </div>
+                  </div>
+                  <h2 className="font-lexend text-3xl font-black uppercase tracking-tight text-white">Identity Scan</h2>
+                  <p className="font-mono text-[10px] text-purple-500 uppercase tracking-[0.4em] font-black">
+                    {status === "scanning" ? "Scanning Bio-Pulse" : status === "analyzing" ? "Analyzing Mission Data" : "Identity Synchronized"}
+                  </p>
+               </div>
+
+               <div className="space-y-4">
+                  <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
+                     <motion.div 
+                        initial={{ width: 0 }}
+                        animate={{ width: `${progress}%` }}
+                        className="h-full bg-white shadow-[0_0_20px_rgba(255,255,255,0.3)]"
+                     />
+                  </div>
+                  <div className="flex justify-between font-mono text-[9px] text-white/20 uppercase tracking-widest font-black">
+                     <span>Pulse Stability</span>
+                     <span>{progress}%</span>
+                  </div>
+               </div>
+
+               <div className="pt-8 border-t border-white/5">
+                  <div className="flex items-center justify-center gap-3 text-white/40">
+                     <Shield className="w-4 h-4" />
+                     <span className="font-mono text-[8px] uppercase tracking-widest">Nexus Security Guardrail Active</span>
+                  </div>
+               </div>
+            </div>
+          </motion.div>
+        </div>
       )}
     </AnimatePresence>
   );
