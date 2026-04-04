@@ -110,16 +110,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signUp = async (email: string, pass: string, name: string) => {
     try {
-      const { data: profile, error: profileError } = await supabase
-        .from("profiles")
-        .select("role")
-        .eq("email", email)
-        .single();
-      
-      if ((profileError || !profile) && email !== "milo.anadi@gmail.com") {
-        addNotification("system", "Access denied: This email is not on the authorized list.");
-        return;
-      }
 
       const { error } = await supabase.auth.signUp({ 
         email, 
