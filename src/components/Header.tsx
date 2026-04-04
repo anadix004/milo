@@ -32,7 +32,7 @@ export default function Header({ onProfileClick, onChatClick, onEventClick, isSi
   };
 
   return (
-    <header className="fixed top-0 inset-x-0 w-full p-6 md:p-8 flex justify-between items-start z-[100] pointer-events-none mix-blend-screen">
+    <header className="fixed top-0 inset-x-0 w-full pt-4 px-4 md:pt-6 md:px-8 flex justify-between items-start z-[100] pointer-events-none mix-blend-screen">
       {/* Top Left: Profile (Leftmost) & Logo (Beside Avatar) */}
       <div className="flex items-center gap-6 pointer-events-auto">
         {/* Profile Avatar - Leftmost */}
@@ -72,7 +72,7 @@ export default function Header({ onProfileClick, onChatClick, onEventClick, isSi
         </Link>
       </div>
 
-      <div className="flex gap-4 items-center flex-row pointer-events-auto">
+      <div className="flex gap-2 md:gap-4 items-center flex-row pointer-events-auto">
         {/* Pigeon Chat Hub Link */}
         <Link 
           href="/chat"
@@ -118,7 +118,7 @@ export default function Header({ onProfileClick, onChatClick, onEventClick, isSi
         
         <Link 
           href="/admin"
-          className="ml-4 text-[10px] font-mono text-white/5 uppercase tracking-[0.4em] hover:text-white/40 transition-colors pointer-events-auto mt-2"
+          className="ml-2 md:ml-4 text-[10px] font-mono text-white/5 uppercase tracking-[0.4em] hover:text-white/40 transition-colors pointer-events-auto"
         >
           TEAM
         </Link>
