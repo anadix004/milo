@@ -20,7 +20,8 @@ import {
   Trash2,
   MapPin,
   Calendar,
-  UserPlus
+  UserPlus,
+  Video
 } from "lucide-react";
 import clsx from "clsx";
 import { useAuth } from "@/components/AuthContext";
