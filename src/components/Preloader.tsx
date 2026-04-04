@@ -38,15 +38,37 @@ export default function Preloader({ progress, isReady }: PreloaderProps) {
              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/60" />
           </div>
 
-          <div className="relative z-10 flex flex-col items-center">
+          <div className="relative z-10 flex items-end">
             {/* Massive Bold Identity Portal */}
             <motion.div 
                initial={{ opacity: 0, scale: 0.8, filter: "blur(20px)" }}
                animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
                transition={{ duration: 1.5, type: "spring", stiffness: 70, damping: 15 }}
-               className="font-lexend text-[clamp(100px,25vw,400px)] font-black text-white uppercase tracking-tighter leading-none select-none lowercase"
+               className="font-lexend text-[clamp(100px,25vw,400px)] font-black text-white lowercase tracking-tighter leading-none select-none flex items-baseline"
             >
               milo
+              {/* Iridescent Pearl Dot */}
+              <div className="relative ml-2 mb-[0.1em] w-[0.15em] h-[0.15em] rounded-full overflow-hidden shadow-[inset_-5px_-5px_15px_rgba(0,0,0,0.4),0_0_20px_rgba(255,255,255,0.2)]">
+                {/* Iridescent Gradient Base */}
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.9)_0%,rgba(255,255,255,0.2)_20%,rgba(138,255,128,0.3)_40%,rgba(128,166,255,0.3)_60%,rgba(255,128,217,0.3)_80%,rgba(0,0,0,0.1)_100%)]" />
+                
+                {/* Highlight Shine */}
+                <div className="absolute top-[10%] left-[10%] w-[40%] h-[40%] bg-white rounded-full blur-[2px] opacity-60" />
+                
+                {/* Spectral Shimmer Animation */}
+                <motion.div 
+                   animate={{ 
+                     rotate: 360,
+                     scale: [1, 1.05, 1],
+                   }}
+                   transition={{ 
+                     duration: 8, 
+                     repeat: Infinity, 
+                     ease: "linear" 
+                   }}
+                   className="absolute inset-0 bg-[linear-gradient(45deg,transparent_20%,rgba(255,255,255,0.1)_50%,transparent_80%)]"
+                />
+              </div>
             </motion.div>
           </div>
 
