@@ -15,7 +15,97 @@ interface EventListingProps {
   selectedCity: string | null;
 }
 
-const CATEGORIES = ["All", "Music", "Tech", "Arts", "Community", "Fashion", "Culture"];
+// Dynamic Category Extraction
+const ALL_CATEGORIES = ["All", ...Array.from(new Set(EVENTS.flatMap(e => e.category.split(" / "))))].sort();
+
+// Premium Dropdown Component
+interface DropdownProps {
+  label: string;
+  value: string;
+  options: string[];
+  onChange: (val: any) => void;
+  icon?: React.ReactNode;
+}
+
+function Dropdown({ label, value, options, onChange, icon }: DropdownProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  return (
+    <div className="relative" ref={containerRef}>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className={clsx(
+          "flex items-center gap-3 px-6 py-4 bg-white/10 border border-white/20 rounded-full transition-all hover:bg-white/15 min-w-[160px] md:min-w-[200px] justify-between group",
+          isOpen && "border-white/40 bg-white/15"
+        )}
+      >
+        <div className="flex items-center gap-3">
+          {icon && <span className="text-white/40 group-hover:text-white/80 transition-colors">{icon}</span>}
+          <div className="flex flex-col items-start leading-none">
+            <span className="text-[9px] uppercase tracking-[0.2em] text-white/40 font-black mb-1">{label}</span>
+            <span className="text-xs font-black text-white uppercase tracking-widest">{value}</span>
+          </div>
+        </div>
+        <motion.div
+           animate={{ rotate: isOpen ? 180 : 0 }}
+           transition={{ type: "spring", stiffness: 70, damping: 15 }}
+           className="text-white/40"
+        >
+          <ArrowUpDown size={14} />
+        </motion.div>
+      </button>
+
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: 10, scale: 0.95, filter: "blur(10px)" }}
+            animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
+            exit={{ opacity: 0, y: 10, scale: 0.95, filter: "blur(10px)" }}
+            transition={{ type: "spring", stiffness: 70, damping: 15 }}
+            className="absolute top-full left-0 right-0 mt-2 z-50 bg-black/90 border border-white/20 rounded-[2rem] overflow-hidden backdrop-blur-3xl shadow-2xl max-h-[400px] overflow-y-auto no-scrollbar"
+          >
+            <div className="p-2 space-y-1">
+              {options.map((opt) => (
+                <button
+                  key={opt}
+                  onClick={() => {
+                    onChange(opt);
+                    setIsOpen(false);
+                  }}
+                  className={clsx(
+                    "w-full px-6 py-4 text-left text-xs font-black uppercase tracking-widest transition-all rounded-2xl flex items-center justify-between group",
+                    value === opt 
+                      ? "bg-white text-black" 
+                      : "text-white/40 hover:text-white hover:bg-white/10"
+                  )}
+                >
+                  {opt}
+                  {value === opt && (
+                    <motion.div 
+                      layoutId="activeDot"
+                      className="w-1.5 h-1.5 rounded-full bg-black"
+                    />
+                  )}
+                </button>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
 
 export default function EventListing({ selectedCity }: EventListingProps) {
   const { addNotification } = useNotifications();
@@ -24,7 +114,7 @@ export default function EventListing({ selectedCity }: EventListingProps) {
   const [selectedCat, setSelectedCat] = useState("All");
   const [sortOrder, setSortOrder] = useState<"featured" | "price-low" | "price-high">("featured");
   const [searchQuery, setSearchQuery] = useState("");
-  const [timeFilter, setTimeFilter] = useState<"All" | "Today" | "Tomorrow" | "Week">("All");
+  const [timeFilter, setTimeFilter] = useState<"All" | "Today" | "Tomorrow" | "Week" | "Month">("All");
   const [joinedEvents, setJoinedEvents] = useState<Set<string>>(new Set());
 
   const isJoined = (id: string) => joinedEvents.has(id);
@@ -44,6 +134,9 @@ export default function EventListing({ selectedCity }: EventListingProps) {
   const nextWeek = new Date();
   nextWeek.setDate(nextWeek.getDate() + 7);
   const nextWeekStr = nextWeek.toISOString().split("T")[0];
+  const nextMonth = new Date();
+  nextMonth.setDate(nextMonth.getDate() + 30);
+  const nextMonthStr = nextMonth.toISOString().split("T")[0];
   
   // Filter events by selected city + category + search + date
   const filteredEvents = useMemo(() => {
@@ -71,6 +164,8 @@ export default function EventListing({ selectedCity }: EventListingProps) {
       result = result.filter(e => e.date === tomorrowStr);
     } else if (timeFilter === "Week") {
       result = result.filter(e => e.date >= todayStr && e.date <= nextWeekStr);
+    } else if (timeFilter === "Month") {
+      result = result.filter(e => e.date >= todayStr && e.date <= nextMonthStr);
     }
 
     // Apply Sorting
@@ -82,7 +177,7 @@ export default function EventListing({ selectedCity }: EventListingProps) {
       if (!a.featured && b.featured) return 1;
       return 0;
     });
-  }, [selectedCity, selectedCat, sortOrder, searchQuery, timeFilter, todayStr, tomorrowStr, nextWeekStr]);
+  }, [selectedCity, selectedCat, sortOrder, searchQuery, timeFilter, todayStr, tomorrowStr, nextWeekStr, nextMonthStr]);
 
   // Separate Featured vs Standard
   const featuredEvents = useMemo(() => filteredEvents.filter(e => e.featured), [filteredEvents]);
@@ -102,6 +197,7 @@ export default function EventListing({ selectedCity }: EventListingProps) {
       <div className="absolute top-0 inset-x-0 h-48 bg-gradient-to-b from-black to-transparent pointer-events-none z-10" />
       
       <div className="max-w-[1440px] mx-auto px-6 mb-12">
+        {/* Cinematic Header System */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-12">
           <div>
             <h2 className="font-[family-name:var(--font-lexend)] text-white text-3xl md:text-5xl font-black uppercase tracking-tight mb-2">
@@ -111,9 +207,12 @@ export default function EventListing({ selectedCity }: EventListingProps) {
               Exploring live events near you
             </p>
           </div>
+        </div>
 
+        {/* Premium Dropdown Ecosystem - Unified Row */}
+        <div className="flex flex-col lg:flex-row items-center gap-4 w-full">
           {/* Cinematic Search Hub */}
-          <div className="flex-1 max-w-md relative group">
+          <div className="flex-1 w-full relative group">
             <div className="absolute inset-y-0 left-6 flex items-center pointer-events-none text-white/90 group-focus-within:text-white transition-colors">
               <Search size={18} />
             </div>
@@ -122,90 +221,36 @@ export default function EventListing({ selectedCity }: EventListingProps) {
               placeholder="SEARCH RADAR..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-white/10 border border-white/60 rounded-full py-4 pl-16 pr-8 text-white placeholder:text-white/60 outline-none focus:border-white transition-all font-black tracking-widest text-sm mix-blend-difference"
+              className="w-full bg-white/10 border border-white/60 rounded-full py-5 pl-16 pr-8 text-white placeholder:text-white/60 outline-none focus:border-white transition-all font-black tracking-widest text-sm mix-blend-difference"
             />
           </div>
-        </div>
 
-        {/* Premium Filter, Sort & Time Hub */}
-        <div className="flex flex-col gap-6 bg-white/[0.08] border border-white/20 p-6 rounded-[2.5rem] backdrop-blur-3xl shadow-2xl">
-          <div className="flex flex-col xl:flex-row items-stretch xl:items-center gap-8">
-            
-            {/* Categories */}
-            <div className="flex items-center gap-4 px-6 py-3 bg-white/10 rounded-full border border-white/20 flex-1">
-              <Filter size={14} className="text-white/60 whitespace-nowrap" />
-              <div className="flex gap-4 overflow-x-auto no-scrollbar py-1">
-                {CATEGORIES.map((cat) => (
-                  <button
-                    key={cat}
-                    onClick={() => setSelectedCat(cat)}
-                    className={clsx(
-                      "px-5 py-2 rounded-full text-[10px] uppercase font-black tracking-[0.2em] transition-all whitespace-nowrap font-[family-name:var(--font-jakarta)]",
-                      selectedCat === cat 
-                        ? "bg-white text-black shadow-[0_0_20px_white]" 
-                        : "text-white/60 hover:text-white hover:bg-white/10"
-                    )}
-                  >
-                    {cat}
-                  </button>
-                ))}
-              </div>
-            </div>
+          <div className="flex flex-wrap md:flex-nowrap items-center gap-4 w-full lg:w-auto">
+            {/* Category Dropdown */}
+            <Dropdown 
+              label="Identify Category"
+              value={selectedCat}
+              options={ALL_CATEGORIES}
+              onChange={setSelectedCat}
+              icon={<Filter size={14} />}
+            />
 
-            <div className="hidden xl:block w-px h-8 bg-white/20" />
+            {/* Time Dropdown */}
+            <Dropdown 
+              label="Temporal Sync"
+              value={timeFilter}
+              options={["All", "Today", "Tomorrow", "Week", "Month"]}
+              onChange={setTimeFilter}
+              icon={<Calendar size={14} />}
+            />
 
-            {/* Time Navigation */}
-            <div className="flex items-center gap-6 px-6 py-3 bg-white/10 rounded-full border border-white/20">
-              <Calendar size={14} className="text-white/60 whitespace-nowrap" />
-              <div className="flex gap-6">
-                {["All", "Today", "Tomorrow", "Week"].map((t) => (
-                  <button
-                    key={t}
-                    onClick={() => setTimeFilter(t as any)}
-                    className={clsx(
-                      "text-[10px] uppercase font-black tracking-[0.2em] transition-all font-[family-name:var(--font-jakarta)] whitespace-nowrap relative group",
-                      timeFilter === t ? "text-white" : "text-white/60 hover:text-white"
-                    )}
-                  >
-                    {t}
-                    {timeFilter === t && (
-                      <motion.div layoutId="timeUnderline" className="absolute -bottom-1 left-0 right-0 h-1 bg-white rounded-full shadow-[0_0_10px_white]" />
-                    )}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="hidden xl:block w-px h-8 bg-white/20" />
-
-            {/* Sorting */}
-            <div className="flex items-center gap-6 px-6 py-3">
-              <div className="flex items-center gap-3 text-white/60">
-                <ArrowUpDown size={14} />
-                <span className="text-[10px] uppercase tracking-[0.3em] font-black font-[family-name:var(--font-jakarta)] whitespace-nowrap">Sort by:</span>
-              </div>
-              <div className="flex gap-6">
-                {[
-                  { id: "featured", label: "Featured" },
-                  { id: "price-low", label: "Price: Low" },
-                  { id: "price-high", label: "Price: High" }
-                ].map((sort) => (
-                  <button
-                    key={sort.id}
-                    onClick={() => setSortOrder(sort.id as any)}
-                    className={clsx(
-                      "text-[10px] uppercase font-black tracking-[0.2em] transition-all font-[family-name:var(--font-jakarta)] whitespace-nowrap relative group",
-                      sortOrder === sort.id ? "text-white" : "text-white/60 hover:text-white"
-                    )}
-                  >
-                    {sort.label}
-                    {sortOrder === sort.id && (
-                      <motion.div layoutId="sortUnderline" className="absolute -bottom-1 left-0 right-0 h-1 bg-white rounded-full shadow-[0_0_10px_white]" />
-                    )}
-                  </button>
-                ))}
-              </div>
-            </div>
+            {/* Sort Dropdown */}
+            <Dropdown 
+              label="Sort Radar"
+              value={sortOrder === "featured" ? "Featured" : sortOrder === "price-low" ? "Price: Low" : "Price: High"}
+              options={["Featured", "Price: Low", "Price: High"]}
+              onChange={(val) => setSortOrder(val === "Featured" ? "featured" : val === "Price: Low" ? "price-low" : "price-high")}
+            />
           </div>
         </div>
       </div>
