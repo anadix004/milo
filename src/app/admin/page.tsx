@@ -231,7 +231,7 @@ function OverviewHub({ queueCount }: any) {
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
       <StatCard label="Pending Events" value={queueCount} accent="purple" />
       <StatCard label="Platform Load" value="Normal" accent="emerald" />
-      <StatCard label="Active Synapse" value="Live" accent="white" />
+      <StatCard label="Active System" value="Live" accent="white" />
       <StatCard label="System Integrity" value="100%" accent="white" />
     </div>
   );
