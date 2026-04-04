@@ -10,7 +10,6 @@ import {
   LogOut, 
   CheckCircle2, 
   XCircle, 
-  Video,
   Image as ImageIcon,
   Loader2,
   Users,
@@ -20,7 +19,8 @@ import {
   EyeOff,
   Trash2,
   MapPin,
-  Calendar
+  Calendar,
+  UserPlus
 } from "lucide-react";
 import clsx from "clsx";
 import { useAuth } from "@/components/AuthContext";
@@ -30,13 +30,13 @@ import { useNotifications } from "@/components/NotificationContext";
 const SPRING_CONFIG = { stiffness: 70, damping: 15 };
 
 // --- SECURE AUTH KEYS ---
-const SECURITY_KEY = "nexus_secure_2026"; // OWNER PASSWORD
+const SECURITY_KEY = "nexus_secure_2026"; 
 const ADMIN_ID = "admin_milo"; 
 
 type AdminView = "dashboard" | "queue" | "manage" | "team" | "upload" | "settings";
 
 export default function AdminPortal() {
-  const { user, isAdmin, isOwner, login, logout: authLogout, isLoading: authLoading, recoverPassword } = useAuth();
+  const { user, session, isAdmin, isOwner, login, logout: authLogout, isLoading: authLoading, recoverPassword } = useAuth();
   const { addNotification } = useNotifications();
   
   const [isAuthorized, setIsAuthorized] = useState(false);
@@ -69,12 +69,10 @@ export default function AdminPortal() {
       return;
     }
 
-    // Standard synchronization Flow
     const loginEmail = idInput === ADMIN_ID ? "milo.anadi@gmail.com" : idInput;
     
     try {
       await login(loginEmail, passInput);
-      // AuthContext will update isAdmin, triggering the useEffect above
     } catch (err) {
       setLoginError(true);
       setTimeout(() => setLoginError(false), 2000);
@@ -91,7 +89,6 @@ export default function AdminPortal() {
     }
   };
 
-  // --- Pending Queue Fetch ---
   const fetchQueue = async () => {
     setIsQueueLoading(true);
     const { data, error } = await supabase
@@ -201,7 +198,7 @@ export default function AdminPortal() {
           {currentView === "dashboard" && <OverviewHub queueCount={queue.length} />}
           {currentView === "queue" && <PendingQueue queue={queue} fetchQueue={fetchQueue} />}
           {currentView === "manage" && <EventsManager />}
-          {currentView === "team" && <TeamHub />}
+          {currentView === "team" && <TeamHub session={session} />}
           {currentView === "upload" && <BroadcastHub />}
           {currentView === "settings" && (
              isSettingsLocked ? (
@@ -216,7 +213,7 @@ export default function AdminPortal() {
   );
 }
 
-// --- Dynamic View Components ---
+// --- Sub-Components ---
 
 function NavItem({ icon, label, active, onClick }: any) {
   return (
@@ -340,13 +337,15 @@ function EventsManager() {
   );
 }
 
-function TeamHub() {
+function TeamHub({ session }: { session: any }) {
   const [team, setTeam] = useState<any[]>([]);
   const [emailInput, setEmailInput] = useState("");
+  const [roleInput, setRoleInput] = useState<"admin" | "team">("team");
+  const [isSyncing, setIsSyncing] = useState(false);
   const { addNotification } = useNotifications();
 
   const fetchTeam = async () => {
-    const { data } = await supabase.from("profiles").select("*").eq("role", "team");
+    const { data } = await supabase.from("profiles").select("*").in("role", ["admin", "team"]);
     setTeam(data || []);
   };
 
@@ -354,38 +353,82 @@ function TeamHub() {
 
   const addMember = async (e: React.FormEvent) => {
     e.preventDefault();
-    const { error } = await supabase.from("profiles").update({ role: "team" }).eq("email", emailInput);
-    if (!error) {
-       addNotification("system", "Team member added successfully.");
-       setEmailInput("");
-       fetchTeam();
-    } else {
-       addNotification("system", "Account not found in profile sync.");
+    if (!session?.access_token) {
+      addNotification("system", "Session synchronization expired.");
+      return;
+    }
+
+    setIsSyncing(true);
+    try {
+      const response = await fetch("/api/admin/add-team", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${session.access_token}`
+        },
+        body: JSON.stringify({ email: emailInput, role: roleInput })
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        addNotification("session", `Whitelister success: ${emailInput} authorized as ${roleInput}.`);
+        setEmailInput("");
+        fetchTeam();
+      } else {
+        addNotification("system", `Authorization failure: ${result.error}`);
+      }
+    } catch (err) {
+      addNotification("system", "API synchronization failed.");
+    } finally {
+      setIsSyncing(false);
     }
   };
 
   return (
     <div className="space-y-12">
-       <div className="max-w-2xl bg-white/[0.02] border border-white/5 p-10 rounded-[2.5rem] space-y-8">
-          <h4 className="font-lexend text-xl font-black uppercase tracking-tight">Add Team Member</h4>
-          <form onSubmit={addMember} className="flex gap-4">
-             <input type="email" placeholder="TEAM EMAIL" value={emailInput} onChange={(e) => setEmailInput(e.target.value)} className="flex-1 bg-white/[0.05] border border-white/10 rounded-2xl p-4 text-white font-mono text-[11px] outline-none" required />
-             <button className="bg-white text-black px-8 py-4 rounded-2xl font-black uppercase text-[10px] hover:scale-105 active:scale-95 transition-all">Authorize</button>
+       <div className="max-w-4xl bg-white/[0.02] border border-white/5 p-12 rounded-[3.5rem] space-y-12 backdrop-blur-3xl">
+          <div className="space-y-4">
+            <h4 className="font-lexend text-2xl font-black uppercase tracking-tight flex items-center gap-4">
+              <UserPlus className="text-purple-400" /> Whitelist Account Creation
+            </h4>
+            <p className="text-[10px] font-mono text-white/20 uppercase tracking-widest">Instant Authorization Pulse</p>
+          </div>
+
+          <form onSubmit={addMember} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+             <div className="space-y-3">
+               <label className="text-[9px] font-mono text-white/20 uppercase tracking-[0.4em] ml-2 font-black">Authorized Email</label>
+               <input type="email" placeholder="TEAM EMAIL" value={emailInput} onChange={(e) => setEmailInput(e.target.value)} className="w-full bg-white/[0.05] border border-white/10 rounded-2xl p-5 text-white font-mono text-[11px] outline-none focus:border-white/20 transition-all font-black tracking-widest" required />
+             </div>
+             
+             <div className="space-y-3">
+               <label className="text-[9px] font-mono text-white/20 uppercase tracking-[0.4em] ml-2 font-black">Designated Role</label>
+               <select value={roleInput} onChange={(e: any) => setRoleInput(e.target.value)} className="w-full bg-white/[0.05] border border-white/10 rounded-2xl p-5 text-white font-lexend text-[10px] font-black uppercase tracking-widest outline-none transition-all focus:border-white/20 appearance-none cursor-pointer">
+                  <option value="team">Team Member</option>
+                  <option value="admin">Administrator</option>
+               </select>
+             </div>
+
+             <div className="flex items-end">
+               <button disabled={isSyncing} className="w-full bg-white text-black py-5 rounded-2xl font-black uppercase text-[10px] hover:scale-105 active:scale-95 transition-all shadow-lg disabled:opacity-50">
+                 {isSyncing ? "Whitelisting..." : "Authorize Entry"}
+               </button>
+             </div>
           </form>
        </div>
 
-       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {team.map(member => (
-             <div key={member.id} className="p-6 bg-white/[0.02] border border-white/5 rounded-3xl flex justify-between items-center hover:border-white/20 transition-all">
+             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={SPRING_CONFIG} key={member.id} className="p-6 bg-white/[0.02] border border-white/5 rounded-3xl flex justify-between items-center hover:border-white/20 transition-all group">
                 <div className="flex items-center gap-4">
-                   <div className="h-10 w-10 rounded-full bg-white/5 flex items-center justify-center font-black uppercase text-xs">{member.full_name?.[0]}</div>
+                   <div className="h-10 w-10 rounded-full bg-white/5 flex items-center justify-center font-black uppercase text-xs group-hover:bg-purple-500/20 group-hover:text-purple-400 transition-all">{member.full_name?.[0]}</div>
                    <div>
                       <p className="text-[10px] font-black uppercase tracking-tight">{member.full_name}</p>
                       <p className="text-[8px] font-mono text-white/20 truncate max-w-[200px]">{member.email}</p>
+                      <span className="text-[7px] font-mono text-purple-400 uppercase tracking-widest mt-1 block font-black">{member.role}</span>
                    </div>
                 </div>
-                <button onClick={async () => { await supabase.from("profiles").update({ role: "user" }).eq("id", member.id); fetchTeam(); }} className="p-3 text-red-500/20 hover:text-red-500 transition-colors"><XCircle size={18} /></button>
-             </div>
+                <button onClick={async () => { if(confirm(`Revoke authorized access for ${member.email}?`)) { await supabase.from("profiles").update({ role: "user" }).eq("id", member.id); fetchTeam(); } }} className="p-3 text-red-500/20 hover:text-red-500 transition-colors"><XCircle size={18} /></button>
+             </motion.div>
           ))}
        </div>
     </div>
@@ -431,7 +474,7 @@ function BroadcastHub() {
     if (!file) return;
 
     if (type === "photo") {
-       if (file.size > 2048 * 1024) { // Increased to 2MB for better quality
+       if (file.size > 2048 * 1024) { 
           addNotification("system", "Photo exceeds 2MB limit.");
           return;
        }
@@ -439,7 +482,7 @@ function BroadcastHub() {
     }
 
     if (type === "video") {
-       if (file.size > 5 * 1024 * 1024) { // Increased to 5MB
+       if (file.size > 5 * 1024 * 1024) {
           addNotification("system", "Video exceeds 5MB limit.");
           return;
        }
