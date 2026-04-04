@@ -1,9 +1,11 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { X, PlusCircle, Globe, ShieldCheck, Lock } from "lucide-react";
-import { useState } from "react";
+import { X, PlusCircle, Globe, ShieldCheck, Lock, Upload, Video, Image as ImageIcon, CheckCircle2, Loader2 } from "lucide-react";
+import { useState, useRef } from "react";
 import { useAuth } from "./AuthContext";
+import { supabase } from "@/utils/supabase";
+import { useNotifications } from "./NotificationContext";
 import clsx from "clsx";
 
 interface EventSubmissionProps {
@@ -12,140 +14,189 @@ interface EventSubmissionProps {
   onAuthRedirect: () => void;
 }
 
+const SPRING_CONFIG = { stiffness: 70, damping: 15 };
+
 export default function EventSubmission({ isOpen, onClose, onAuthRedirect }: EventSubmissionProps) {
   const { user, isAuthenticated } = useAuth();
-  const [formData, setFormData] = useState({ title: "", city: "Delhi NCR", date: "" });
+  const { addNotification } = useNotifications();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formData, setFormData] = useState({ 
+    title: "", 
+    cityId: "Delhi NCR", 
+    date: "", 
+    description: "", 
+    price: "Free",
+    category: "Culture" 
+  });
+  
+  const [media, setMedia] = useState<{ photo: File | null; video: File | null }>({ photo: null, video: null });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // --- GATEKEEPER: MEDIA VALIDATION ---
+  const validateMedia = async (e: React.ChangeEvent<HTMLInputElement>, type: "photo" | "video") => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (type === "photo") {
+       if (file.size > 1024 * 1024) { // 1MB limit
+          addNotification("system", "Visual Frame Overflow: Photo exceeds 1MB limit.");
+          e.target.value = "";
+          return;
+       }
+       setMedia(prev => ({ ...prev, photo: file }));
+       addNotification("system", "Visual Frame Synchronized.");
+    }
+
+    if (type === "video") {
+       if (file.size > 2 * 1024 * 1024) { // 2MB limit
+          addNotification("system", "Kinetic Sequence Overflow: Video exceeds 2MB limit.");
+          e.target.value = "";
+          return;
+       }
+
+       // Duration Check: The 10.5s Rule
+       const video = document.createElement("video");
+       video.preload = "metadata";
+       video.onloadedmetadata = () => {
+         window.URL.revokeObjectURL(video.src);
+         if (video.duration > 10.5) {
+            addNotification("system", "Temporal Violation: Broadcast must be 10.5s or less.");
+            e.target.value = "";
+         } else {
+            setMedia(prev => ({ ...prev, video: file }));
+            addNotification("system", "Kinetic Sequence Synchronized.");
+         }
+       };
+       video.src = URL.createObjectURL(file);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isAuthenticated) return;
+    if (!isAuthenticated || !user) return;
     setIsSubmitting(true);
-    setTimeout(() => {
-      setIsSubmitting(false);
+
+    try {
+      let imageUrl = "";
+      let videoUrl = "";
+
+      // 1. Upload Visuals to identification Bucket
+      if (media.photo) {
+        const ext = media.photo.name.split(".").pop();
+        const fileName = `${Date.now()}_img.${ext}`;
+        const { data, error } = await supabase.storage.from("event-assets").upload(fileName, media.photo);
+        if (error) throw error;
+        imageUrl = supabase.storage.from("event-assets").getPublicUrl(fileName).data.publicUrl;
+      }
+
+      if (media.video) {
+        const ext = media.video.name.split(".").pop();
+        const fileName = `${Date.now()}_vid.${ext}`;
+        const { data, error } = await supabase.storage.from("event-assets").upload(fileName, media.video);
+        if (error) throw error;
+        videoUrl = supabase.storage.from("event-assets").getPublicUrl(fileName).data.publicUrl;
+      }
+
+      // 2. synchronize mission to Events Identification Table
+      const { error: dbError } = await supabase.from("events").insert({
+        title: formData.title,
+        description: formData.description,
+        location: formData.cityId,
+        cityId: formData.cityId.toLowerCase().replace(" ", "-"),
+        date: formData.date,
+        price: formData.price,
+        category: formData.category,
+        image: imageUrl || "https://images.unsplash.com/photo-1492684223066-81342ee5ff30",
+        video_url: videoUrl,
+        user_id: user.id,
+        is_verified: false // Awaiting Admin verification
+      });
+
+      if (dbError) throw dbError;
+
+      addNotification("radar", "Mission pulse reaches 100% synchronization. Awaiting Admin verification.");
       onClose();
-      alert("Event Added to the Radar! 🛰️");
-    }, 2000);
+    } catch (err: any) {
+      addNotification("system", `Identification Sync Failed: ${err.message}`);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 md:p-6">
-          {/* Overlay */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={onClose}
-            className="absolute inset-0 bg-black/80 backdrop-blur-md"
-          />
+        <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 md:p-6 overflow-y-auto">
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} className="absolute inset-0 bg-black/90 backdrop-blur-3xl" />
 
-          {/* Modal */}
-          <motion.div
-            initial={{ scale: 0.9, opacity: 0, y: 20 }}
-            animate={{ scale: 1, opacity: 1, y: 0 }}
-            exit={{ scale: 0.9, opacity: 0, y: 20 }}
-            className="relative w-full max-w-2xl bg-black border border-white/10 rounded-3xl overflow-hidden font-[family-name:var(--font-lexend)] shadow-[0_0_100px_rgba(168,85,247,0.1)]"
-          >
-            {/* Header */}
-            <div className="p-8 border-b border-white/10 flex justify-between items-center bg-white/5">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-purple-500/20 rounded-full flex items-center justify-center text-purple-400">
-                  <PlusCircle size={24} />
-                </div>
-                <div>
-                  <h2 className="text-white text-xl font-black uppercase tracking-widest leading-tight">Radar Submission</h2>
-                  <p className="text-[10px] text-purple-500 uppercase tracking-[0.4em] mt-1 flex items-center gap-1 font-bold">
-                    <ShieldCheck size={10} /> Verified Host Hub
-                  </p>
-                </div>
-              </div>
-              <button onClick={onClose} className="p-2 text-white/30 hover:text-white transition-colors">
-                <X size={32} />
-              </button>
+          <motion.div initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0, y: 20 }} transition={SPRING_CONFIG} className="relative w-full max-w-3xl bg-neutral-950 border border-white/10 rounded-[2.5rem] overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+            {/* Header Hub */}
+            <div className="p-8 border-b border-white/5 flex justify-between items-center bg-white/[0.02]">
+               <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-purple-500/20 rounded-full flex items-center justify-center text-purple-400"><PlusCircle size={24} /></div>
+                  <div>
+                    <h2 className="text-white text-xl font-black uppercase tracking-tight">Initiate Radar broadcast</h2>
+                    <p className="text-[10px] text-purple-500 uppercase tracking-[0.4em] mt-1 font-black">Verified Identity Hub</p>
+                  </div>
+               </div>
+               <button onClick={onClose} className="text-white/20 hover:text-white transition-colors"><X size={32} /></button>
             </div>
 
-            <div className="p-8 md:p-12">
-              {!isAuthenticated ? (
-                /* Locked State */
-                <div className="flex flex-col items-center justify-center py-12 text-center">
-                  <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center text-white/20 mb-6 border border-white/10">
-                    <Lock size={40} />
-                  </div>
-                  <h3 className="text-white text-lg font-black uppercase tracking-widest mb-4">Authentication Required</h3>
-                  <p className="text-white/40 text-sm max-w-xs leading-relaxed mb-8 font-medium">
-                    To maintain the cinematic integrity of the radar, only verified Milo identities can submit new city happenings.
-                  </p>
-                  <button 
-                    onClick={() => { onClose(); onAuthRedirect(); }}
-                    className="bg-white text-black px-12 py-4 rounded-full font-bold text-sm tracking-widest uppercase hover:scale-105 transition-all shadow-[0_10px_30px_rgba(255,255,255,0.2)]"
-                  >
-                    Authenticate Identity
-                  </button>
-                </div>
-              ) : (
-                /* Submission Form */
-                <form onSubmit={handleSubmit} className="space-y-8">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div className="space-y-3">
-                      <label className="text-[10px] text-white/30 uppercase tracking-[0.4em] ml-2">Happenings Name</label>
-                      <input 
-                        required
-                        type="text" 
-                        placeholder="e.g. Urban Tech Meetup" 
-                        className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-sm text-white placeholder:text-white/10 outline-none focus:border-purple-500/50 transition-all"
-                        value={formData.title}
-                        onChange={(e) => setFormData({...formData, title: e.target.value})}
-                      />
+            <div className="flex-1 p-8 md:p-12 overflow-y-auto no-scrollbar">
+               {!isAuthenticated ? (
+                 <div className="py-20 flex flex-col items-center justify-center text-center space-y-8">
+                    <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center border border-white/10"><Lock size={40} className="text-white/20" /></div>
+                    <h3 className="text-2xl font-black uppercase tracking-tight text-white">Identification Required</h3>
+                    <p className="text-white/40 text-sm max-w-xs font-mono">Authenticate your Milo identity to broadcast missions to the Live Radar.</p>
+                    <button onClick={() => { onClose(); onAuthRedirect(); }} className="bg-white text-black px-12 py-5 rounded-full font-black text-xs uppercase tracking-widest hover:scale-105 transition-all">Identify Pulse</button>
+                 </div>
+               ) : (
+                 <form onSubmit={handleSubmit} className="space-y-10">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                       <InputGroup label="Mission Title" placeholder="What's happening?" value={formData.title} onChange={(v: string) => setFormData({...formData, title: v})} />
+                       <InputGroup label="Temporal Sync (Date)" placeholder="YYYY-MM-DD" type="date" value={formData.date} onChange={(v: string) => setFormData({...formData, date: v})} />
                     </div>
-                    <div className="space-y-3">
-                      <label className="text-[10px] text-white/30 uppercase tracking-[0.4em] ml-2">City</label>
-                      <select 
-                        className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-sm text-white outline-none focus:border-purple-500/50 transition-all appearance-none cursor-pointer"
-                        value={formData.city}
-                        onChange={(e) => setFormData({...formData, city: e.target.value})}
-                      >
-                        <option value="Delhi NCR">Delhi NCR Hub</option>
-                        <option value="Mumbai">Mumbai Coast</option>
-                        <option value="Bangalore">Bangalore Network</option>
-                      </select>
+                    
+                    <div className="space-y-4">
+                       <label className="text-[10px] text-white/30 uppercase tracking-[0.4em] ml-2 font-black">Broadcast Narrative</label>
+                       <textarea value={formData.description} onChange={(e) => setFormData({...formData, description: e.target.value})} placeholder="Synchronization details..." className="w-full bg-white/[0.03] border border-white/10 rounded-[2rem] p-6 text-sm text-white placeholder:text-white/10 outline-none focus:border-white/30 h-32 no-scrollbar" required />
                     </div>
-                  </div>
 
-                  <div className="space-y-3">
-                    <label className="text-[10px] text-white/30 uppercase tracking-[0.4em] ml-2">Temporal Window (Date)</label>
-                    <input 
-                      required
-                      type="date" 
-                      className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-sm text-white outline-none focus:border-purple-500/50 transition-all cursor-pointer"
-                      value={formData.date}
-                      onChange={(e) => setFormData({...formData, date: e.target.value})}
-                    />
-                  </div>
+                    <div className="space-y-6">
+                       <p className="text-[10px] font-mono text-white/20 uppercase tracking-[0.4em] font-black text-center">Media Gatekeeper Sync</p>
+                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <MediaInput label="Visual (1MB)" icon={<ImageIcon size={20} />} onSelect={(e: any) => validateMedia(e, "photo")} accept="image/*" active={!!media.photo} />
+                          <MediaInput label="Kinetic (10s/2MB)" icon={<Video size={20} />} onSelect={(e: any) => validateMedia(e, "video")} accept="video/*" active={!!media.video} />
+                       </div>
+                    </div>
 
-                  <div className="pt-4">
-                    <button 
-                      disabled={isSubmitting}
-                      type="submit" 
-                      className={clsx(
-                        "w-full py-5 rounded-2xl font-black text-sm tracking-[0.4em] uppercase transition-all duration-700 relative overflow-hidden group",
-                        isSubmitting ? "bg-purple-500 text-white" : "bg-white text-black hover:bg-purple-500 hover:text-white"
-                      )}
-                    >
-                      <span className={clsx("relative z-10", isSubmitting && "animate-pulse")}>
-                        {isSubmitting ? "Connecting..." : "Add to Radar"}
-                      </span>
-                      {/* Button Pulse Glow */}
-                      <div className="absolute inset-0 bg-white group-hover:bg-purple-400 opacity-0 group-active:opacity-20 transition-opacity" />
+                    <button disabled={isSubmitting} className="w-full bg-white text-black py-8 rounded-full font-black uppercase tracking-widest text-xs hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50">
+                       {isSubmitting ? <Loader2 className="animate-spin mx-auto" /> : "Authorize Broadcast"}
                     </button>
-                  </div>
-                </form>
-              )}
+                 </form>
+               )}
             </div>
           </motion.div>
         </div>
       )}
     </AnimatePresence>
+  );
+}
+
+function InputGroup({ label, placeholder, value, onChange, type = "text" }: { label: string; placeholder: string; value: string; onChange: (v: string) => void; type?: string }) {
+  return (
+    <div className="space-y-3">
+      <label className="text-[10px] text-white/30 uppercase tracking-[0.4em] ml-2 font-black">{label}</label>
+      <input required type={type} placeholder={placeholder} value={value} onChange={(e) => onChange(e.target.value)} className="w-full bg-white/[0.03] border border-white/10 rounded-2xl p-6 text-sm text-white outline-none focus:border-white/30 transition-all font-black tracking-widest" />
+    </div>
+  );
+}
+
+function MediaInput({ label, icon, onSelect, accept, active }: { label: string; icon: any; onSelect: (e: any) => void; accept: string; active: boolean }) {
+  return (
+    <label className={clsx("relative flex flex-col items-center justify-center p-10 bg-white/[0.03] border border-dashed rounded-[2rem] cursor-pointer transition-all hover:bg-white/[0.05]", active ? "border-emerald-500/50 bg-emerald-500/5" : "border-white/10 hover:border-white/20")}>
+       <input type="file" className="hidden" onChange={onSelect} accept={accept} />
+       <div className={clsx("mb-4", active ? "text-emerald-400" : "text-white/20")}>{icon}</div>
+       <span className={clsx("text-[9px] font-black uppercase tracking-widest", active ? "text-emerald-400" : "text-white/40")}>{active ? "Synchronized" : label}</span>
+    </label>
   );
 }

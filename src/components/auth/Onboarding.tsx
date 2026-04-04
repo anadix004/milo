@@ -2,18 +2,24 @@
 
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Camera, Check, ChevronRight, User, Phone, Calendar, Loader2 } from "lucide-react";
+import { Camera, Check, ChevronRight, User, Phone, Calendar, Loader2, LogIn } from "lucide-react";
 import clsx from "clsx";
+import { useAuth } from "../AuthContext";
+import { supabase } from "@/utils/supabase";
+import { useNotifications } from "../NotificationContext";
 
 const SPRING_CONFIG = { stiffness: 70, damping: 15 };
 
-type Step = "username" | "details" | "capture";
+type Step = "login" | "username" | "details" | "capture";
 
 export default function Onboarding({ onComplete }: { onComplete: (data: any) => void }) {
-  const [step, setStep] = useState<Step>("username");
+  const { session, loginWithGoogle, refreshProfile } = useAuth();
+  const { addNotification } = useNotifications();
+  const [step, setStep] = useState<Step>("login");
   const [username, setUsername] = useState("");
   const [isChecking, setIsChecking] = useState(false);
   const [isAvailable, setIsAvailable] = useState<boolean | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [formData, setFormData] = useState({
     mobile: "",
@@ -25,6 +31,14 @@ export default function Onboarding({ onComplete }: { onComplete: (data: any) => 
   const [photo, setPhoto] = useState<string | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    if (session?.user) {
+      setStep("username");
+    } else {
+      setStep("login");
+    }
+  }, [session]);
 
   // --- Step 1: Username Check Simulation ---
   useEffect(() => {
@@ -53,8 +67,8 @@ export default function Onboarding({ onComplete }: { onComplete: (data: any) => 
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
       }
-    } catch (err) {
-      console.error("Camera access denied:", err);
+    } catch (err: any) {
+      addNotification("system", `Auth failed: ${err.message}`);
     }
   };
 
@@ -84,21 +98,70 @@ export default function Onboarding({ onComplete }: { onComplete: (data: any) => 
     return () => stopCamera();
   }, [step]);
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (step === "username" && isAvailable) setStep("details");
     else if (step === "details") setStep("capture");
     else if (step === "capture" && photo) {
-      onComplete({ username, ...formData, photo });
+      setIsSubmitting(true);
+      try {
+        const { error } = await supabase.from("profiles").upsert({
+          id: session?.user.id,
+          username,
+          full_name: session?.user.user_metadata.full_name || username,
+          avatar_url: photo, // We'll handle bucket upload in later tasks if needed
+          mobile: formData.mobile,
+          gender: formData.gender,
+          dob: formData.dob,
+          updated_at: new Date().toISOString(),
+        });
+
+        if (error) throw error;
+
+        await refreshProfile();
+        onComplete({ username, ...formData, photo });
+      } catch (err) {
+        console.error("Profile update failed:", err);
+      } finally {
+        setIsSubmitting(false);
+      }
     }
   };
 
   return (
     <div className="fixed inset-0 z-[100] bg-black flex items-center justify-center p-6 overflow-hidden">
-      {/* Background Cinematic Texture */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.03),transparent_70%)] pointer-events-none" />
       
       <div className="w-full max-w-xl relative">
         <AnimatePresence mode="wait">
+          {/* STEP 0: LOGIN GATE */}
+          {step === "login" && (
+            <motion.div
+              key="step-login"
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 1.1, y: -20 }}
+              transition={SPRING_CONFIG}
+              className="flex flex-col items-center text-center space-y-12"
+            >
+              <div className="space-y-4">
+                <h2 className="font-[family-name:var(--font-lexend)] text-4xl md:text-5xl font-black text-white uppercase tracking-tight">
+                  Authorization nexus
+                </h2>
+                <p className="text-white/40 font-[family-name:var(--font-roboto-mono)] text-[10px] uppercase tracking-[0.4em]">
+                  Phase 00 // Authorize cinematic identity access
+                </p>
+              </div>
+
+              <button
+                onClick={loginWithGoogle}
+                className="group flex items-center gap-4 px-12 py-6 bg-white text-black rounded-full font-black uppercase tracking-widest text-sm transition-all hover:scale-105 active:scale-95 shadow-[0_0_50px_rgba(255,255,255,0.2)]"
+              >
+                <LogIn size={20} />
+                Access with Google
+              </button>
+            </motion.div>
+          )}
+
           {/* STEP 1: USERNAME */}
           {step === "username" && (
             <motion.div
@@ -138,7 +201,6 @@ export default function Onboarding({ onComplete }: { onComplete: (data: any) => 
                   )}
                 </div>
 
-                {/* Telemetry Status */}
                 <div className="h-4 flex items-center justify-center">
                   <AnimatePresence mode="wait">
                     {isChecking ? (
@@ -294,11 +356,9 @@ export default function Onboarding({ onComplete }: { onComplete: (data: any) => 
                       className="w-full h-full object-cover grayscale scale-x-[-1]"
                     />
                   )}
-                  {/* Border Scanner Effect */}
                   <div className="absolute inset-0 border-[1px] border-white/20 rounded-full animate-pulse pointer-events-none" />
                 </div>
                 
-                {/* Hidden Canvas for Capture */}
                 <canvas ref={canvasRef} width={400} height={400} className="hidden" />
               </div>
 
@@ -315,10 +375,11 @@ export default function Onboarding({ onComplete }: { onComplete: (data: any) => 
                   <div className="flex flex-col gap-4">
                     <button
                       onClick={handleNext}
-                      className="group bg-emerald-500 text-black py-6 rounded-full font-black uppercase tracking-widest flex items-center justify-center gap-3 transition-all hover:scale-105 active:scale-95"
+                      disabled={isSubmitting}
+                      className="group bg-emerald-500 text-black py-6 rounded-full font-black uppercase tracking-widest flex items-center justify-center gap-3 transition-all hover:scale-105 active:scale-95 disabled:opacity-50"
                     >
-                      Complete Sync
-                      <Check size={20} strokeWidth={3} />
+                      {isSubmitting ? <Loader2 className="animate-spin" /> : "Complete Sync"}
+                      {!isSubmitting && <Check size={20} strokeWidth={3} />}
                     </button>
                     <button
                       onClick={() => { setPhoto(null); startCamera(); }}
@@ -334,12 +395,12 @@ export default function Onboarding({ onComplete }: { onComplete: (data: any) => 
         </AnimatePresence>
       </div>
 
-      {/* Technical Background HUD */}
       <div className="absolute bottom-12 left-12 hidden md:block">
         <p className="text-[8px] font-[family-name:var(--font-roboto-mono)] text-white/10 uppercase tracking-[0.5em] font-black leading-loose">
           Terminal Status: Identification Pending<br />
           Network Status: Secure<br />
-          System: Anti-Gravity V2.4
+          System: {session?.user ? `Authorized // ${session.user.email}` : "Gatekeeper // Identity Required"}<br />
+          Anti-Gravity V2.5
         </p>
       </div>
     </div>

@@ -31,3 +31,4 @@ next-env.d.ts
 *.tsbuildinfo
 .git_corrupted
 node_modules_corrupt
+.env.local
