@@ -6,6 +6,7 @@ import clsx from "clsx";
 import { EVENTS, EventData } from "@/constants/events";
 import { Filter, ArrowUpDown, Search, Calendar } from "lucide-react";
 import IdentityScan from "@/components/IdentityScan";
+import Comments from "@/components/events/Comments";
 
 import { parsePrice } from "@/utils/price";
 
@@ -22,6 +23,12 @@ export default function EventListing({ selectedCity }: EventListingProps) {
   const [sortOrder, setSortOrder] = useState<"featured" | "price-low" | "price-high">("featured");
   const [searchQuery, setSearchQuery] = useState("");
   const [timeFilter, setTimeFilter] = useState<"All" | "Today" | "Tomorrow" | "Week">("All");
+  const [joinedEvents, setJoinedEvents] = useState<Set<string>>(new Set());
+
+  const isJoined = (id: string) => joinedEvents.has(id);
+  const joinEvent = (id: string) => {
+    setJoinedEvents((prev) => new Set(prev).add(id));
+  };
 
   // Get relative dates for filtering
   const todayStr = new Date().toISOString().split("T")[0];
@@ -239,11 +246,12 @@ export default function EventListing({ selectedCity }: EventListingProps) {
         </AnimatePresence>
       </div>
 
-      {/* Deep-Dive Expansion */}
       <AnimatePresence>
         {expandedEvent && (
           <EventDetailView 
             event={expandedEvent} 
+            isJoined={isJoined(expandedEvent.id)}
+            onJoin={() => joinEvent(expandedEvent.id)}
             onClose={() => setExpandedEvent(null)} 
           />
         )}
@@ -336,17 +344,21 @@ function EventGridCard({ event, onExpand }: { event: EventData, onExpand: (e: Ev
   );
 }
 
-function EventDetailView({ event, onClose }: { event: EventData, onClose: () => void }) {
+function EventDetailView({ event, isJoined, onJoin, onClose }: { event: EventData, isJoined: boolean, onJoin: () => void, onClose: () => void }) {
   return (
     <motion.div 
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-12"
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-12 font-[family-name:var(--font-jakarta)]"
     >
       <div className="absolute inset-0 bg-black/95 backdrop-blur-3xl" onClick={onClose} />
       <motion.div 
-        className="relative w-full max-w-6xl h-full md:max-h-[80vh] bg-neutral-950 border border-white/10 rounded-[2.5rem] overflow-hidden flex flex-col md:flex-row shadow-2xl"
+        initial={{ opacity: 0, scale: 0.9, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.9, y: 20 }}
+        transition={{ type: "spring", stiffness: 70, damping: 15 }}
+        className="relative w-full max-w-6xl h-full md:max-h-[85vh] bg-neutral-950 border border-white/10 rounded-[2.5rem] overflow-hidden flex flex-col md:flex-row shadow-2xl"
       >
         <button onClick={onClose} className="absolute top-8 right-8 z-50 p-4 bg-white/5 hover:bg-white/10 rounded-full border border-white/10 text-white transition-all">
           <ArrowUpDown className="rotate-45" size={20} />
@@ -357,7 +369,7 @@ function EventDetailView({ event, onClose }: { event: EventData, onClose: () => 
           <div className="absolute inset-0 bg-gradient-to-r from-black via-transparent to-transparent hidden md:block" />
         </div>
 
-        <div className="flex-1 p-8 md:p-16 flex flex-col justify-center gap-8 overflow-y-auto">
+        <div className="flex-1 p-8 md:p-16 flex flex-col gap-8 overflow-y-auto no-scrollbar">
           <div>
             <span className="text-white/40 text-[10px] font-mono uppercase tracking-[0.4em] mb-4 block">
               {event.category} // {event.date}
@@ -375,10 +387,20 @@ function EventDetailView({ event, onClose }: { event: EventData, onClose: () => 
               <p className="text-white/20 text-[10px] font-mono uppercase tracking-widest mb-1">Access Tier</p>
               <p className="text-2xl font-black text-white">{event.price}</p>
             </div>
-            <button className="px-12 py-5 bg-white text-black rounded-full font-black uppercase tracking-widest text-[10px] hover:scale-105 transition-all active:scale-95">
-              Secure Entry
+            <button 
+              onClick={onJoin}
+              disabled={isJoined}
+              className={clsx(
+                "px-12 py-5 rounded-full font-black uppercase tracking-widest text-[10px] hover:scale-105 transition-all active:scale-95",
+                isJoined ? "bg-emerald-500 text-black animate-pulse" : "bg-white text-black"
+              )}
+            >
+              {isJoined ? "PLAN JOINED" : "JOIN PLAN"}
             </button>
           </div>
+
+          {/* Social Layer: Comments */}
+          <Comments isJoined={isJoined} />
         </div>
       </motion.div>
     </motion.div>
