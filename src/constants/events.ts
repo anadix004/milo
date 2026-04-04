@@ -7,6 +7,7 @@ export interface EventData {
   description: string;
   price: string;
   color: string;
+  date: string; // YYYY-MM-DD
   featured?: boolean;
 }
 
@@ -21,6 +22,7 @@ export const EVENTS: EventData[] = [
     description: "An evening of traditional music and arts at the iconic Lotus Temple architecture.",
     price: "₹1,499",
     color: "#a855f7",
+    date: "2026-04-04", // Today
     featured: true,
   },
   {
@@ -32,6 +34,7 @@ export const EVENTS: EventData[] = [
     description: "Futuristic electronic beats set against the historic backdrop of the Qutub Minar.",
     price: "₹2,999",
     color: "#a855f7",
+    date: "2026-04-05", // Tomorrow
   },
   {
     id: "del-3",
@@ -42,6 +45,7 @@ export const EVENTS: EventData[] = [
     description: "The capital's biggest outdoor tech mixer in the heart of old Delhi.",
     price: "₹899",
     color: "#a855f7",
+    date: "2026-04-06", // This Week
   },
   {
     id: "del-4",
@@ -52,6 +56,7 @@ export const EVENTS: EventData[] = [
     description: "A blend of traditional jazz and Indian classical instruments under the starlit minar.",
     price: "₹2,200",
     color: "#a855f7",
+    date: "2026-04-04", // Today
   },
   {
     id: "del-5",
@@ -62,6 +67,7 @@ export const EVENTS: EventData[] = [
     description: "AR-guided walk through the historic lanes of Old Delhi with hidden digital treasures.",
     price: "₹599",
     color: "#a855f7",
+    date: "2026-04-05", // Tomorrow
   },
   {
     id: "del-6",
@@ -72,6 +78,7 @@ export const EVENTS: EventData[] = [
     description: "A massive projection mapping show on the memorial arch celebrating the city's future.",
     price: "₹1,100",
     color: "#a855f7",
+    date: "2026-04-10", // This Week
   },
   {
     id: "del-7",
@@ -82,6 +89,7 @@ export const EVENTS: EventData[] = [
     description: "Artificial intelligence reimagining the Mughal history through immersive 3D headsets.",
     price: "₹1,800",
     color: "#a855f7",
+    date: "2026-04-04", // Today
     featured: true,
   },
   {
@@ -93,6 +101,7 @@ export const EVENTS: EventData[] = [
     description: "Contemporary pop festival featuring the top regional and global artists.",
     price: "₹4,500",
     color: "#a855f7",
+    date: "2026-04-07", // This Week
   },
   {
     id: "del-9",
@@ -103,6 +112,7 @@ export const EVENTS: EventData[] = [
     description: "Laser and water show on the banks of Yamuna focusing on ecological restoration.",
     price: "₹700",
     color: "#a855f7",
+    date: "2026-04-04", // Today
   },
   {
     id: "del-10",
@@ -113,6 +123,7 @@ export const EVENTS: EventData[] = [
     description: "Fusion food festival where traditional recipes are optimized by AI chefs.",
     price: "₹1,200",
     color: "#a855f7",
+    date: "2026-04-05", // Tomorrow
   },
 
   // Bangalore Events (10)
@@ -125,6 +136,7 @@ export const EVENTS: EventData[] = [
     description: "The city's biggest 48-hour coding sprint inside the digital gardens of Bangalore.",
     price: "₹499",
     color: "#22c55e",
+    date: "2026-04-04", // Today
     featured: true,
   },
   {
@@ -136,6 +148,7 @@ export const EVENTS: EventData[] = [
     description: "Eco-friendly open-air music festival celebrating the Garden City's vibrant spirit.",
     price: "₹1,899",
     color: "#22c55e",
+    date: "2026-04-04", // Today
     featured: true,
   },
   {
@@ -147,6 +160,7 @@ export const EVENTS: EventData[] = [
     description: "Future showcase for sustainable urban planning in Bangalore.",
     price: "₹1,200",
     color: "#22c55e",
+    date: "2026-04-06", // This Week
   },
   {
     id: "blr-4",
@@ -157,6 +171,7 @@ export const EVENTS: EventData[] = [
     description: "Witness the integration of robotic life monitoring within the historic glass house.",
     price: "₹750",
     color: "#22c55e",
+    date: "2026-04-05", // Tomorrow
   },
   {
     id: "blr-5",
@@ -167,6 +182,7 @@ export const EVENTS: EventData[] = [
     description: "An underground electronic session set in a decommissioned warehouse turned garden.",
     price: "₹2,500",
     color: "#22c55e",
+    date: "2026-04-04", // Today
   },
   {
     id: "blr-6",
@@ -177,6 +193,7 @@ export const EVENTS: EventData[] = [
     description: "Networking event for the top 500 startups in the country's tech capital.",
     price: "₹5,000",
     color: "#22c55e",
+    date: "2026-04-08", // This Week
   },
   {
     id: "blr-7",
@@ -187,6 +204,7 @@ export const EVENTS: EventData[] = [
     description: "A virtual reality walk through the prehistoric forests that preceded Bangalore.",
     price: "₹300",
     color: "#22c55e",
+    date: "2026-04-05", // Tomorrow
   },
   {
     id: "blr-8",
@@ -197,6 +215,7 @@ export const EVENTS: EventData[] = [
     description: "Street mural festival where technology informs the art style of the local neighborhood.",
     price: "₹200",
     color: "#22c55e",
+    date: "2026-04-04", // Today
   },
   {
     id: "blr-9",
@@ -207,6 +226,7 @@ export const EVENTS: EventData[] = [
     description: "The grand showcase of humanoid automation developed in the silicon heartland.",
     price: "₹1,500",
     color: "#22c55e",
+    date: "2026-04-04", // Today
     featured: true,
   },
   {
@@ -218,6 +238,7 @@ export const EVENTS: EventData[] = [
     description: "Celebrating the local indie music scene with innovative digital audio installations.",
     price: "₹699",
     color: "#22c55e",
+    date: "2026-04-05", // Tomorrow
   },
 
   // Mumbai Events (10)
@@ -230,6 +251,7 @@ export const EVENTS: EventData[] = [
     description: "A high-fashion runway event utilizing the Gateway of India as a digital canvas.",
     price: "₹3,500",
     color: "#06b6d4",
+    date: "2026-04-04", // Today
     featured: true,
   },
   {
@@ -241,6 +263,7 @@ export const EVENTS: EventData[] = [
     description: "Immersive open-air cinema screen experience right on the shores of Marine Drive.",
     price: "₹1,200",
     color: "#06b6d4",
+    date: "2026-04-05", // Tomorrow
   },
   {
     id: "mum-3",
@@ -251,6 +274,7 @@ export const EVENTS: EventData[] = [
     description: "Interactive AI paintings generated by the coastline's tidal waves.",
     price: "₹2,500",
     color: "#06b6d4",
+    date: "2026-04-04", // Today
     featured: true,
   },
   {
@@ -262,6 +286,7 @@ export const EVENTS: EventData[] = [
     description: "An experimental music night exploring the intersections of indie jazz and glitch-hop.",
     price: "₹1,800",
     color: "#06b6d4",
+    date: "2026-04-09", // This Week
   },
   {
     id: "mum-5",
@@ -272,6 +297,7 @@ export const EVENTS: EventData[] = [
     description: "A rare collection of vintage tech restored and automated with modern AI.",
     price: "₹900",
     color: "#06b6d4",
+    date: "2026-04-04", // Today
   },
   {
     id: "mum-6",
@@ -282,6 +308,7 @@ export const EVENTS: EventData[] = [
     description: "Electric hydrofoil boat racing under the Worli Sea Link.",
     price: "₹3,999",
     color: "#06b6d4",
+    date: "2026-04-10", // This Week
   },
   {
     id: "mum-7",
@@ -292,6 +319,7 @@ export const EVENTS: EventData[] = [
     description: "A showcase of grassroots technological innovation and recycling within the city.",
     price: "FREE",
     color: "#06b6d4",
+    date: "2026-04-04", // Today
   },
   {
     id: "mum-8",
@@ -302,6 +330,7 @@ export const EVENTS: EventData[] = [
     description: "Interactive data visualization of the world's oceans shown inside the Powai hub.",
     price: "₹500",
     color: "#06b6d4",
+    date: "2026-04-04", // Today
     featured: true,
   },
   {
@@ -313,6 +342,7 @@ export const EVENTS: EventData[] = [
     description: "Exploring the colonial architecture of South Mumbai through a digital lens.",
     price: "₹1,500",
     color: "#06b6d4",
+    date: "2026-04-05", // Tomorrow
   },
   {
     id: "mum-10",
@@ -323,6 +353,7 @@ export const EVENTS: EventData[] = [
     description: "Closing gala event at the Gateway featuring a massive orchestra and light show.",
     price: "₹5,000",
     color: "#06b6d4",
+    date: "2026-04-04", // Today
   },
 
   // Global / Generic
@@ -335,6 +366,7 @@ export const EVENTS: EventData[] = [
     description: "Participate in the global Milo identity scan beta testing session.",
     price: "FREE",
     color: "#FFFFFF",
+    date: "2026-04-04", // Today
     featured: true,
   },
   {
@@ -346,5 +378,6 @@ export const EVENTS: EventData[] = [
     description: "A glimpse into the future of 3D event discovery and immersive networking.",
     price: "₹999",
     color: "#FFFFFF",
+    date: "2026-04-11", // This Week
   }
 ];
