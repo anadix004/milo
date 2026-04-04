@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Lexend, Roboto_Mono, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
+import { NotificationProvider } from "@/components/NotificationContext";
+import { AuthProvider } from "@/components/AuthContext";
+import SmoothScroll from "@/components/SmoothScroll";
 
 const lexend = Lexend({
   subsets: ["latin"],
@@ -24,9 +27,6 @@ export const metadata: Metadata = {
   description: "High-end, immersive city event discovery.",
 };
 
-import { AuthProvider } from "@/components/AuthContext";
-import SmoothScroll from "@/components/SmoothScroll";
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -37,11 +37,13 @@ export default function RootLayout({
       <body
         className={`${lexend.variable} ${plusJakarta.variable} ${robotoMono.variable} antialiased bg-black text-white selection:bg-white selection:text-black overflow-x-hidden`}
       >
-        <AuthProvider>
-          <SmoothScroll>
-            {children}
-          </SmoothScroll>
-        </AuthProvider>
+        <NotificationProvider>
+          <AuthProvider>
+            <SmoothScroll>
+              {children}
+            </SmoothScroll>
+          </AuthProvider>
+        </NotificationProvider>
       </body>
     </html>
   );

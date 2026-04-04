@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Users, Bell, X } from "lucide-react";
+import { useNotifications } from "./NotificationContext";
 
 interface SocialAlert {
   id: string;
@@ -13,6 +14,7 @@ const SPRING_CONFIG = { stiffness: 70, damping: 15 };
 
 export default function SocialToast() {
   const [alerts, setAlerts] = useState<SocialAlert[]>([]);
+  const { addNotification } = useNotifications();
 
   const removeAlert = useCallback((id: string) => {
     setAlerts((prev) => prev.filter((a) => a.id !== id));
@@ -21,6 +23,7 @@ export default function SocialToast() {
   const triggerFriendAlert = useCallback((name: string) => {
     const id = Math.random().toString(36).substr(2, 9);
     setAlerts((prev) => [...prev, { id, friendName: name }]);
+    addNotification("social", `${name} is hitting a live event on your radar.`);
     
     // Auto-dismiss after 5s
     setTimeout(() => removeAlert(id), 5000);

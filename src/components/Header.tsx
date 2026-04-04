@@ -1,12 +1,15 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { User, PlusCircle, Menu } from "lucide-react";
 import { useAuth } from "./AuthContext";
+import { useNotifications } from "./NotificationContext";
 import PigeonLogo from "./PigeonLogo";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 import clsx from "clsx";
+import { Bell, User, PlusCircle, Menu } from "lucide-react";
+import NotificationSidebar from "./NotificationSidebar";
 
 interface HeaderProps {
   onProfileClick: () => void;
@@ -17,8 +20,10 @@ interface HeaderProps {
 
 export default function Header({ onProfileClick, onChatClick, onEventClick, isSidebarOpen }: HeaderProps) {
   const { user } = useAuth();
+  const { unreadCount } = useNotifications();
   const pathname = usePathname();
   const isChatPage = pathname === "/chat";
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   
   const scrollToTop = () => {
     if (pathname === "/") {
@@ -39,8 +44,6 @@ export default function Header({ onProfileClick, onChatClick, onEventClick, isSi
           )}
         >
           <User size={18} />
-          {/* Notification / Alert dot */}
-          <div className="absolute top-0 right-0 w-2 h-2 bg-purple-500 rounded-full border border-black" />
         </button>
 
         {/* Milo Logo - Home Anchor */}
@@ -91,9 +94,26 @@ export default function Header({ onProfileClick, onChatClick, onEventClick, isSi
         {/* Event Submission Hub */}
         <button 
           onClick={onEventClick}
-          className="relative w-10 h-10 rounded-full flex items-center justify-center bg-black/20 border border-white/10 backdrop-blur-md text-white/70 hover:text-white hover:bg-white/10 transition-all"
+          className="relative w-10 h-10 rounded-full flex items-center justify-center bg-black/20 border border-white/10 backdrop-blur-md text-white/70 hover:text-white hover:bg-white/10 transition-all font-black"
         >
           <PlusCircle size={18} />
+        </button>
+
+        {/* NOTIFICATION NEXUS HUB */}
+        <button 
+          onClick={() => setIsNotificationsOpen(true)}
+          className="relative w-10 h-10 rounded-full flex items-center justify-center bg-black/20 border border-white/10 backdrop-blur-md text-white/70 hover:text-white hover:bg-white/10 transition-all"
+        >
+          <Bell size={18} />
+          {unreadCount > 0 && (
+            <motion.span 
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              className="absolute -top-1 -right-1 w-4 h-4 bg-purple-500 rounded-full flex items-center justify-center text-[8px] font-black font-lexend text-white border-2 border-black"
+            >
+              {unreadCount}
+            </motion.span>
+          )}
         </button>
         
         <div className="flex flex-col items-end gap-2">
@@ -107,6 +127,11 @@ export default function Header({ onProfileClick, onChatClick, onEventClick, isSi
             TEAM
           </Link>
         </div>
+
+        <NotificationSidebar 
+           isOpen={isNotificationsOpen} 
+           onClose={() => setIsNotificationsOpen(false)} 
+        />
       </div>
     </header>
   );

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from "react";
+import { useNotifications } from "./NotificationContext";
 
 interface AuthUser {
   id: string;
@@ -24,6 +25,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
+  const { addNotification } = useNotifications();
 
   useEffect(() => {
     // Persistent Session: Load from localStorage
@@ -36,6 +38,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = (userData: AuthUser) => {
     setUser(userData);
     localStorage.setItem("milo_user", JSON.stringify(userData));
+    addNotification("session", "Identity synchronised. Session started successfully.");
   };
 
   const logout = () => {

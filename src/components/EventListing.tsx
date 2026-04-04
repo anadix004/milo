@@ -4,9 +4,10 @@ import { useState, useRef, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import clsx from "clsx";
 import { EVENTS, EventData } from "@/constants/events";
-import { Filter, ArrowUpDown, Search, Calendar } from "lucide-react";
+import { Filter, ArrowUpDown, Search, Calendar, Heart, Send } from "lucide-react";
 import IdentityScan from "@/components/IdentityScan";
 import Comments from "@/components/events/Comments";
+import { useNotifications } from "./NotificationContext";
 
 import { parsePrice } from "@/utils/price";
 
@@ -17,6 +18,7 @@ interface EventListingProps {
 const CATEGORIES = ["All", "Music", "Tech", "Arts", "Community", "Fashion", "Culture"];
 
 export default function EventListing({ selectedCity }: EventListingProps) {
+  const { addNotification } = useNotifications();
   const [expandedEvent, setExpandedEvent] = useState<EventData | null>(null);
   const [isScanOpen, setIsScanOpen] = useState(false);
   const [selectedCat, setSelectedCat] = useState("All");
@@ -28,6 +30,10 @@ export default function EventListing({ selectedCity }: EventListingProps) {
   const isJoined = (id: string) => joinedEvents.has(id);
   const joinEvent = (id: string) => {
     setJoinedEvents((prev) => new Set(prev).add(id));
+    const event = EVENTS.find(e => e.id === id);
+    if (event) {
+       addNotification("radar", `Plan synchronised: ${event.name} has been added to your identity.`);
+    }
   };
 
   // Get relative dates for filtering
@@ -345,6 +351,15 @@ function EventGridCard({ event, onExpand }: { event: EventData, onExpand: (e: Ev
 }
 
 function EventDetailView({ event, isJoined, onJoin, onClose }: { event: EventData, isJoined: boolean, onJoin: () => void, onClose: () => void }) {
+  const [isLiked, setIsLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(Math.floor(Math.random() * 1000) + 500);
+
+  const handleLike = () => {
+    if (!isJoined) return;
+    setIsLiked(!isLiked);
+    setLikeCount(prev => isLiked ? prev - 1 : prev + 1);
+  };
+
   return (
     <motion.div 
       initial={{ opacity: 0 }}
@@ -360,9 +375,7 @@ function EventDetailView({ event, isJoined, onJoin, onClose }: { event: EventDat
         transition={{ type: "spring", stiffness: 70, damping: 15 }}
         className="relative w-full max-w-6xl h-full md:max-h-[85vh] bg-neutral-950 border border-white/10 rounded-[2.5rem] overflow-hidden flex flex-col md:flex-row shadow-2xl"
       >
-        <button onClick={onClose} className="absolute top-8 right-8 z-50 p-4 bg-white/5 hover:bg-white/10 rounded-full border border-white/10 text-white transition-all">
-          <ArrowUpDown className="rotate-45" size={20} />
-        </button>
+        {/* REFINEMENT: Removed top-right close button for cinematic frame */}
 
         <div className="w-full md:w-1/2 h-48 md:h-full relative shrink-0">
           <img src={event.image} alt={event.name} className="w-full h-full object-cover" />
@@ -370,17 +383,50 @@ function EventDetailView({ event, isJoined, onJoin, onClose }: { event: EventDat
         </div>
 
         <div className="flex-1 p-8 md:p-16 flex flex-col gap-8 overflow-y-auto no-scrollbar">
-          <div>
-            <span className="text-white/40 text-[10px] font-mono uppercase tracking-[0.4em] mb-4 block">
-              {event.category} // {event.date}
-            </span>
-            <h2 className="font-lexend text-4xl md:text-6xl font-black text-white uppercase tracking-tighter leading-none mb-6">
-              {event.name}
-            </h2>
-            <p className="text-white/60 font-mono text-xs md:text-sm leading-relaxed max-w-md">
-              {event.description}
-            </p>
+          <div className="flex justify-between items-start">
+            <div>
+              <span className="text-white/40 text-[10px] font-mono uppercase tracking-[0.4em] mb-4 block font-black">
+                {event.category} // {event.date}
+              </span>
+              <h2 className="font-lexend text-4xl md:text-6xl font-black text-white uppercase tracking-tighter leading-none mb-4">
+                {event.name}
+              </h2>
+            </div>
+            
+            {/* Insta-Style Social Actions */}
+            <div className="flex items-center gap-4">
+               <button 
+                  onClick={handleLike}
+                  disabled={!isJoined}
+                  className={clsx(
+                    "flex flex-col items-center gap-1 transition-all",
+                    !isJoined ? "opacity-20 cursor-not-allowed" : "hover:scale-110 active:scale-95"
+                  )}
+               >
+                 <Heart 
+                    size={24} 
+                    className={clsx(
+                      "transition-colors duration-300", 
+                      isLiked ? "fill-rose-500 text-rose-500" : "text-white/40"
+                    )} 
+                 />
+                 {isJoined && (
+                   <span className="text-[10px] font-mono text-white/40 font-bold">{likeCount}</span>
+                 )}
+               </button>
+
+               <button className="flex flex-col items-center gap-1 hover:scale-110 active:scale-95 transition-all group">
+                 <Send size={24} className="text-white/40 group-hover:text-white transition-colors" />
+                 {isJoined && (
+                   <span className="text-[10px] font-mono text-white/40 font-bold">SHARES</span>
+                 )}
+               </button>
+            </div>
           </div>
+
+          <p className="text-white/60 font-mono text-xs md:text-sm leading-relaxed max-w-md">
+            {event.description}
+          </p>
 
           <div className="flex items-center justify-between pt-8 border-t border-white/5">
             <div>
