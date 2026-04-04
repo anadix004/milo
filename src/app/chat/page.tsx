@@ -1,14 +1,15 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Send, ShieldCheck, MapPin, Search, Users, ChevronLeft } from "lucide-react";
-import { useState, useEffect } from "react";
+import { Send, Users, Search } from "lucide-react";
+import { useState } from "react";
 import Header from "@/components/Header";
 import ProfileSidebar from "@/components/ProfileSidebar";
 import EventSubmission from "@/components/EventSubmission";
+import AuthModal from "@/components/AuthModal";
 import PigeonLogo from "@/components/PigeonLogo";
-import Link from "next/link";
 import clsx from "clsx";
+import { useAuth } from "@/components/AuthContext";
 
 const MOCK_FRIENDS = [
   { id: 1, name: "Neon_Ghost", status: "online", bio: "Active in Delhi NCR", type: "friend" },
@@ -24,14 +25,14 @@ const MOCK_EVENTS = [
 ];
 
 export default function ChatPage() {
+  const { isAuthenticated } = useAuth();
   const [messages, setMessages] = useState([
     { id: 1, text: "Wait, is the Rooftop party in Delhi NCR still on?", user: "CyberNomad", time: "2m ago" },
     { id: 2, text: "Yes! 🏙️ Getting everything ready now. See you there.", user: "Milo_Admin", isSystem: true },
     { id: 3, text: "The Tech Summit Alpha starts in 10 minutes.", user: "DataVoyager", time: "Just now" }
   ]);
   const [inputValue, setInputValue] = useState("");
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [isEventOpen, setIsEventOpen] = useState(false);
+  const [activeModal, setActiveModal] = useState<"profile" | "event" | "auth" | null>(null);
 
   const handleSend = () => {
     if (!inputValue.trim()) return;
@@ -39,32 +40,45 @@ export default function ChatPage() {
     setInputValue("");
   };
 
+  const closeModals = () => setActiveModal(null);
+
+  const handleAuthGate = (callback: () => void) => {
+    if (isAuthenticated) {
+      callback();
+    } else {
+      setActiveModal("auth");
+    }
+  };
+
   return (
     <main className="min-h-screen bg-black text-white font-[family-name:var(--font-lexend)] overflow-hidden flex flex-col pt-24 pb-8">
-      {/* Cinematic Background Fix */}
       <div className="fixed inset-0 bg-[#050505] -z-10" />
       <div className="fixed inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.05),transparent_50%)] -z-10" />
 
       <Header 
-        onProfileClick={() => setIsSidebarOpen(true)}
-        onChatClick={() => {}}
-        onEventClick={() => setIsEventOpen(true)}
-        isSidebarOpen={isSidebarOpen} 
+        onProfileClick={() => setActiveModal("profile")}
+        onEventClick={() => handleAuthGate(() => setActiveModal("event"))}
+        isSidebarOpen={activeModal === "profile"} 
       />
 
       <ProfileSidebar 
-        isOpen={isSidebarOpen} 
-        onClose={() => setIsSidebarOpen(false)} 
+        isOpen={activeModal === "profile"} 
+        onClose={closeModals} 
+        onAuthClick={() => setActiveModal("auth")}
       />
 
       <EventSubmission 
-        isOpen={isEventOpen} 
-        onClose={() => setIsEventOpen(false)}
-        onAuthRedirect={() => setIsSidebarOpen(true)}
+        isOpen={activeModal === "event"} 
+        onClose={closeModals}
+        onAuthRedirect={() => setActiveModal("auth")}
+      />
+
+      <AuthModal 
+        isOpen={activeModal === "auth"}
+        onClose={closeModals}
       />
 
       <div className="flex-1 w-full max-w-[1800px] mx-auto flex gap-6 px-6 h-[calc(100vh-160px)] overflow-hidden">
-        
         {/* LEFT COLUMN: FRIENDS SECTION */}
         <motion.div 
           initial={{ x: -20, opacity: 0 }}
@@ -106,7 +120,6 @@ export default function ChatPage() {
           transition={{ duration: 0.8 }}
           className="flex-1 flex flex-col bg-black/40 backdrop-blur-3xl border border-white/10 rounded-[3rem] overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,0.8)]"
         >
-          {/* Dashboard Header */}
           <div className="p-6 md:p-8 border-b border-white/5 flex justify-between items-center bg-white/[0.02]">
             <div className="flex items-center gap-4">
               <div className="relative p-2">
@@ -129,7 +142,6 @@ export default function ChatPage() {
             </div>
           </div>
 
-          {/* Message Feed */}
           <div className="flex-1 overflow-y-auto p-6 md:p-10 space-y-8 no-scrollbar scroll-smooth">
             {messages.map((m) => (
               <motion.div 
@@ -164,7 +176,6 @@ export default function ChatPage() {
             ))}
           </div>
 
-          {/* Message Input (Input) */}
           <div className="p-6 md:p-8 bg-white/[0.01] border-t border-white/5">
             <div className="relative group max-w-4xl mx-auto">
               <input 
