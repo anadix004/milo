@@ -96,9 +96,17 @@ export default function Header({ onProfileClick, onChatClick, onEventClick, isSi
           <PlusCircle size={18} />
         </button>
         
-        <button className="px-6 py-2 rounded-full bg-white/10 backdrop-blur-md text-white text-xs font-medium tracking-[0.2em] uppercase border border-white/20 hover:bg-white/20 transition-colors">
-          <Menu size={16} />
-        </button>
+        <div className="flex flex-col items-end gap-2">
+          <button className="px-6 py-2 rounded-full bg-white/10 backdrop-blur-md text-white text-xs font-medium tracking-[0.2em] uppercase border border-white/20 hover:bg-white/20 transition-colors">
+            <Menu size={16} />
+          </button>
+          <Link 
+            href="/admin"
+            className="text-[8px] font-mono text-white/5 uppercase tracking-widest hover:text-white/40 transition-colors pointer-events-auto"
+          >
+            TEAM
+          </Link>
+        </div>
       </div>
     </header>
   );
