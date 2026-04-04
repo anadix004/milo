@@ -105,16 +105,16 @@ export default function EventListing({ selectedCity }: EventListingProps) {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-12">
           <div>
             <h2 className="font-[family-name:var(--font-lexend)] text-white text-3xl md:text-5xl font-black uppercase tracking-tight mb-2">
-              {selectedCity ? selectedCity : "Global"} <span className="text-white/20 italic">Radar</span>
+              {selectedCity ? selectedCity : "Global"} <span className="text-white/50 italic">Radar</span>
             </h2>
-            <p className="font-[family-name:var(--font-roboto-mono)] text-white/40 text-[10px] md:text-xs uppercase tracking-[0.4em]">
+            <p className="font-[family-name:var(--font-roboto-mono)] text-white/80 text-[10px] md:text-xs uppercase tracking-[0.4em]">
               Exploring live events near you
             </p>
           </div>
 
           {/* Cinematic Search Hub */}
           <div className="flex-1 max-w-md relative group">
-            <div className="absolute inset-y-0 left-6 flex items-center pointer-events-none text-white/30 group-focus-within:text-white transition-colors">
+            <div className="absolute inset-y-0 left-6 flex items-center pointer-events-none text-white/60 group-focus-within:text-white transition-colors">
               <Search size={18} />
             </div>
             <input 
@@ -122,19 +122,19 @@ export default function EventListing({ selectedCity }: EventListingProps) {
               placeholder="SEARCH RADAR..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-white/[0.03] border border-white/10 rounded-full py-4 pl-16 pr-8 text-white placeholder:text-white/10 outline-none focus:border-white/30 backdrop-blur-3xl transition-all font-black tracking-widest text-sm mix-blend-difference"
+              className="w-full bg-white/10 border border-white/30 rounded-full py-4 pl-16 pr-8 text-white placeholder:text-white/30 outline-none focus:border-white/50 backdrop-blur-3xl transition-all font-black tracking-widest text-sm mix-blend-difference"
             />
           </div>
         </div>
 
         {/* Premium Filter, Sort & Time Hub */}
-        <div className="bg-white/[0.02] border border-white/5 p-2 md:p-3 rounded-[3rem] backdrop-blur-3xl shadow-2xl overflow-hidden">
-          <div className="flex flex-col lg:flex-row items-stretch lg:items-center gap-4 md:gap-6">
+        <div className="flex flex-col gap-6 bg-white/[0.08] border border-white/20 p-6 rounded-[2.5rem] backdrop-blur-3xl shadow-2xl">
+          <div className="flex flex-col xl:flex-row items-stretch xl:items-center gap-8">
             
             {/* Categories */}
-            <div className="flex items-center gap-4 px-6 py-3 bg-white/5 rounded-full border border-white/5 min-w-0 flex-1">
-              <Filter size={14} className="text-white/30 whitespace-nowrap shrink-0" />
-              <div className="flex gap-3 overflow-x-auto no-scrollbar items-center py-1">
+            <div className="flex items-center gap-4 px-6 py-3 bg-white/10 rounded-full border border-white/20 flex-1">
+              <Filter size={14} className="text-white/60 whitespace-nowrap" />
+              <div className="flex gap-4 overflow-x-auto no-scrollbar py-1">
                 {CATEGORIES.map((cat) => (
                   <button
                     key={cat}
@@ -142,8 +142,8 @@ export default function EventListing({ selectedCity }: EventListingProps) {
                     className={clsx(
                       "px-5 py-2 rounded-full text-[10px] uppercase font-black tracking-[0.2em] transition-all whitespace-nowrap font-[family-name:var(--font-jakarta)]",
                       selectedCat === cat 
-                        ? "bg-white text-black shadow-[0_0_25px_rgba(255,255,255,0.5)] scale-105" 
-                        : "text-white/40 hover:text-white/80 hover:bg-white/5"
+                        ? "bg-white text-black shadow-[0_0_20px_white]" 
+                        : "text-white/60 hover:text-white hover:bg-white/10"
                     )}
                   >
                     {cat}
@@ -152,33 +152,37 @@ export default function EventListing({ selectedCity }: EventListingProps) {
               </div>
             </div>
 
+            <div className="hidden xl:block w-px h-8 bg-white/20" />
+
             {/* Time Navigation */}
-            <div className="flex items-center gap-6 px-8 py-4 bg-white/5 rounded-full border border-white/5 shrink-0">
-              <Calendar size={14} className="text-white/30 whitespace-nowrap" />
+            <div className="flex items-center gap-6 px-6 py-3 bg-white/10 rounded-full border border-white/20">
+              <Calendar size={14} className="text-white/60 whitespace-nowrap" />
               <div className="flex gap-6">
                 {["All", "Today", "Tomorrow", "Week"].map((t) => (
                   <button
                     key={t}
                     onClick={() => setTimeFilter(t as any)}
                     className={clsx(
-                      "text-[11px] uppercase font-black tracking-[0.2em] transition-all font-[family-name:var(--font-jakarta)] whitespace-nowrap relative group",
-                      timeFilter === t ? "text-white" : "text-white/30 hover:text-white/60"
+                      "text-[10px] uppercase font-black tracking-[0.2em] transition-all font-[family-name:var(--font-jakarta)] whitespace-nowrap relative group",
+                      timeFilter === t ? "text-white" : "text-white/60 hover:text-white"
                     )}
                   >
                     {t}
                     {timeFilter === t && (
-                      <motion.div layoutId="timeUnderline" className="absolute -bottom-1 left-0 right-0 h-[2px] bg-white rounded-full shadow-[0_0_10px_white]" />
+                      <motion.div layoutId="timeUnderline" className="absolute -bottom-1 left-0 right-0 h-1 bg-white rounded-full shadow-[0_0_10px_white]" />
                     )}
                   </button>
                 ))}
               </div>
             </div>
 
+            <div className="hidden xl:block w-px h-8 bg-white/20" />
+
             {/* Sorting */}
-            <div className="flex items-center gap-6 px-8 py-4 bg-white/5 lg:bg-transparent rounded-full border border-white/5 lg:border-none shrink-0">
-              <div className="flex items-center gap-3 text-white/20">
+            <div className="flex items-center gap-6 px-6 py-3">
+              <div className="flex items-center gap-3 text-white/60">
                 <ArrowUpDown size={14} />
-                <span className="text-[10px] uppercase tracking-[0.3em] font-black font-[family-name:var(--font-jakarta)] whitespace-nowrap">Sort:</span>
+                <span className="text-[10px] uppercase tracking-[0.3em] font-black font-[family-name:var(--font-jakarta)] whitespace-nowrap">Sort by:</span>
               </div>
               <div className="flex gap-6">
                 {[
@@ -191,12 +195,12 @@ export default function EventListing({ selectedCity }: EventListingProps) {
                     onClick={() => setSortOrder(sort.id as any)}
                     className={clsx(
                       "text-[10px] uppercase font-black tracking-[0.2em] transition-all font-[family-name:var(--font-jakarta)] whitespace-nowrap relative group",
-                      sortOrder === sort.id ? "text-white" : "text-white/30 hover:text-white/60"
+                      sortOrder === sort.id ? "text-white" : "text-white/60 hover:text-white"
                     )}
                   >
                     {sort.label}
                     {sortOrder === sort.id && (
-                      <motion.div layoutId="sortUnderline" className="absolute -bottom-1 left-0 right-0 h-[2px] bg-white rounded-full shadow-[0_0_10px_white]" />
+                      <motion.div layoutId="sortUnderline" className="absolute -bottom-1 left-0 right-0 h-1 bg-white rounded-full shadow-[0_0_10px_white]" />
                     )}
                   </button>
                 ))}
