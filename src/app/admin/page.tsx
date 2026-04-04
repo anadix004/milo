@@ -29,8 +29,9 @@ import { useNotifications } from "@/components/NotificationContext";
 
 const SPRING_CONFIG = { stiffness: 70, damping: 15 };
 
-// --- SECURE SECURITY KEY ---
-const SECURITY_KEY = "nexus_secure_2026";
+// --- SECURE SECURITY KEYS ---
+const SECURITY_KEY = "nexus_secure_2026"; // OWNER KEY
+const TEAM_KEY = "milo_team_2026";      // TEAM KEY PULSE
 const ADMIN_ID = "admin_milo"; 
 
 type AdminView = "dashboard" | "queue" | "team" | "upload" | "settings";
