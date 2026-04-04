@@ -55,7 +55,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return true; 
       }
       
-      // Default to User role if no profile yet, but milo.anadi@gmail.com is Owner
       const role = baseUser.email === "milo.anadi@gmail.com" ? "owner" : "user";
       setUser({ ...baseUser, role } as AuthUser);
       return false; 
@@ -87,10 +86,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const hasProfile = await fetchProfile(session.user.id, session.user);
         
         if (_event === "SIGNED_IN") {
-          if (hasProfile) {
-            addNotification("session", "Welcome back. Redirecting to your radar.");
-            router.push("/");
-          } else {
+          if (!hasProfile) {
              addNotification("session", "Account initialized. Let's set up your profile.");
           }
         }
@@ -114,20 +110,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signUp = async (email: string, pass: string, name: string) => {
     try {
-      // 1. Gatekeeper Check: Is this email pre-authorized?
       const { data: profile, error: profileError } = await supabase
         .from("profiles")
         .select("role")
         .eq("email", email)
         .single();
       
-      // If no pre-authorized identity exists AND it's not the owner
       if ((profileError || !profile) && email !== "milo.anadi@gmail.com") {
         addNotification("system", "Access denied: This email is not on the authorized list.");
         return;
       }
 
-      // 2. synchronize mission pulse
       const { error } = await supabase.auth.signUp({ 
         email, 
         password: pass,

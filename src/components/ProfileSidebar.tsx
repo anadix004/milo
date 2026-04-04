@@ -11,9 +11,10 @@ const SPRING_CONFIG = { stiffness: 70, damping: 15 };
 interface ProfileSidebarProps {
   isOpen: boolean;
   onClose: () => void;
+  onAuthClick: () => void;
 }
 
-export default function ProfileSidebar({ isOpen, onClose }: ProfileSidebarProps) {
+export default function ProfileSidebar({ isOpen, onClose, onAuthClick }: ProfileSidebarProps) {
   const { user, isAuthenticated, logout } = useAuth();
   const [isUploading, setIsUploading] = useState(false);
   const [isGhostMode, setIsGhostMode] = useState(false);
@@ -80,8 +81,14 @@ export default function ProfileSidebar({ isOpen, onClose }: ProfileSidebarProps)
               {!isAuthenticated ? (
                 /* Auth Flow */
                 <div className="space-y-6">
-                   <div className="text-center p-6 border border-white/5 bg-white/[0.02] rounded-[2rem] space-y-2">
+                   <div className="text-center p-6 border border-white/5 bg-white/[0.02] rounded-[2rem] space-y-4">
                       <p className="text-[10px] text-white/60 uppercase tracking-widest font-black">Please log in to continue</p>
+                      <button 
+                         onClick={onAuthClick}
+                         className="w-full bg-white text-black py-4 rounded-full font-black uppercase tracking-widest text-[10px] hover:scale-105 active:scale-95 transition-all shadow-[0_20px_40px_rgba(255,255,255,0.1)]"
+                      >
+                         Log In / Sign Up
+                      </button>
                    </div>
                 </div>
               ) : (

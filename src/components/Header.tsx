@@ -114,12 +114,6 @@ export default function Header({ onProfileClick, onChatClick, onEventClick, isSi
           )}
         </button>
         
-        <Link 
-          href="/admin"
-          className="ml-2 md:ml-4 text-[10px] font-mono text-white/10 uppercase tracking-[0.4em] hover:text-white/40 transition-colors pointer-events-auto"
-        >
-          TEAM
-        </Link>
 
         <NotificationSidebar 
            isOpen={isNotificationsOpen} 

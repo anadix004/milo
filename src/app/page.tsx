@@ -80,6 +80,7 @@ export default function Home() {
       <ProfileSidebar 
         isOpen={activeModal === "profile"} 
         onClose={closeModals} 
+        onAuthClick={() => setActiveModal("auth")}
       />
 
       <EventSubmission 

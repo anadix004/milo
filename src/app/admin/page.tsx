@@ -129,7 +129,6 @@ export default function AdminPortal() {
           
           <div className="pt-8 border-t border-white/5 space-y-4">
              <p className="font-mono text-[8px] text-white/20 uppercase tracking-widest">Team members should use their authorized email and password.</p>
-             <p className="font-mono text-[8px] text-purple-400 uppercase tracking-widest">Administrator: milo.anadi@gmail.com</p>
           </div>
         </motion.div>
       </div>
