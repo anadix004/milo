@@ -44,7 +44,7 @@ export async function POST(req: Request) {
       email,
       password: TEAM_PASSWORD,
       email_confirm: true,
-      user_metadata: { full_name: "Team Member" },
+      user_metadata: { display_name: "Team Member", full_name: "Team Member" },
     });
 
     if (createError) {
@@ -58,7 +58,8 @@ export async function POST(req: Request) {
         id: newUser.user.id,
         email: email,
         role: role,
-        full_name: "Team Member",
+        display_name: "Team Member",
+        username: email.split("@")[0],
       });
 
     if (insertError) {

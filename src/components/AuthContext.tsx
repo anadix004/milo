@@ -12,7 +12,7 @@ interface AuthUser extends User {
   mobile?: string;
   gender?: string;
   dob?: string;
-  full_name?: string;
+  display_name?: string;
   role: "owner" | "team" | "user";
 }
 
@@ -114,7 +114,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const { error } = await supabase.auth.signUp({ 
         email, 
         password: pass,
-        options: { data: { full_name: name } }
+        options: { data: { display_name: name, full_name: name } }
       });
       
       if (error) {

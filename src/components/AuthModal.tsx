@@ -51,9 +51,8 @@ export default function AuthModal({ isOpen, onClose }: { isOpen: boolean; onClos
     
     const { error } = await supabase.from("profiles").upsert({
       id: user?.id,
-      email: user?.email,
-      full_name: name,
-      role: user?.email === "milo.anadi@gmail.com" ? "owner" : "user"
+      display_name: name,
+      username: user?.email?.split("@")[0],
     });
 
     if (!error) {

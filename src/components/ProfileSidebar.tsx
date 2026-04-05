@@ -72,7 +72,7 @@ export default function ProfileSidebar({ isOpen, onClose, onAuthClick }: Profile
                 </div>
               </div>
               <p className="mt-4 text-[9px] font-mono text-white/40 uppercase tracking-[0.3em] font-black">
-                {isAuthenticated ? (user?.full_name || user?.email) : "Log in to view ID"}
+                {isAuthenticated ? (user?.display_name || user?.email) : "Log in to view ID"}
               </p>
             </div>
 

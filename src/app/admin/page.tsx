@@ -421,9 +421,9 @@ function TeamHub({ session }: { session: any }) {
           {team.map(member => (
              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={SPRING_CONFIG} key={member.id} className="p-6 bg-white/[0.02] border border-white/5 rounded-3xl flex justify-between items-center hover:border-white/20 transition-all group">
                 <div className="flex items-center gap-4">
-                   <div className="h-10 w-10 rounded-full bg-white/5 flex items-center justify-center font-black uppercase text-xs group-hover:bg-purple-500/20 group-hover:text-purple-400 transition-all">{member.full_name?.[0]}</div>
+                   <div className="h-10 w-10 rounded-full bg-white/5 flex items-center justify-center font-black uppercase text-xs group-hover:bg-purple-500/20 group-hover:text-purple-400 transition-all">{member.display_name?.[0]}</div>
                    <div>
-                      <p className="text-[10px] font-black uppercase tracking-tight">{member.full_name}</p>
+                      <p className="text-[10px] font-black uppercase tracking-tight">{member.display_name}</p>
                       <p className="text-[8px] font-mono text-white/20 truncate max-w-[200px]">{member.email}</p>
                       <span className="text-[7px] font-mono text-purple-400 uppercase tracking-widest mt-1 block font-black">{member.role}</span>
                    </div>
