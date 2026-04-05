@@ -59,21 +59,29 @@ export default function ProfileSidebar({ isOpen, onClose, onAuthClick }: Profile
 
             {/* Profile Section */}
             <div className="flex flex-col items-center mb-12">
-              <div className="relative group cursor-pointer" onClick={simulateUpload}>
+              <div className="relative group cursor-pointer">
                 <div className={clsx(
-                  "p-4 rounded-full transition-all duration-500 border-2",
-                  isUploading ? "animate-pulse border-white/40" : "border-white/5",
-                  isGhostMode && "bg-emerald-500/10 shadow-[0_0_30px_rgba(16,185,129,0.3)] border-emerald-400"
+                  "w-32 h-32 rounded-full transition-all duration-500 border-2 overflow-hidden flex items-center justify-center bg-white/[0.02]",
+                  isGhostMode ? "bg-emerald-500/10 shadow-[0_0_30px_rgba(16,185,129,0.3)] border-emerald-400" : "border-white/5 hover:border-white/20"
                 )}>
-                  <User size={40} className={clsx("transition-colors", isGhostMode ? "text-emerald-400" : "text-white/20")} />
+                  {user?.avatar_url ? (
+                    <img src={user.avatar_url} alt="Profile" className="w-full h-full object-cover" />
+                  ) : (
+                    <User size={40} className={clsx("transition-colors", isGhostMode ? "text-emerald-400" : "text-white/20")} />
+                  )}
                 </div>
-                <div className="absolute bottom-0 right-0 w-8 h-8 bg-black/60 backdrop-blur-md rounded-full border border-white/10 flex items-center justify-center text-white/70 group-hover:text-white transition-colors">
+                <div className="absolute bottom-2 right-2 w-8 h-8 bg-black/60 backdrop-blur-md rounded-full border border-white/10 flex items-center justify-center text-white/70 group-hover:text-white transition-colors">
                   <ImageIcon size={14} />
                 </div>
               </div>
-              <p className="mt-4 text-[9px] font-mono text-white/40 uppercase tracking-[0.3em] font-black">
-                {isAuthenticated ? (user?.display_name || user?.email) : "Log in to view ID"}
-              </p>
+              <div className="text-center mt-6 space-y-2">
+                 <p className="text-sm font-black text-white uppercase tracking-tight">
+                    {isAuthenticated ? (user?.display_name || user?.email?.split('@')[0]) : "Guest User"}
+                 </p>
+                 <p className="text-[8px] font-mono text-white/20 uppercase tracking-[0.4em] font-black">
+                    {isAuthenticated ? "Pulse Active // Verified" : "Radar Unauthorized"}
+                 </p>
+              </div>
             </div>
 
             {/* Content Hub */}

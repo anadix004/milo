@@ -13,7 +13,7 @@ interface AuthUser extends User {
   gender?: string;
   dob?: string;
   display_name?: string;
-  role: "owner" | "team" | "user";
+  role: "owner" | "admin" | "team" | "user";
 }
 
 interface AuthContextType {
@@ -55,7 +55,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return true; 
       }
       
-      const role = baseUser.email === "milo.anadi@gmail.com" ? "owner" : "user";
+      const role = baseUser.email === "anadimishra2006@gmail.com" ? "owner" : "user";
       setUser({ ...baseUser, role } as AuthUser);
       return false; 
     } catch (err) {
@@ -156,7 +156,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const isAdmin = user?.role === "owner" || user?.role === "team";
+  const isAdmin = user?.role === "owner" || user?.role === "admin" || user?.role === "team";
   const isOwner = user?.role === "owner";
 
   return (
