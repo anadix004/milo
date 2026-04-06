@@ -9,6 +9,7 @@ import {
   Loader2,
   Lock
 } from "lucide-react";
+import { supabase } from "@/utils/supabase";
 import { useAuth } from "@/components/AuthContext";
 import { useRouter } from "next/navigation";
 import { useNotifications } from "@/components/NotificationContext";
@@ -26,7 +27,7 @@ const SECURITY_KEY = "nexus_secure_2026";
 const ADMIN_ID = "admin_milo"; 
 
 export default function AdminPortal() {
-  const { user, isAdmin, isOwner, login, isLoading: authLoading, recoverPassword, isAuthenticated } = useAuth();
+  const { user, isAdmin, isOwner, login, logout, isLoading: authLoading, recoverPassword, isAuthenticated } = useAuth();
   const { addNotification } = useNotifications();
   const router = useRouter();
   
@@ -38,11 +39,7 @@ export default function AdminPortal() {
   const [currentTab, setCurrentTab] = useState<AdminTab>("queue");
 
   // --- Auth Gate Synchronization ---
-  useEffect(() => {
-    if (isAdmin) {
-      setIsAuthorized(true);
-    }
-  }, [isAdmin]);
+  // AUTO-LOGIN DISABLED: Every session requires manual authorization pulse.
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,6 +54,24 @@ export default function AdminPortal() {
 
     try {
       await login(idInput, passInput);
+      
+      // Wait for AuthContext to update the user object
+      // We check the role immediately after a successful login pulse
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("email", idInput)
+        .single();
+
+      const authorizedRoles = ["owner", "admin", "team"];
+      if (profile && authorizedRoles.includes(profile.role)) {
+        setIsAuthorized(true);
+        addNotification("session", "Identity authorized. Dashboard active.");
+      } else {
+        await logout();
+        setLoginError(true);
+        addNotification("system", "Access Denied: Identity lacks clearance.");
+      }
     } catch (err) {
       setLoginError(true);
       setTimeout(() => setLoginError(false), 2000);
