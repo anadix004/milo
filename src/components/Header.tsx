@@ -100,7 +100,7 @@ export default function Header({ onProfileClick, onChatClick, onEventClick, isSi
         {/* Notifications */}
         <button 
           onClick={() => setIsNotificationsOpen(true)}
-          className="relative w-10 h-10 rounded-full flex items-center justify-center bg-black/20 border border-white/10 backdrop-blur-md text-white/70 hover:text-white hover:bg-white/10 transition-all font-black"
+          className="relative w-10 h-10 rounded-full flex items-center justify-center bg-black/80 border border-white/5 backdrop-blur-md text-white/70 hover:text-white hover:bg-white/10 transition-all font-black"
         >
           <Bell size={18} />
           {unreadCount > 0 && (

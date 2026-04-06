@@ -32,7 +32,7 @@ export default function NotificationSidebar({ isOpen, onClose }: NotificationSid
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[200]"
+            className="fixed inset-0 bg-black/80 backdrop-blur-md z-[200]"
           />
 
           {/* Sidebar Panel */}
@@ -41,7 +41,7 @@ export default function NotificationSidebar({ isOpen, onClose }: NotificationSid
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: "100%", opacity: 0 }}
             transition={{ type: "spring", stiffness: 70, damping: 15 }}
-            className="fixed inset-y-0 right-0 w-full max-w-md bg-black/40 backdrop-blur-3xl border-l border-white/10 z-[210] flex flex-col shadow-2xl"
+            className="fixed inset-y-0 right-0 w-full max-w-md bg-black border-l border-white/5 z-[210] flex flex-col shadow-[0_0_100px_rgba(0,0,0,1)]"
           >
             {/* Header */}
             <div className="p-8 border-b border-white/5 flex items-center justify-between">
@@ -67,7 +67,7 @@ export default function NotificationSidebar({ isOpen, onClose }: NotificationSid
                     key={n.id}
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
-                    className="p-6 bg-white/[0.03] border border-white/5 rounded-2xl space-y-3 group hover:border-white/20 transition-all"
+                    className="p-6 bg-white/[0.015] border border-white/5 rounded-2xl space-y-3 group hover:border-white/10 transition-all"
                   >
                     <div className="flex items-center justify-between">
                        <div className="flex items-center gap-3">

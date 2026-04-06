@@ -48,7 +48,7 @@ export default function SocialToast() {
             animate={{ x: 0, opacity: 1, filter: "blur(0px)" }}
             exit={{ x: 400, opacity: 0, filter: "blur(10px)" }}
             transition={SPRING_CONFIG}
-            className="pointer-events-auto group relative w-full bg-white/[0.03] border border-white/10 backdrop-blur-3xl rounded-[2rem] p-6 flex items-center gap-5 shadow-2xl overflow-hidden"
+            className="pointer-events-auto group relative w-full bg-black/90 border border-white/5 backdrop-blur-xl rounded-[2rem] p-6 flex items-center gap-5 shadow-[0_0_50px_rgba(0,0,0,0.8)] overflow-hidden"
           >
             {/* Animated accent line */}
             <motion.div 

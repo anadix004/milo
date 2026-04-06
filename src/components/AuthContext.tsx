@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useRef } from "react";
 import { supabase } from "@/utils/supabase";
 import { useNotifications } from "./NotificationContext";
 import { Session, User } from "@supabase/supabase-js";
@@ -39,6 +39,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const { addNotification } = useNotifications();
   const router = useRouter();
+  const isInitialized = useRef(false);
 
   const fetchProfile = async (uid: string, baseUser: User) => {
     try {
@@ -76,32 +77,44 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      setSession(session);
-      if (session?.user) {
-        await fetchProfile(session.user.id, session.user);
+    if (isInitialized.current) return;
+    isInitialized.current = true;
+
+    const initAuth = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        setSession(session);
+        if (session?.user) {
+          await fetchProfile(session.user.id, session.user);
+        }
+      } catch (err) {
+        console.error("Critical Auth Initializer Error:", err);
+      } finally {
+        setIsLoading(false);
       }
-      setIsLoading(false);
-    });
+    };
+
+    initAuth();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setSession(session);
       if (session?.user) {
-        const hasProfile = await fetchProfile(session.user.id, session.user);
-        
-        if (_event === "SIGNED_IN") {
-          if (!hasProfile) {
-             addNotification("session", "Account initialized. Let's set up your profile.");
+        // Run profile sync in background to avoid blocking the loading pulse
+        fetchProfile(session.user.id, session.user).then(hasProfile => {
+          if (_event === "SIGNED_IN" && !hasProfile) {
+            addNotification("session", "Account initialized. Let's set up your profile.");
           }
-        }
+        });
       } else {
         setUser(null);
       }
+      
+      // Strict loading gate clearance
       setIsLoading(false);
     });
 
     return () => subscription.unsubscribe();
-  }, [addNotification, router]);
+  }, [addNotification]);
 
   const login = async (email: string, pass: string) => {
     const { error } = await supabase.auth.signInWithPassword({ email, password: pass });
