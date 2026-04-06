@@ -79,7 +79,7 @@ export default function Sidebar({ currentTab, setTab, pendingCount = 0 }: Sideba
                 {item.label}
               </span>
             </div>
-            {item.pill > 0 && (
+            {item.pill !== undefined && item.pill > 0 && (
               <div className="px-2 py-1 bg-red-500 text-white font-mono text-[8px] rounded-md animate-pulse">
                 {item.pill}
               </div>
