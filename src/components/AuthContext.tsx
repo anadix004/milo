@@ -55,7 +55,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return true; 
       }
       
-      const role = baseUser.email === "anadimishra2006@gmail.com" ? "owner" : "user";
+      const role = baseUser.email === "milo.anadi@gmail.com" ? "owner" : "user";
       setUser({ ...baseUser, role } as AuthUser);
       return false; 
     } catch (err) {
