@@ -10,11 +10,12 @@ import {
   Globe,
   Loader2
 } from "lucide-react";
-import { supabase } from "@/utils/supabase";
+import { createClient } from "@/utils/supabase/client";
 import { motion } from "framer-motion";
 import clsx from "clsx";
 
 export default function PlatformPulse() {
+  const supabase = createClient();
   const [stats, setStats] = useState({
     liveEvents: 0,
     processedToday: 0,

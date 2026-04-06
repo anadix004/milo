@@ -5,8 +5,8 @@ import { User, Mail, Globe, Image as ImageIcon, QrCode, LogOut, X, ChevronRight,
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import clsx from "clsx";
+import { createClient } from "@/utils/supabase/client";
 import { useAuth } from "./AuthContext";
-import { supabase } from "@/utils/supabase";
 import IdentityScan from "./IdentityScan";
 
 const SPRING_CONFIG = { stiffness: 70, damping: 15 };
@@ -18,6 +18,7 @@ interface ProfileSidebarProps {
 }
 
 export default function ProfileSidebar({ isOpen, onClose, onAuthClick }: ProfileSidebarProps) {
+  const supabase = createClient();
   const { user, isAuthenticated, logout, refreshProfile, isAdmin, isOwner } = useAuth();
   const router = useRouter();
   const isTeam = user?.role === "team";

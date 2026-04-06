@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, PlusCircle, Globe, ShieldCheck, Lock, Upload, Video, Image as ImageIcon, CheckCircle2, Loader2 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { useAuth } from "./AuthContext";
-import { supabase } from "@/utils/supabase";
+import { createClient } from "@/utils/supabase/client";
 import { useNotifications } from "./NotificationContext";
 import { METRO_CITIES } from "@/constants/cities";
 import clsx from "clsx";
@@ -19,6 +19,7 @@ interface EventSubmissionProps {
 const SPRING_CONFIG = { stiffness: 70, damping: 15 };
 
 export default function EventSubmission({ isOpen, onClose, onAuthRedirect }: EventSubmissionProps) {
+  const supabase = createClient();
   const { user, isAuthenticated } = useAuth();
   const { addNotification } = useNotifications();
   const [isSubmitting, setIsSubmitting] = useState(false);

@@ -4,8 +4,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { useAuth } from "./AuthContext";
 import { useNotifications } from "./NotificationContext";
-import { supabase } from "@/utils/supabase";
+import { createClient } from "@/utils/supabase/client";
 import IdentityScan from "./IdentityScan";
+import { useRouter } from "next/navigation";
 import { 
   User as UserIcon, 
   Mail, 
@@ -26,8 +27,10 @@ type AuthStep = "gateway" | "login" | "signup-credentials" | "signup-handle" | "
 const SPRING_TRANSITION: any = { type: "spring", stiffness: 300, damping: 30 };
 
 export default function AuthModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+  const supabase = createClient();
   const { login, signUp, user, isAuthenticated, refreshProfile, recoverPassword, loginWithGoogle } = useAuth();
   const { addNotification } = useNotifications();
+  const router = useRouter();
   
   const [currentStep, setCurrentStep] = useState<AuthStep>("gateway");
   const [formData, setFormData] = useState({
@@ -125,6 +128,7 @@ export default function AuthModal({ isOpen, onClose }: { isOpen: boolean; onClos
       }
       
       await refreshProfile();
+      router.refresh();
       onClose();
     } catch (err: any) {
       setErrorStatus(err.message || "Operation Failed");

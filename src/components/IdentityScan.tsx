@@ -11,7 +11,7 @@ import {
   ShieldCheck,
   Zap
 } from "lucide-react";
-import { supabase } from "@/utils/supabase";
+import { createClient } from "@/utils/supabase/client";
 import { useAuth } from "./AuthContext";
 
 const SPRING_CONFIG = { stiffness: 70, damping: 15 };
@@ -20,7 +20,8 @@ interface IdentityScanProps {
   onComplete: (url: string) => void;
 }
 
-export default function IdentityScan({ onComplete }: IdentityScanProps) {
+export default function IdentityScan({ onComplete }: { onComplete: (url: string) => void }) {
+  const supabase = createClient();
   const { user } = useAuth();
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);

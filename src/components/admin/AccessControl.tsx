@@ -13,13 +13,14 @@ import {
   ExternalLink,
   Search
 } from "lucide-react";
-import { supabase } from "@/utils/supabase";
+import { createClient } from "@/utils/supabase/client";
 import { useAuth } from "@/components/AuthContext";
 import { useNotifications } from "@/components/NotificationContext";
 import EventSubmission from "@/components/EventSubmission";
 import clsx from "clsx";
 
 export default function AccessControl() {
+  const supabase = createClient();
   const { session } = useAuth();
   const { addNotification } = useNotifications();
   

@@ -4,7 +4,7 @@ import { useState, useMemo, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, MapPin, Calendar, Clock, Filter, Star, ChevronRight, X, Music, Trophy, Layout, Search as SearchIcon, Heart, Share2, Ticket, Check, ArrowUpDown, Send, Loader2 } from "lucide-react";
 import clsx from "clsx";
-import { supabase } from "@/utils/supabase";
+import { createClient } from "@/utils/supabase/client";
 import { useNotifications } from "./NotificationContext";
 import { useAuth } from "./AuthContext";
 import { parsePrice } from "@/utils/price";
@@ -125,6 +125,7 @@ function Dropdown({ label, value, options, onChange, icon }: DropdownProps) {
 }
 
 export default function EventListing({ selectedCity, onAuthRequired }: { selectedCity: string | null; onAuthRequired: () => void }) {
+  const supabase = createClient();
   const { isAuthenticated } = useAuth();
   const { addNotification } = useNotifications();
   const [events, setEvents] = useState<EventData[]>([]);

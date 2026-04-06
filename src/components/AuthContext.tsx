@@ -1,39 +1,38 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, useRef } from "react";
-import { supabase } from "@/utils/supabase";
+import { createClient } from "@/utils/supabase/client";
 import { useNotifications } from "./NotificationContext";
 import { Session, User } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
 
 interface AuthUser extends User {
   username?: string;
-  avatar_url?: string;
-  mobile?: string;
-  gender?: string;
-  dob?: string;
+  full_name?: string;
   display_name?: string;
-  role: "owner" | "admin" | "team" | "user";
+  avatar_url?: string;
+  role?: string;
 }
 
 interface AuthContextType {
   user: AuthUser | null;
   session: Session | null;
   isLoading: boolean;
-  login: (email: string, pass: string) => Promise<void>;
-  signUp: (email: string, pass: string, name: string) => Promise<void>;
-  loginWithGoogle: () => Promise<void>;
-  logout: () => Promise<void>;
-  isAuthenticated: boolean;
-  refreshProfile: () => Promise<void>;
-  recoverPassword: (email: string) => Promise<void>;
   isAdmin: boolean;
   isOwner: boolean;
+  isAuthenticated: boolean;
+  login: (email: string, pass: string) => Promise<void>;
+  signUp: (email: string, pass: string, data: any) => Promise<void>;
+  logout: () => Promise<void>;
+  refreshProfile: () => Promise<void>;
+  recoverPassword: (email: string) => Promise<void>;
+  loginWithGoogle: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const supabase = createClient();
   const [user, setUser] = useState<AuthUser | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -54,7 +53,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const isOwnerEmail = baseUser.email === "milo.anadi@gmail.com";
       
       if (data) {
-        // Hardcoded Owner Priority: If email matches, role MUST be owner.
         const role = isOwnerEmail ? "owner" : (data.role || "user");
         setUser({ ...baseUser, ...data, role } as AuthUser);
         return true; 
@@ -99,7 +97,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setSession(session);
       if (session?.user) {
-        // Run profile sync in background to avoid blocking the loading pulse
         fetchProfile(session.user.id, session.user).then(hasProfile => {
           if (_event === "SIGNED_IN" && !hasProfile) {
             addNotification("session", "Account initialized. Let's set up your profile.");
@@ -108,39 +105,38 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } else {
         setUser(null);
       }
-      
-      // Strict loading gate clearance
       setIsLoading(false);
+      
+      // Trigger router.refresh to sync with Server Components/Middleware
+      router.refresh();
     });
 
     return () => subscription.unsubscribe();
-  }, [addNotification]);
+  }, [addNotification, router, supabase]);
 
   const login = async (email: string, pass: string) => {
     const { error } = await supabase.auth.signInWithPassword({ email, password: pass });
     if (error) {
       addNotification("system", `Login failed: ${error.message}`);
     } else {
-       addNotification("session", "Login successful. Welcome back.");
+      addNotification("session", "Identity verified. Redirecting...");
+      router.refresh();
+      router.push("/");
     }
   };
 
-  const signUp = async (email: string, pass: string, name: string) => {
-    try {
-
-      const { error } = await supabase.auth.signUp({ 
-        email, 
-        password: pass,
-        options: { data: { display_name: name, full_name: name } }
-      });
-      
-      if (error) {
-        addNotification("system", `Signup failed: ${error.message}`);
-      } else {
-         addNotification("session", "Account created. Please verify your email.");
-      }
-    } catch (err) {
-       addNotification("system", "Authentication error: Connection failed.");
+  const signUp = async (email: string, pass: string, data: any) => {
+    const { error } = await supabase.auth.signUp({
+      email,
+      password: pass,
+      options: { data }
+    });
+    if (error) {
+      addNotification("system", `Signup failed: ${error.message}`);
+    } else {
+      addNotification("session", "Enrollment successful. Welcome to Milo.");
+      router.refresh();
+      router.push("/");
     }
   };
 
@@ -148,18 +144,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: window.location.origin,
-      },
+        redirectTo: `${window.location.origin}/auth/callback`
+      }
     });
-    if (error) addNotification("system", `Google Auth failed: ${error.message}`);
+    if (error) {
+      addNotification("system", `Google Auth failed: ${error.message}`);
+    }
   };
 
   const logout = async () => {
     await supabase.auth.signOut();
-    localStorage.removeItem("milo_user");
     setUser(null);
     setSession(null);
+    router.refresh();
     router.push("/");
+    addNotification("session", "Identity purged. Nexus disconnected.");
   };
 
   const recoverPassword = async (email: string) => {
@@ -169,27 +168,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (error) {
        addNotification("system", `Recovery failed: ${error.message}`);
     } else {
-       addNotification("session", "Password reset link sent to your email.");
+       addNotification("session", "Recovery pulse sent. Check your inbox.");
     }
   };
 
-  const isAdmin = user?.role === "owner" || user?.role === "admin" || user?.role === "team";
+  const isAdmin = user?.role === "admin" || user?.role === "owner";
   const isOwner = user?.role === "owner";
+  const isAuthenticated = !!session;
 
   return (
     <AuthContext.Provider value={{ 
       user, 
       session, 
       isLoading, 
+      isAdmin, 
+      isOwner, 
+      isAuthenticated,
       login, 
-      signUp,
-      loginWithGoogle,
-      logout, 
-      isAuthenticated: !!session?.user,
+      signUp, 
+      logout,
       refreshProfile,
       recoverPassword,
-      isAdmin,
-      isOwner
+      loginWithGoogle
     }}>
       {children}
     </AuthContext.Provider>

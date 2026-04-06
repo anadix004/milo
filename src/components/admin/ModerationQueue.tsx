@@ -11,11 +11,12 @@ import {
   Loader2,
   AlertCircle
 } from "lucide-react";
-import { supabase } from "@/utils/supabase";
+import { createClient } from "@/utils/supabase/client";
 import { useNotifications } from "@/components/NotificationContext";
 import clsx from "clsx";
 
 export default function ModerationQueue() {
+  const supabase = createClient();
   const { addNotification } = useNotifications();
   const [queue, setQueue] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
