@@ -20,12 +20,14 @@ import ProfileSidebar from "@/components/ProfileSidebar";
 import EventSubmission from "@/components/EventSubmission";
 import AuthModal from "@/components/AuthModal";
 
+import BottomNav from "@/components/mobile/BottomNav";
+
 export default function Home() {
   const { isAuthenticated } = useAuth();
   const [selectedCity, setSelectedCity] = useState<string | null>(null);
   const [isReady, setIsReady] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [activeModal, setActiveModal] = useState<"profile" | "event" | "auth" | null>(null);
+  const [activeModal, setActiveModal] = useState<"profile" | "event" | "auth" | "notifications" | null>(null);
 
   useEffect(() => {
     const allAssets = [...HERO_FRAMES.map(f => `/sequence/frames/${f}`), ...CITY_IMAGES];
@@ -33,25 +35,31 @@ export default function Home() {
     const totalAssets = allAssets.length;
 
     const preload = async () => {
-      const promises = allAssets.map((src) => {
+      const isMobile = window.innerWidth < 768;
+      // Skip heavy city images on mobile to save ~24MB of data
+      const assetsToLoad = isMobile 
+        ? HERO_FRAMES.filter((_, i) => i % 2 === 0).map(f => `/sequence/frames/${f}`)
+        : allAssets;
+
+      const promises = assetsToLoad.map((src) => {
         return new Promise((resolve) => {
           const img = new Image();
           img.src = src;
           img.onload = () => {
             loadedCount++;
-            setProgress((loadedCount / totalAssets) * 100);
+            setProgress((loadedCount / assetsToLoad.length) * 100);
             resolve(true);
           };
           img.onerror = () => {
             loadedCount++;
-            setProgress((loadedCount / totalAssets) * 100);
+            setProgress((loadedCount / assetsToLoad.length) * 100);
             resolve(true);
           };
         });
       });
 
       await Promise.all(promises);
-      setTimeout(() => setIsReady(true), 1200); // Aesthetic delay
+      setTimeout(() => setIsReady(true), isMobile ? 600 : 1200);
     };
 
     preload();
@@ -68,7 +76,7 @@ export default function Home() {
   };
 
   return (
-    <main className="w-full bg-[#000000]">
+    <main className="w-full bg-[#000000] pb-[80px] md:pb-0">
       <Preloader progress={progress} isReady={isReady} />
       
       <Header 
@@ -94,8 +102,12 @@ export default function Home() {
         onClose={() => setActiveModal(null)}
       />
 
-      {/* Show content only when partially ready to avoid flashes, 
-          but technically Preloader handles the overlay */}
+      <BottomNav 
+        onProfileClick={() => setActiveModal("profile")}
+        onEventClick={() => handleAuthGate(() => setActiveModal("event"))}
+        onNotificationsClick={() => setActiveModal("notifications")}
+      />
+
       <div className={isReady ? "opacity-100" : "opacity-0 transition-opacity duration-1000"}>
         <HeroSection />
         <CitySelector 

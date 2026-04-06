@@ -43,12 +43,15 @@ const CITIES = [
   }
 ];
 
+import { useIsMobile } from "@/hooks/useMediaQuery";
+
 interface CitySelectorProps {
   selectedCity: string | null;
   onSelect: (id: string | null) => void;
 }
 
 export default function CitySelector({ selectedCity, onSelect }: CitySelectorProps) {
+  const isMobile = useIsMobile();
   const [isOpen, setIsOpen] = useState(false);
   const selectedCityData = CITIES.find(c => c.id === selectedCity);
 
@@ -61,7 +64,10 @@ export default function CitySelector({ selectedCity, onSelect }: CitySelectorPro
       <div className="w-full max-w-7xl mx-auto px-4 md:px-12 flex flex-col items-center">
         <motion.div
           onClick={() => setIsOpen(!isOpen)}
-          className="relative group w-full max-w-md bg-white/[0.02] border border-white/[0.05] rounded-full px-8 py-4 flex items-center justify-between cursor-pointer backdrop-blur-3xl transition-all duration-500 hover:border-white/20 hover:bg-white/[0.04]"
+          className={clsx(
+            "relative group w-full bg-white/[0.02] border border-white/[0.05] rounded-full px-8 py-4 flex items-center justify-between cursor-pointer backdrop-blur-3xl transition-all duration-500 hover:border-white/20 hover:bg-white/[0.04]",
+            isMobile ? "max-w-none" : "max-w-md"
+          )}
         >
           <div className="flex items-center gap-4">
             <div className="w-5 h-5 text-white/50 group-hover:text-white transition-colors">
@@ -70,7 +76,7 @@ export default function CitySelector({ selectedCity, onSelect }: CitySelectorPro
               </svg>
             </div>
             <span className="font-[family-name:var(--font-lexend)] text-xs md:text-sm font-black uppercase tracking-[0.4em] text-white/80 group-hover:text-white truncate">
-              {selectedCityData ? `YOUR CITY: ${selectedCityData.name}` : "SELECT YOUR CITY"}
+              {selectedCityData ? `${isMobile ? "" : "YOUR CITY: "}${selectedCityData.name}` : "SELECT YOUR CITY"}
             </span>
           </div>
 
@@ -83,7 +89,6 @@ export default function CitySelector({ selectedCity, onSelect }: CitySelectorPro
             </svg>
           </motion.div>
 
-          {/* Pulsing indicator if not selected */}
           {!selectedCity && !isOpen && (
             <div className="absolute -right-2 -top-2 w-4 h-4 bg-white rounded-full animate-ping opacity-20" />
           )}
@@ -99,11 +104,14 @@ export default function CitySelector({ selectedCity, onSelect }: CitySelectorPro
               transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
               className="w-full mt-8"
             >
-              <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-2 py-8 flex-wrap">
+              <div className={clsx(
+                "flex items-center justify-center gap-4 py-8",
+                isMobile ? "flex-col w-full" : "flex-row flex-wrap md:gap-2"
+              )}>
                 {CITIES.map((city, idx) => (
-                  <div key={city.id} className="flex items-center group/container">
+                  <div key={city.id} className={clsx("flex items-center group/container", isMobile && "w-full")}>
                     {/* Compact Separator */}
-                    {idx !== 0 && <div className="hidden lg:block w-px h-8 bg-white/10 mx-4" />}
+                    {idx !== 0 && !isMobile && <div className="hidden lg:block w-px h-8 bg-white/10 mx-4" />}
                     
                     {/* Monument Selection Trigger */}
                     <div
@@ -113,7 +121,8 @@ export default function CitySelector({ selectedCity, onSelect }: CitySelectorPro
                       }}
                       className={clsx(
                         "flex items-center gap-4 md:gap-6 px-6 md:px-8 py-3 md:py-4 cursor-pointer transition-all duration-700 rounded-full border border-transparent hover:border-white/10 hover:bg-white/[0.03]",
-                        selectedCity === city.id ? "bg-white/[0.05] border-white/20 scale-105" : "opacity-40 hover:opacity-100"
+                        isMobile && "w-full bg-white/[0.015] border-white/5",
+                        selectedCity === city.id ? "bg-white/[0.05] border-white/20 scale-[1.02] md:scale-105" : "opacity-40 hover:opacity-100"
                       )}
                     >
                       {/* Monument Icon */}
@@ -121,8 +130,8 @@ export default function CitySelector({ selectedCity, onSelect }: CitySelectorPro
                         {city.monument}
                       </div>
 
-                      <div className="flex items-center gap-3 md:gap-4">
-                        {/* Selector Trigger (In Front of Name) */}
+                      <div className="flex items-center gap-3 md:gap-4 flex-1">
+                        {/* Selector Trigger */}
                         <div className="relative w-3 h-3 md:w-4 md:h-4 flex items-center justify-center">
                           <div className={clsx(
                             "absolute inset-0 rounded-full border border-white/20 transition-all",
@@ -142,6 +151,10 @@ export default function CitySelector({ selectedCity, onSelect }: CitySelectorPro
                           {city.name}
                         </h2>
                       </div>
+                      
+                      {isMobile && selectedCity === city.id && (
+                        <CheckCircle2 size={16} className="text-white/60" />
+                      )}
                     </div>
                   </div>
                 ))}
@@ -155,8 +168,10 @@ export default function CitySelector({ selectedCity, onSelect }: CitySelectorPro
       <div className="mt-12 flex gap-8 md:gap-12 font-[family-name:var(--font-roboto-mono)] text-[8px] tracking-[0.6em] uppercase text-white/5 items-center px-4 text-center">
         <span>Identity Scan: ACTIVE</span>
         <div className="hidden md:block w-24 h-px bg-white/10" />
-        <span className="hidden sm:inline">City selection required to see events</span>
+        <span className={clsx(isMobile ? "text-[6px]" : "hidden md:inline")}>City synchronization Required</span>
       </div>
     </section>
   );
 }
+
+import { CheckCircle2 } from "lucide-react";

@@ -1,9 +1,17 @@
 "use client";
-
 import { ReactLenis } from "lenis/react";
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useState } from "react";
 
 export default function SmoothScroll({ children }: { children: ReactNode }) {
+  const [isMobile, setIsMobile] = useState(false);
+  
+  useEffect(() => {
+    // Disable Lenis on mobile to permit native momentum scroll
+    setIsMobile(window.innerWidth < 768);
+  }, []);
+
+  if (isMobile) return <>{children}</>;
+  
   return (
     <ReactLenis root options={{ 
         lerp: 0.1, 

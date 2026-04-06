@@ -25,6 +25,12 @@ const robotoMono = Roboto_Mono({
 export const metadata: Metadata = {
   title: "Milo | Cinematic Event Radar",
   description: "High-end, immersive city event discovery.",
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 1,
+    viewportFit: "cover",
+  },
 };
 
 export default function RootLayout({

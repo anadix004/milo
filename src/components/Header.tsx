@@ -1,44 +1,32 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { useAuth } from "./AuthContext";
-import { useNotifications } from "./NotificationContext";
-import PigeonLogo from "./PigeonLogo";
+import { User, Plus, Bell, MessageSquare } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useState } from "react";
 import clsx from "clsx";
-import { Bell, User, PlusCircle } from "lucide-react";
-import NotificationSidebar from "./NotificationSidebar";
+import { motion } from "framer-motion";
 
 interface HeaderProps {
   onProfileClick: () => void;
-  onChatClick?: () => void;
   onEventClick: () => void;
   isSidebarOpen: boolean;
 }
 
-export default function Header({ onProfileClick, onChatClick, onEventClick, isSidebarOpen }: HeaderProps) {
+export default function Header({ onProfileClick, onEventClick, isSidebarOpen }: HeaderProps) {
   const { user, isAuthenticated } = useAuth();
-  const { unreadCount } = useNotifications();
-  const pathname = usePathname();
-  const isChatPage = pathname === "/chat";
-  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
-  
+
   const scrollToTop = () => {
-    if (pathname === "/") {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (
     <header className="fixed top-0 inset-x-0 w-full pt-4 pl-4 pr-2 md:pt-6 md:pl-8 md:pr-4 flex justify-between items-start z-[100] pointer-events-none mix-blend-screen">
-      {/* Top Left: Profile & Logo */}
+      {/* Top Left: Profile & Logo (Left) - Hidden on Mobile */}
       <div className="flex items-center gap-6 pointer-events-auto">
         <button 
           onClick={onProfileClick}
           className={clsx(
-            "relative px-4 py-2 rounded-full flex items-center justify-center gap-2 border border-white/10 backdrop-blur-md transition-all duration-500",
+            "hidden md:flex relative px-4 py-2 rounded-full items-center justify-center gap-2 border border-white/10 backdrop-blur-md transition-all duration-500",
             isSidebarOpen ? "bg-white text-black border-white" : "bg-black/20 text-white hover:bg-white/10"
           )}
         >
@@ -55,70 +43,42 @@ export default function Header({ onProfileClick, onChatClick, onEventClick, isSi
         >
           <motion.div
             animate={{ 
-              scale: [1, 1.2, 1],
-              opacity: [0.3, 0.6, 0.3]
+              textShadow: [
+                "0 0 10px rgba(255,255,255,0.2)",
+                "0 0 20px rgba(255,255,255,0.4)",
+                "0 0 10px rgba(255,255,255,0.2)"
+              ]
             }}
-            transition={{ 
-              duration: 4, 
-              repeat: Infinity, 
-              ease: "easeInOut" 
-            }}
-            className="absolute w-16 h-16 bg-white/10 rounded-full blur-xl group-hover:bg-white/20 transition-colors duration-500"
-          />
-          
-          <span className="relative font-[family-name:var(--font-lexend)] text-white text-sm md:text-lg font-bold tracking-[0.2em] lowercase">
-            milo
-          </span>
+            transition={{ duration: 3, repeat: Infinity }}
+            className="flex flex-col items-center"
+          >
+            <h1 className="font-[family-name:var(--font-lexend)] text-2xl md:text-3xl font-black uppercase tracking-[0.4em] text-white italic">
+              MILO
+            </h1>
+            <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-white/40 to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-700" />
+          </motion.div>
         </Link>
       </div>
 
-      <div className="flex gap-2 md:gap-4 items-center flex-row pointer-events-auto">
-        {/* Pigeon Chat */}
-        <Link 
-          href="/chat"
-          className={clsx(
-            "relative w-10 h-10 rounded-full flex items-center justify-center border backdrop-blur-md transition-all group",
-            isChatPage 
-              ? "bg-cyan-500 text-white border-cyan-400" 
-              : "bg-black/20 border-white/10 text-white/70 hover:text-white hover:bg-white/10"
-          )}
-        >
-          <PigeonLogo size={20} animate={!isChatPage} />
-          {!isChatPage && (
-            <span className="absolute -top-1 -right-1 w-3 h-3 bg-cyan-500 rounded-full blur-[2px] opacity-60 animate-pulse" />
-          )}
+      {/* Global Command Center (Right) */}
+      <div className="flex items-center gap-2 md:gap-4 pointer-events-auto">
+        <Link href="/chat" className="group flex items-center gap-2 bg-black/20 border border-white/10 backdrop-blur-md rounded-full px-4 py-2 transition-all duration-500 hover:border-white/30 hover:bg-white/10">
+          <div className="w-1.5 h-1.5 rounded-full bg-cyan-500 shadow-[0_0_8px_rgba(6,182,212,0.5)] group-hover:animate-pulse" />
+          <span className="font-[family-name:var(--font-lexend)] text-[9px] font-black uppercase tracking-[0.1em] text-white/60 group-hover:text-white">Pigeon</span>
+          <MessageSquare size={12} className="text-white/20 group-hover:text-white transition-colors" />
         </Link>
 
-        {/* Create Event */}
         <button 
           onClick={onEventClick}
-          className="relative w-10 h-10 rounded-full flex items-center justify-center bg-black/20 border border-white/10 backdrop-blur-md text-white/70 hover:text-white hover:bg-white/10 transition-all"
+          className="hidden md:flex items-center justify-center w-10 h-10 rounded-full bg-white text-black hover:scale-110 active:scale-95 transition-all duration-500 shadow-[0_0_20px_rgba(255,255,255,0.2)]"
         >
-          <PlusCircle size={18} />
-        </button>
-
-        {/* Notifications */}
-        <button 
-          onClick={() => setIsNotificationsOpen(true)}
-          className="relative w-10 h-10 rounded-full flex items-center justify-center bg-black/80 border border-white/5 backdrop-blur-md text-white/70 hover:text-white hover:bg-white/10 transition-all font-black"
-        >
-          <Bell size={18} />
-          {unreadCount > 0 && (
-            <motion.span 
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              className="absolute -top-1 -right-1 w-4 h-4 bg-purple-500 rounded-full flex items-center justify-center text-[8px] font-black font-lexend text-white border-2 border-black"
-            >
-              {unreadCount}
-            </motion.span>
-          )}
+          <Plus size={18} strokeWidth={3} />
         </button>
         
-
-        <NotificationSidebar 
-           isOpen={isNotificationsOpen} 
-           onClose={() => setIsNotificationsOpen(false)} 
-        />
+        <button className="hidden md:flex items-center justify-center w-10 h-10 rounded-full bg-black/20 border border-white/10 text-white/40 hover:text-white hover:border-white/30 hover:bg-white/10 transition-all duration-500 relative backdrop-blur-md">
+          <Bell size={18} />
+          <div className="absolute top-0 right-0 w-2.5 h-2.5 bg-purple-500 rounded-full border-2 border-black" />
+        </button>
       </div>
     </header>
   );
