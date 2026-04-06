@@ -23,8 +23,10 @@ import clsx from "clsx";
 type AdminTab = "queue" | "pulse" | "access" | "audit";
 
 const SPRING_CONFIG = { stiffness: 70, damping: 15 };
-const SECURITY_KEY = "nexus_secure_2026"; 
-const ADMIN_ID = "admin_milo"; 
+const OWNER_PASS = "milo_owner_vault_2026"; 
+const OWNER_ID = "owner_milo"; 
+const TEAM_PASS = "milo_team_secure_2026";
+const TEAM_ID = "team_milo";
 
 export default function AdminPortal() {
   const { user, isAdmin, isOwner, login, logout, isLoading: authLoading, recoverPassword, isAuthenticated } = useAuth();
@@ -45,10 +47,16 @@ export default function AdminPortal() {
     e.preventDefault();
     setLoginError(false);
     
-    // Direct Identification Bridge (Owner Bypass)
-    if (idInput === ADMIN_ID && passInput === SECURITY_KEY) {
+    // Direct Identification Bridge (Owner & Team Bypass)
+    if (idInput === OWNER_ID && passInput === OWNER_PASS) {
       setIsAuthorized(true);
-      addNotification("session", "Admin Hub: Direct Bridge Established.");
+      addNotification("session", "Root Command: Direct Bridge Established.");
+      return;
+    }
+
+    if (idInput === TEAM_ID && passInput === TEAM_PASS) {
+      setIsAuthorized(true);
+      addNotification("session", "Team Access: Direct Bridge Established.");
       return;
     }
 
