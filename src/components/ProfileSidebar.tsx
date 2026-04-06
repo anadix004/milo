@@ -1,10 +1,12 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { User, Mail, Globe, Image as ImageIcon, QrCode, LogOut, X, ChevronRight, ShieldCheck } from "lucide-react";
+import { User, Mail, Globe, Image as ImageIcon, QrCode, LogOut, X, ChevronRight, ShieldCheck, Camera, Loader2 } from "lucide-react";
 import { useState } from "react";
 import clsx from "clsx";
 import { useAuth } from "./AuthContext";
+import { supabase } from "@/utils/supabase";
+import IdentityScan from "./IdentityScan";
 
 const SPRING_CONFIG = { stiffness: 70, damping: 15 };
 
@@ -15,14 +17,44 @@ interface ProfileSidebarProps {
 }
 
 export default function ProfileSidebar({ isOpen, onClose, onAuthClick }: ProfileSidebarProps) {
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, logout, refreshProfile } = useAuth();
   const [isUploading, setIsUploading] = useState(false);
   const [isGhostMode, setIsGhostMode] = useState(false);
   const [showPass, setShowPass] = useState(false);
+  const [isUpdatingAvatar, setIsUpdatingAvatar] = useState(false);
+  const [updateMode, setUpdateMode] = useState<"camera" | "upload" | null>(null);
 
-  const simulateUpload = () => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+
     setIsUploading(true);
-    setTimeout(() => setIsUploading(false), 2000);
+    try {
+      const fileName = `${user.id}_manual_${Date.now()}.${file.name.split('.').pop()}`;
+      
+      const { error: uploadError } = await supabase.storage
+        .from("avatars")
+        .upload(fileName, file);
+
+      if (uploadError) throw uploadError;
+
+      const publicUrl = supabase.storage.from("avatars").getPublicUrl(fileName).data.publicUrl;
+
+      const { error: profileError } = await supabase
+        .from("profiles")
+        .update({ avatar_url: publicUrl })
+        .eq("id", user.id);
+
+      if (profileError) throw profileError;
+
+      await refreshProfile();
+      setIsUpdatingAvatar(false);
+      setUpdateMode(null);
+    } catch (err) {
+      console.error("Manual upload failed:", err);
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   return (
@@ -59,9 +91,17 @@ export default function ProfileSidebar({ isOpen, onClose, onAuthClick }: Profile
 
             {/* Profile Section */}
             <div className="flex flex-col items-center mb-12">
-              <div className="relative group cursor-pointer">
+              <div 
+                onClick={() => {
+                  if (isAuthenticated) setIsUpdatingAvatar(!isUpdatingAvatar);
+                }}
+                className={clsx(
+                  "relative group cursor-pointer transition-transform active:scale-95",
+                  !isAuthenticated && "cursor-default opacity-50"
+                )}
+              >
                 <div className={clsx(
-                  "w-32 h-32 rounded-full transition-all duration-500 border-2 overflow-hidden flex items-center justify-center bg-white/[0.02]",
+                  "w-32 h-32 rounded-full transition-all duration-500 border-2 overflow-hidden flex items-center justify-center bg-white/[0.02] relative",
                   isGhostMode ? "bg-emerald-500/10 shadow-[0_0_30px_rgba(16,185,129,0.3)] border-emerald-400" : "border-white/5 hover:border-white/20"
                 )}>
                   {user?.avatar_url ? (
@@ -69,14 +109,21 @@ export default function ProfileSidebar({ isOpen, onClose, onAuthClick }: Profile
                   ) : (
                     <User size={40} className={clsx("transition-colors", isGhostMode ? "text-emerald-400" : "text-white/20")} />
                   )}
+                  {isAuthenticated && (
+                     <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity backdrop-blur-sm">
+                        <Camera size={20} className="text-white" />
+                     </div>
+                  )}
                 </div>
-                <div className="absolute bottom-2 right-2 w-8 h-8 bg-black/60 backdrop-blur-md rounded-full border border-white/10 flex items-center justify-center text-white/70 group-hover:text-white transition-colors">
-                  <ImageIcon size={14} />
-                </div>
+                {isAuthenticated && (
+                   <div className="absolute bottom-2 right-2 w-8 h-8 bg-black/60 backdrop-blur-md rounded-full border border-white/10 flex items-center justify-center text-white/70 group-hover:text-white transition-colors">
+                      <ImageIcon size={14} />
+                   </div>
+                )}
               </div>
               <div className="text-center mt-6 space-y-2">
                  <p className="text-sm font-black text-white uppercase tracking-tight">
-                    {isAuthenticated ? (user?.display_name || user?.email?.split('@')[0]) : "Guest User"}
+                    {isAuthenticated ? (user?.username || user?.display_name || user?.email?.split('@')[0]) : "Guest User"}
                  </p>
                  <p className="text-[8px] font-mono text-white/20 uppercase tracking-[0.4em] font-black">
                     {isAuthenticated ? "Pulse Active // Verified" : "Radar Unauthorized"}
@@ -99,6 +146,81 @@ export default function ProfileSidebar({ isOpen, onClose, onAuthClick }: Profile
                       </button>
                    </div>
                 </div>
+              ) : isUpdatingAvatar ? (
+                /* Avatar Update Pulse */
+                <motion.div 
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className="space-y-8"
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-white/40 text-[9px] uppercase tracking-widest font-black font-mono">Identity Update</h3>
+                    <button onClick={() => setIsUpdatingAvatar(false)} className="p-2 text-white/20 hover:text-white"><X size={16}/></button>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-3">
+                    <button 
+                      onClick={() => setUpdateMode(updateMode === "camera" ? null : "camera")}
+                      className={clsx(
+                        "p-6 rounded-[1.5rem] border flex items-center justify-between transition-all",
+                        updateMode === "camera" ? "bg-white text-black border-white" : "bg-white/5 border-white/5 hover:border-white/20 text-white"
+                      )}
+                    >
+                      <div className="flex items-center gap-4">
+                        <Camera size={20} />
+                        <div className="text-left">
+                          <p className="font-black text-[10px] tracking-widest uppercase">Live Pulse Sync</p>
+                          <p className="text-[7px] uppercase tracking-widest opacity-40">Identity Scan Pulse</p>
+                        </div>
+                      </div>
+                    </button>
+                    
+                    <div className="relative group">
+                       <input 
+                         type="file" 
+                         accept="image/*" 
+                         onChange={handleFileUpload}
+                         className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                       />
+                       <button 
+                         className={clsx(
+                           "w-full p-6 bg-white/5 border border-white/5 rounded-[1.5rem] flex items-center gap-4 text-white group-hover:border-white/20 transition-all",
+                           isUploading && "opacity-50 cursor-not-allowed"
+                         )}
+                       >
+                         {isUploading ? <Loader2 size={20} className="animate-spin" /> : <ImageIcon size={20} />}
+                         <div className="text-left">
+                           <p className="font-black text-[10px] tracking-widest uppercase">File Upload</p>
+                           <p className="text-[7px] uppercase tracking-widest opacity-40">Static Identity Sync</p>
+                         </div>
+                       </button>
+                    </div>
+                  </div>
+
+                  <AnimatePresence>
+                    {updateMode === "camera" && (
+                      <motion.div 
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        className="p-4 bg-white/5 rounded-3xl border border-white/5 overflow-hidden"
+                      >
+                         <IdentityScan onComplete={async () => {
+                           await refreshProfile();
+                           setIsUpdatingAvatar(false);
+                           setUpdateMode(null);
+                         }} />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
+                  <button 
+                    onClick={() => setIsUpdatingAvatar(false)}
+                    className="w-full text-center font-mono text-[8px] text-white/20 uppercase tracking-widest hover:text-white transition-colors py-4 font-black"
+                  >
+                    Return to Profile
+                  </button>
+                </motion.div>
               ) : (
                 /* Profile Hub */
                 <div className="space-y-8">

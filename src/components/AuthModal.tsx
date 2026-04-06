@@ -40,12 +40,17 @@ export default function AuthModal({ isOpen, onClose }: { isOpen: boolean; onClos
   const [isSyncing, setIsSyncing] = useState(false);
   const [errorStatus, setErrorStatus] = useState<string | null>(null);
 
-  // Transition to identity scan if authenticated but profile incomplete
+  // Detect missing handle for existing users (especially Google entrants)
   useEffect(() => {
-    if (isAuthenticated && currentStep !== "identity") {
-      setCurrentStep("identity");
+    if (isAuthenticated && user) {
+      if (!user.username) {
+        setCurrentStep("signup-handle");
+      } else if (currentStep !== "identity") {
+        // We no longer force identity scan here. 
+        // If they have a username, we let them proceed.
+      }
     }
-  }, [isAuthenticated, currentStep]);
+  }, [isAuthenticated, user, currentStep]);
 
   const handleNext = () => {
     setErrorStatus(null);
@@ -76,22 +81,37 @@ export default function AuthModal({ isOpen, onClose }: { isOpen: boolean; onClos
     setIsSyncing(true);
     setErrorStatus(null);
     try {
-      // Pass username into metadata as requested
-      const { data, error } = await supabase.auth.signUp({
-        email: formData.email,
-        password: formData.password,
-        options: {
-          data: {
+      if (isAuthenticated) {
+        // Handle existing users (like Google) needing a username
+        const { error } = await supabase.auth.updateUser({
+          data: { 
             username: formData.username,
             full_name: formData.name || formData.username
           }
-        }
-      });
+        });
+        if (error) throw error;
+        addNotification("session", "Identity pulse updated. Handle verified.");
+      } else {
+        // Standard signup for new accounts
+        const { error } = await supabase.auth.signUp({
+          email: formData.email,
+          password: formData.password,
+          options: {
+            data: {
+              username: formData.username,
+              full_name: formData.name || formData.username
+            }
+          }
+        });
+        if (error) throw error;
+        addNotification("session", "Signup successful. Initialize pulse...");
+      }
       
-      if (error) throw error;
-      addNotification("session", "Signup successful. Verifying identity...");
+      // Sync and close
+      await refreshProfile();
+      onClose();
     } catch (err: any) {
-      setErrorStatus(err.message || "Signup Failed");
+      setErrorStatus(err.message || "Operation Failed");
     } finally {
       setIsSyncing(false);
     }
@@ -108,6 +128,12 @@ export default function AuthModal({ isOpen, onClose }: { isOpen: boolean; onClos
     setFormData({ email: "", password: "", username: "", name: "" });
     setErrorStatus(null);
     onClose();
+  };
+
+  // Helper to switch steps and clear errors
+  const transitionTo = (step: AuthStep) => {
+    setErrorStatus(null);
+    setCurrentStep(step);
   };
 
   return (
@@ -133,7 +159,7 @@ export default function AuthModal({ isOpen, onClose }: { isOpen: boolean; onClos
              <div className="absolute top-8 left-8 right-8 flex justify-between items-center z-20">
                 {currentStep !== "gateway" && currentStep !== "identity" && (
                    <button 
-                     onClick={() => setCurrentStep("gateway")}
+                     onClick={() => transitionTo("gateway")}
                      className="text-white/20 hover:text-white transition-colors p-2 -ml-2"
                    >
                       <ArrowLeft size={20} />
@@ -183,13 +209,13 @@ export default function AuthModal({ isOpen, onClose }: { isOpen: boolean; onClos
 
                          <div className="space-y-3">
                             <button 
-                              onClick={() => setCurrentStep("login")}
+                              onClick={() => transitionTo("login")}
                               className="w-full bg-white/5 border border-white/10 text-white py-5 rounded-3xl font-black uppercase tracking-widest text-[9px] hover:bg-white/10 transition-all"
                             >
                                Log In
                             </button>
                             <button 
-                              onClick={() => setCurrentStep("signup-credentials")}
+                              onClick={() => transitionTo("signup-credentials")}
                               className="w-full bg-white/5 border border-white/10 text-white/40 py-5 rounded-3xl font-black uppercase tracking-widest text-[9px] hover:text-white transition-all"
                             >
                                Create Account
@@ -303,11 +329,26 @@ export default function AuthModal({ isOpen, onClose }: { isOpen: boolean; onClos
                          <p className="font-mono text-[9px] text-white/20 uppercase tracking-[0.5em] font-black">Choose your Radar Identity</p>
                       </div>
 
-                      <form onSubmit={executeSignUp} className="space-y-8">
+                      <form 
+                        onSubmit={(e) => {
+                          e.preventDefault();
+                          if (isAuthenticated) {
+                            // Logic for existing Google users needing a handle could go here, 
+                            // but usually signUp is for brand new ones.
+                            // For simplicity, if already auth'd and needing handle, we might need a separate updateProfile function.
+                            executeSignUp(e);
+                          } else {
+                            executeSignUp(e);
+                          }
+                        }} 
+                        className="space-y-8"
+                      >
                          <div className="relative group">
                             <AtSign className="absolute left-6 top-1/2 -translate-y-1/2 text-white/20" size={18} />
                             <input 
                               type="text" 
+                              name="radar_identity_nexus"
+                              autoComplete="off"
                               placeholder="USERNAME" 
                               value={formData.username} 
                               onChange={(e) => setFormData({...formData, username: e.target.value.toLowerCase().replace(/\s/g, "")})} 
@@ -363,3 +404,4 @@ export default function AuthModal({ isOpen, onClose }: { isOpen: boolean; onClos
     </AnimatePresence>
   );
 }
+
