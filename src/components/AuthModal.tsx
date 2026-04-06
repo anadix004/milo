@@ -56,9 +56,21 @@ export default function AuthModal({ isOpen, onClose }: { isOpen: boolean; onClos
     setErrorStatus(null);
     if (currentStep === "signup-credentials") {
       if (!formData.email || !formData.password) {
-        setErrorStatus("Credentials Required");
+        setErrorStatus("Identity Credentials Required");
         return;
       }
+      
+      // Client-side Pulse Validation for Password
+      const hasUpper = /[A-Z]/.test(formData.password);
+      const hasLower = /[a-z]/.test(formData.password);
+      const hasNumber = /[0-9]/.test(formData.password);
+      const isLongEnough = formData.password.length >= 8;
+
+      if (!hasUpper || !hasLower || !hasNumber || !isLongEnough) {
+        setErrorStatus("Password must be 8+ chars with Uppercase, Lowercase, and Numbers.");
+        return;
+      }
+
       setCurrentStep("signup-handle");
     }
   };
@@ -82,7 +94,6 @@ export default function AuthModal({ isOpen, onClose }: { isOpen: boolean; onClos
     setErrorStatus(null);
     try {
       if (isAuthenticated) {
-        // Handle existing users (like Google) needing a username
         const { error } = await supabase.auth.updateUser({
           data: { 
             username: formData.username,
@@ -92,7 +103,6 @@ export default function AuthModal({ isOpen, onClose }: { isOpen: boolean; onClos
         if (error) throw error;
         addNotification("session", "Identity pulse updated. Handle verified.");
       } else {
-        // Standard signup for new accounts
         const { error } = await supabase.auth.signUp({
           email: formData.email,
           password: formData.password,
@@ -103,11 +113,17 @@ export default function AuthModal({ isOpen, onClose }: { isOpen: boolean; onClos
             }
           }
         });
-        if (error) throw error;
+        if (error) {
+          // If Supabase still finds an error (e.g. password strength), 
+          // we send them back to the credentials step to fix it.
+          if (error.message.toLowerCase().includes("password")) {
+             setCurrentStep("signup-credentials");
+          }
+          throw error;
+        }
         addNotification("session", "Signup successful. Initialize pulse...");
       }
       
-      // Sync and close
       await refreshProfile();
       onClose();
     } catch (err: any) {
