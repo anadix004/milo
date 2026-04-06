@@ -1,8 +1,9 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { User, Mail, Globe, Image as ImageIcon, QrCode, LogOut, X, ChevronRight, ShieldCheck, Camera, Loader2 } from "lucide-react";
+import { User, Mail, Globe, Image as ImageIcon, QrCode, LogOut, X, ChevronRight, ShieldCheck, Camera, Loader2, Shield } from "lucide-react";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import clsx from "clsx";
 import { useAuth } from "./AuthContext";
 import { supabase } from "@/utils/supabase";
@@ -17,7 +18,10 @@ interface ProfileSidebarProps {
 }
 
 export default function ProfileSidebar({ isOpen, onClose, onAuthClick }: ProfileSidebarProps) {
-  const { user, isAuthenticated, logout, refreshProfile } = useAuth();
+  const { user, isAuthenticated, logout, refreshProfile, isAdmin, isOwner } = useAuth();
+  const router = useRouter();
+  const isTeam = user?.role === "team";
+  const hasAdminAccess = isAdmin || isOwner || isTeam;
   const [isUploading, setIsUploading] = useState(false);
   const [isGhostMode, setIsGhostMode] = useState(false);
   const [showPass, setShowPass] = useState(false);
@@ -222,9 +226,34 @@ export default function ProfileSidebar({ isOpen, onClose, onAuthClick }: Profile
                   </button>
                 </motion.div>
               ) : (
-                /* Profile Hub */
+                 /* Profile Hub */
                 <div className="space-y-8">
                   
+                  {/* ADMIN COMMAND HUB BRIDGE */}
+                  {isAuthenticated && hasAdminAccess && (
+                    <div className="space-y-4">
+                      <h3 className="text-amber-500/40 text-[9px] uppercase tracking-widest px-2 font-black font-mono">Administrative Pulse</h3>
+                      <button 
+                        onClick={() => {
+                          onClose();
+                          router.push("/admin");
+                        }}
+                        className="w-full p-6 rounded-[1.5rem] bg-amber-400/5 border border-amber-400/20 flex items-center justify-between transition-all hover:bg-amber-400/10 hover:border-amber-400/40 group shadow-[0_0_30px_rgba(251,191,36,0.05)]"
+                      >
+                        <div className="flex items-center gap-4">
+                          <div className="w-10 h-10 bg-amber-400/20 rounded-2xl flex items-center justify-center text-amber-400 group-hover:scale-110 transition-transform">
+                            <Shield size={20} />
+                          </div>
+                          <div className="text-left">
+                            <span className="font-black text-[10px] tracking-widest uppercase text-amber-400 block">Command Hub</span>
+                            <span className="text-[7px] uppercase tracking-widest text-amber-400/40">Authorized Entry Only</span>
+                          </div>
+                        </div>
+                        <ChevronRight size={16} className="text-amber-400/40 group-hover:text-amber-400" />
+                      </button>
+                    </div>
+                  )}
+
                   {/* MILO PASS OPTION HEARTBEAT */}
                   <div className="space-y-4">
                     <h3 className="text-white/40 text-[9px] uppercase tracking-widest px-2 font-black font-mono">Mission Identification</h3>

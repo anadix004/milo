@@ -10,6 +10,7 @@ import {
   PlusCircle 
 } from "lucide-react";
 import { useAuth } from "@/components/AuthContext";
+import { useRouter } from "next/navigation";
 import clsx from "clsx";
 import PigeonLogo from "@/components/PigeonLogo";
 
@@ -21,6 +22,7 @@ interface SidebarProps {
 
 export default function Sidebar({ currentTab, setTab, pendingCount = 0 }: SidebarProps) {
   const { user, logout } = useAuth();
+  const router = useRouter();
   const role = user?.role || "user";
 
   // Role Visibility Gates
@@ -29,6 +31,7 @@ export default function Sidebar({ currentTab, setTab, pendingCount = 0 }: Sideba
     { id: "pulse", label: "Platform Pulse", icon: <Activity size={18} />, roles: ["owner", "admin"] },
     { id: "access", label: "Access Control", icon: <Shield size={18} />, roles: ["owner", "admin"] },
     { id: "audit", label: "Audit Logs", icon: <Terminal size={18} />, roles: ["owner"] },
+    { id: "exit", label: "Exit to Radar", icon: <PlusCircle size={18} className="rotate-45" />, roles: ["owner", "admin", "team"] },
   ];
 
   const visibleNav = navigation.filter(item => item.roles.includes(role));
@@ -63,7 +66,13 @@ export default function Sidebar({ currentTab, setTab, pendingCount = 0 }: Sideba
         {visibleNav.map((item) => (
           <button
             key={item.id}
-            onClick={() => setTab(item.id)}
+            onClick={() => {
+              if (item.id === "exit") {
+                router.push("/");
+              } else {
+                setTab(item.id);
+              }
+            }}
             className={clsx(
               "w-full flex items-center justify-between p-4 rounded-2xl transition-all duration-300 group",
               currentTab === item.id 
