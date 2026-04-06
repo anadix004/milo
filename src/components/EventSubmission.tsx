@@ -6,7 +6,9 @@ import { useState, useRef } from "react";
 import { useAuth } from "./AuthContext";
 import { supabase } from "@/utils/supabase";
 import { useNotifications } from "./NotificationContext";
+import { METRO_CITIES } from "@/constants/cities";
 import clsx from "clsx";
+import { Trash2, Link as LinkIcon } from "lucide-react";
 
 interface EventSubmissionProps {
   isOpen: boolean;
@@ -22,12 +24,17 @@ export default function EventSubmission({ isOpen, onClose, onAuthRedirect }: Eve
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({ 
     title: "", 
-    cityId: "Delhi NCR", 
+    cityId: "", 
+    zoneId: "",
     date: "", 
     description: "", 
     price: "Free",
-    category: "Culture" 
+    category: "Culture",
+    venueAddress: "",
+    aadhaarId: ""
   });
+  
+  const [ticketLinks, setTicketLinks] = useState([{ name: "", url: "" }]);
   
   const [media, setMedia] = useState<{ photo: File | null; video: File | null }>({ photo: null, video: null });
 
@@ -100,11 +107,14 @@ export default function EventSubmission({ isOpen, onClose, onAuthRedirect }: Eve
       const { error: dbError } = await supabase.from("events").insert({
         title: formData.title,
         description: formData.description,
-        location: formData.cityId,
-        cityId: formData.cityId.toLowerCase().replace(" ", "-"),
+        location: formData.zoneId ? `${formData.zoneId}, ${formData.cityId}` : formData.cityId,
+        cityId: formData.cityId,
         date: formData.date,
         price: formData.price,
         category: formData.category,
+        venue_address: formData.venueAddress,
+        aadhaar_id: formData.aadhaarId,
+        ticket_links: ticketLinks.filter(l => l.url.trim() !== ""),
         image: imageUrl || "https://images.unsplash.com/photo-1492684223066-81342ee5ff30",
         video_url: videoUrl,
         user_id: user.id,
@@ -156,10 +166,116 @@ export default function EventSubmission({ isOpen, onClose, onAuthRedirect }: Eve
                        <InputGroup label="Temporal Sync (Date)" placeholder="YYYY-MM-DD" type="date" value={formData.date} onChange={(v: string) => setFormData({...formData, date: v})} />
                     </div>
                     
-                    <div className="space-y-4">
-                       <label className="text-[10px] text-white/30 uppercase tracking-[0.4em] ml-2 font-black">Broadcast Narrative</label>
-                       <textarea value={formData.description} onChange={(e) => setFormData({...formData, description: e.target.value})} placeholder="Synchronization details..." className="w-full bg-white/[0.03] border border-white/10 rounded-[2rem] p-6 text-sm text-white placeholder:text-white/10 outline-none focus:border-white/30 h-32 no-scrollbar" required />
-                    </div>
+                     <div className="space-y-8">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                           <div className="space-y-3">
+                              <label className="text-[10px] text-white/30 uppercase tracking-[0.4em] ml-2 font-black">Primary Metropolitan</label>
+                              <select 
+                                value={formData.cityId} 
+                                onChange={(e) => setFormData({...formData, cityId: e.target.value, zoneId: ""})}
+                                className="w-full bg-white/[0.03] border border-white/10 rounded-2xl p-6 text-sm text-white outline-none focus:border-white/30 transition-all font-black tracking-widest appearance-none"
+                                required
+                              >
+                                 <option value="" className="bg-black text-white/20">Select City</option>
+                                 {METRO_CITIES.map(city => (
+                                   <option key={city.id} value={city.id} className="bg-black text-white">{city.label}</option>
+                                 ))}
+                              </select>
+                           </div>
+
+                           <div className="space-y-3">
+                              <label className="text-[10px] text-white/30 uppercase tracking-[0.4em] ml-2 font-black">Metropolitan Zone / Section</label>
+                              <select 
+                                value={formData.zoneId} 
+                                onChange={(e) => setFormData({...formData, zoneId: e.target.value})}
+                                disabled={!formData.cityId}
+                                className="w-full bg-white/[0.03] border border-white/10 rounded-2xl p-6 text-sm text-white outline-none focus:border-white/30 transition-all font-black tracking-widest appearance-none disabled:opacity-20"
+                                required
+                              >
+                                 <option value="" className="bg-black text-white/20">Select Zone</option>
+                                 {METRO_CITIES.find(c => c.id === formData.cityId)?.zones.map(zone => (
+                                   <option key={zone.id} value={zone.id} className="bg-black text-white">{zone.label}</option>
+                                 ))}
+                              </select>
+                           </div>
+                        </div>
+
+                        <div className="space-y-3">
+                           <label className="text-[10px] text-white/30 uppercase tracking-[0.4em] ml-2 font-black">Detailed Venue Address</label>
+                           <textarea 
+                             value={formData.venueAddress} 
+                             onChange={(e) => setFormData({...formData, venueAddress: e.target.value})} 
+                             placeholder="Floor, Building, Street, Landmark..." 
+                             className="w-full bg-white/[0.03] border border-white/10 rounded-2xl p-6 text-sm text-white placeholder:text-white/10 outline-none focus:border-white/30 h-24 no-scrollbar font-black tracking-widest" 
+                             required 
+                           />
+                        </div>
+
+                        <div className="space-y-4">
+                           <div className="flex items-center justify-between px-2">
+                             <label className="text-[10px] text-white/30 uppercase tracking-[0.4em] font-black">Ticket Booking Links</label>
+                             <button 
+                               type="button"
+                               onClick={() => setTicketLinks([...ticketLinks, { name: "", url: "" }])}
+                               className="text-[9px] text-purple-400 uppercase tracking-widest font-black hover:text-purple-300 transition-colors"
+                             >
+                               + Add Link
+                             </button>
+                           </div>
+                           
+                           <div className="space-y-3">
+                              {ticketLinks.map((link, idx) => (
+                                <div key={idx} className="flex gap-3 group">
+                                   <input 
+                                     placeholder="Link Name (e.g. Official Site)" 
+                                     value={link.name}
+                                     onChange={(e) => {
+                                        const newLinks = [...ticketLinks];
+                                        newLinks[idx].name = e.target.value;
+                                        setTicketLinks(newLinks);
+                                     }}
+                                     className="flex-1 bg-white/[0.03] border border-white/10 rounded-2xl p-4 text-[10px] text-white outline-none focus:border-white/30 transition-all font-black"
+                                   />
+                                   <input 
+                                     placeholder="Booking URL" 
+                                     value={link.url}
+                                     onChange={(e) => {
+                                        const newLinks = [...ticketLinks];
+                                        newLinks[idx].url = e.target.value;
+                                        setTicketLinks(newLinks);
+                                     }}
+                                     className="flex-[2] bg-white/[0.03] border border-white/10 rounded-2xl p-4 text-[10px] text-white outline-none focus:border-white/30 transition-all font-black"
+                                   />
+                                   {ticketLinks.length > 1 && (
+                                     <button 
+                                       type="button"
+                                       onClick={() => setTicketLinks(ticketLinks.filter((_, i) => i !== idx))}
+                                       className="p-4 text-white/10 hover:text-red-500 transition-colors"
+                                     >
+                                        <Trash2 size={16} />
+                                     </button>
+                                   )}
+                                </div>
+                              ))}
+                           </div>
+                        </div>
+
+                        <div className="space-y-3">
+                           <label className="text-[10px] text-white/30 uppercase tracking-[0.4em] ml-2 font-black">Identity Verification (Aadhaar ID)</label>
+                           <input 
+                             required 
+                             placeholder="XXXX XXXX XXXX" 
+                             value={formData.aadhaarId} 
+                             onChange={(e) => setFormData({...formData, aadhaarId: e.target.value})} 
+                             className="w-full bg-white/[0.03] border border-white/10 rounded-2xl p-6 text-sm text-white outline-none focus:border-white/30 transition-all font-black tracking-widest uppercase font-mono" 
+                           />
+                        </div>
+
+                        <div className="space-y-4">
+                           <label className="text-[10px] text-white/30 uppercase tracking-[0.4em] ml-2 font-black">Mission Narrative</label>
+                           <textarea value={formData.description} onChange={(e) => setFormData({...formData, description: e.target.value})} placeholder="Synchronization details..." className="w-full bg-white/[0.03] border border-white/10 rounded-[2rem] p-6 text-sm text-white placeholder:text-white/10 outline-none focus:border-white/30 h-32 no-scrollbar font-black tracking-widest" required />
+                        </div>
+                     </div>
 
                     <div className="space-y-6">
                        <p className="text-[10px] font-mono text-white/20 uppercase tracking-[0.4em] font-black text-center">Media Gatekeeper Sync</p>

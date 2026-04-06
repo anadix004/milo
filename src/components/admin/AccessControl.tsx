@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { 
   UserPlus, 
   Shield, 
@@ -14,7 +15,9 @@ import {
 import { supabase } from "@/utils/supabase";
 import { useAuth } from "@/components/AuthContext";
 import { useNotifications } from "@/components/NotificationContext";
+import EventSubmission from "@/components/EventSubmission";
 import clsx from "clsx";
+import { Search } from "lucide-react";
 
 export default function AccessControl() {
   const { session } = useAuth();
@@ -25,6 +28,10 @@ export default function AccessControl() {
   const [emailInput, setEmailInput] = useState("");
   const [roleInput, setRoleInput] = useState<"admin" | "team">("team");
   const [isSyncing, setIsSyncing] = useState(false);
+  const [isEventModalOpen, setIsEventModalOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
 
   const fetchRoster = async () => {
     setLoading(true);
@@ -41,6 +48,40 @@ export default function AccessControl() {
   useEffect(() => {
     fetchRoster();
   }, []);
+
+  const handleSearch = async () => {
+    if (!searchQuery.trim()) return;
+    setIsSearching(true);
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("*")
+      .ilike("email", `%${searchQuery}%`)
+      .limit(5);
+    
+    if (!error) setSearchResults(data || []);
+    setIsSearching(true); // Keeping pulse active for UI
+    setTimeout(() => setIsSearching(false), 500);
+  };
+
+  const updateRole = async (targetId: string, email: string, newRole: string) => {
+    if (!confirm(`Update ${email} to role: ${newRole.toUpperCase()}?`)) return;
+    
+    setIsSyncing(true);
+    const { error } = await supabase
+      .from("profiles")
+      .update({ role: newRole })
+      .eq("id", targetId);
+
+    if (error) {
+      addNotification("system", `System Error: Failed to update role for ${email}.`);
+    } else {
+      addNotification("radar", `Authorization Updated: ${email} is now ${newRole.toUpperCase()}.`);
+      fetchRoster();
+      setSearchResults([]);
+      setSearchQuery("");
+    }
+    setIsSyncing(false);
+  };
 
   const handleWhitelist = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -94,47 +135,77 @@ export default function AccessControl() {
         
         {/* THE WHITELISTER (VIP BOUNCER) */}
         <section className="space-y-12">
-          <div className="space-y-4">
-             <h2 className="font-lexend text-2xl font-black text-white uppercase tracking-tight flex items-center gap-4">
-                <Shield className="text-white/40" /> Personnel Whitelist
-             </h2>
-             <p className="font-mono text-[10px] text-white/40 uppercase tracking-[0.4em]">Instant platform authorization gate.</p>
-          </div>
-
-          <form 
-            onSubmit={handleWhitelist}
-            className="group flex flex-col md:flex-row gap-4 p-4 bg-white/[0.02] border border-white/5 rounded-3xl hover:border-white/10 transition-all duration-700"
-          >
-            <div className="flex-1 flex items-center gap-4 px-4 py-2 bg-white/[0.03] border border-white/5 rounded-2xl">
-              <UserPlus size={16} className="text-white/20" />
-              <input 
-                type="email" 
-                placeholder="Personnel Email Address" 
-                value={emailInput}
-                onChange={(e) => setEmailInput(e.target.value)}
-                required
-                className="flex-1 bg-transparent border-none text-sm text-white placeholder-white/20 outline-none font-mono tracking-widest uppercase font-black"
-              />
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
+            <div className="space-y-4">
+               <h2 className="font-lexend text-2xl font-black text-white uppercase tracking-tight flex items-center gap-4">
+                  <Shield className="text-white/40" /> Role Command Nexus
+               </h2>
+               <p className="font-mono text-[10px] text-white/40 uppercase tracking-[0.4em]">Search and authorize platform personnel.</p>
             </div>
             
-            <div className="flex items-center gap-4 px-4 py-2 bg-white/[0.03] border border-white/5 rounded-2xl min-w-[160px]">
-               <select 
-                 value={roleInput}
-                 onChange={(e: any) => setRoleInput(e.target.value)}
-                 className="w-full bg-transparent border-none text-[10px] text-white/60 font-lexend font-black uppercase tracking-widest outline-none cursor-pointer appearance-none"
-               >
-                  <option value="team" className="bg-black text-white">TEAM</option>
-                  <option value="admin" className="bg-black text-white">ADMIN</option>
-               </select>
+            <button 
+              onClick={() => setIsEventModalOpen(true)}
+              className="flex items-center gap-3 bg-purple-500 text-white px-8 py-4 rounded-2xl font-lexend font-black uppercase tracking-widest text-[10px] hover:scale-[1.02] active:scale-95 transition-all shadow-xl shadow-purple-500/20"
+            >
+              <UserPlus size={16} />
+              Direct Mission Broadcast
+            </button>
+          </div>
+
+          <div className="space-y-6">
+            <div className="flex flex-col md:flex-row gap-4 p-4 bg-white/[0.02] border border-white/5 rounded-3xl">
+              <div className="flex-1 flex items-center gap-4 px-4 py-2 bg-white/[0.03] border border-white/5 rounded-2xl">
+                <Search size={16} className="text-white/20" />
+                <input 
+                  type="text" 
+                  placeholder="Identify Personnel by Email..." 
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyPress={(e) => e.key === "Enter" && handleSearch()}
+                  className="flex-1 bg-transparent border-none text-sm text-white placeholder-white/20 outline-none font-mono tracking-widest uppercase font-black"
+                />
+              </div>
+              <button 
+                onClick={handleSearch}
+                disabled={isSearching}
+                className="bg-white text-black px-8 py-4 rounded-2xl font-lexend font-black uppercase tracking-widest text-[10px] hover:scale-[1.02] transition-all"
+              >
+                {isSearching ? "Searching..." : "Identify User"}
+              </button>
             </div>
 
-            <button 
-              disabled={isSyncing}
-              className="bg-white text-black px-8 py-4 rounded-2xl font-lexend font-black uppercase tracking-widest text-[10px] hover:scale-[1.02] active:scale-95 transition-all shadow-xl shadow-white/5 disabled:opacity-50"
-            >
-              {isSyncing ? "Authorizing..." : "Authorize Personnel"}
-            </button>
-          </form>
+            {searchResults.length > 0 && (
+              <motion.div 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-white/[0.02] border border-white/5 rounded-3xl overflow-hidden divide-y divide-white/5"
+              >
+                {searchResults.map(user => (
+                  <div key={user.id} className="p-6 flex items-center justify-between group hover:bg-white/[0.03] transition-colors">
+                    <div className="flex flex-col">
+                      <span className="font-mono text-xs text-white uppercase font-black tracking-widest">{user.email}</span>
+                      <span className="font-mono text-[8px] text-white/20 uppercase tracking-[0.2em] mt-1">Current Role: {user.role}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                       {["user", "team", "admin"].map(role => (
+                         <button 
+                           key={role}
+                           onClick={() => updateRole(user.id, user.email, role)}
+                           disabled={isSyncing || user.role === role}
+                           className={clsx(
+                             "px-4 py-2 rounded-xl font-mono text-[9px] font-black uppercase tracking-widest border transition-all",
+                             user.role === role ? "border-white/20 text-white/20" : "border-white/5 text-white/40 hover:border-white/20 hover:text-white"
+                           )}
+                         >
+                           {role}
+                         </button>
+                       ))}
+                    </div>
+                  </div>
+                ))}
+              </motion.div>
+            )}
+          </div>
         </section>
 
         {/* ACTIVE PERSONNEL ROSTER */}
@@ -208,6 +279,12 @@ export default function AccessControl() {
           </div>
         </section>
       </div>
+      
+      <EventSubmission 
+        isOpen={isEventModalOpen} 
+        onClose={() => setIsEventModalOpen(false)} 
+        onAuthRedirect={() => {}} 
+      />
     </div>
   );
 }

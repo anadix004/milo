@@ -8,6 +8,7 @@ import { supabase } from "@/utils/supabase";
 import { useNotifications } from "./NotificationContext";
 import { useAuth } from "./AuthContext";
 import { parsePrice } from "@/utils/price";
+import { METRO_CITIES, getCityName } from "@/constants/cities";
 import Comments from "@/components/events/Comments";
 
 // --- SPRING CONFIG SYNC ---
@@ -29,6 +30,9 @@ export interface EventData {
   featured: boolean;
   cityId: string;
   is_verified?: boolean;
+  venue_address?: string;
+  ticket_links?: { name: string; url: string }[];
+  aadhaar_id?: string;
 }
 
 // Premium Dropdown Component
@@ -236,7 +240,7 @@ export default function EventListing({ selectedCity, onAuthRequired }: { selecte
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-12">
           <div>
             <h2 className="font-[family-name:var(--font-lexend)] text-white text-3xl md:text-5xl font-black uppercase tracking-tight mb-2">
-              {selectedCity ? selectedCity : "Global"} <span className="text-white/50 italic">Events</span>
+              {selectedCity ? getCityName(selectedCity) : "Global"} <span className="text-white/50 italic">Events</span>
             </h2>
             <p className="font-[family-name:var(--font-roboto-mono)] text-white/80 text-[10px] md:text-xs uppercase tracking-[0.4em]">
               Explore what's happening near you
@@ -361,7 +365,37 @@ function EventDetailView({ event, isJoined, onJoin, onClose }: { event: EventDat
             <span className="text-white/40 text-[10px] font-mono uppercase tracking-[0.4em] mb-4 block">{event.category} // {event.date}</span>
             <h2 className="text-4xl md:text-6xl font-black text-white uppercase tracking-tighter leading-none mb-4">{event.title}</h2>
           </div>
-          <p className="text-white/60 font-mono text-xs md:text-sm leading-relaxed max-w-md">{event.description}</p>
+          <div className="space-y-4">
+             <p className="text-white/40 text-[9px] uppercase tracking-[0.4em] font-black font-mono">Mission Broadcast Details</p>
+             <p className="text-white/60 font-mono text-xs md:text-sm leading-relaxed max-w-md">{event.description}</p>
+          </div>
+
+          {event.venue_address && (
+            <div className="space-y-2">
+               <p className="text-white/20 text-[9px] uppercase tracking-[0.4em] font-black font-mono">Authorized Venue</p>
+               <p className="text-white/80 font-mono text-[10px] md:text-xs leading-relaxed uppercase tracking-wider">{event.venue_address}</p>
+            </div>
+          )}
+
+          {event.ticket_links && event.ticket_links.length > 0 && (
+            <div className="space-y-4">
+               <p className="text-white/20 text-[9px] uppercase tracking-[0.4em] font-black font-mono">Booking Channels</p>
+               <div className="flex flex-wrap gap-3">
+                  {event.ticket_links.map((link, i) => (
+                    <a 
+                      key={i} 
+                      href={link.url} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full text-[9px] font-black text-white hover:bg-white/10 hover:border-white/20 transition-all uppercase tracking-widest"
+                    >
+                      <Ticket size={12} className="text-purple-400" />
+                      {link.name || "Book Now"}
+                    </a>
+                  ))}
+               </div>
+            </div>
+          )}
           <div className="flex items-center justify-between pt-8 border-t border-white/5">
                 <div>
                   <p className="text-white/20 text-[10px] font-mono tracking-widest mb-1 uppercase">Tier</p>

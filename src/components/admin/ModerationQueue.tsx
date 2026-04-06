@@ -143,10 +143,43 @@ export default function ModerationQueue() {
                     </div>
                   </div>
 
-                  <div className="space-y-4 pt-4 border-t border-white/5">
-                     <p className="text-white/60 font-lexend text-sm leading-relaxed tracking-wide">
-                        {event.description || "No description provided."}
-                     </p>
+                  <div className="space-y-6 pt-6 border-t border-white/5">
+                     <div className="space-y-2">
+                        <p className="text-white/20 text-[8px] uppercase tracking-[0.4em] font-black font-mono">Mission Narrative</p>
+                        <p className="text-white/60 font-lexend text-sm leading-relaxed tracking-wide">
+                           {event.description || "No description provided."}
+                        </p>
+                     </div>
+
+                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                           <p className="text-white/20 text-[8px] uppercase tracking-[0.4em] font-black font-mono">Venue Specifics</p>
+                           <p className="text-white/80 font-mono text-[10px] tracking-wider uppercase leading-relaxed">
+                              {event.venue_address || "TBA"}
+                           </p>
+                        </div>
+                        <div className="space-y-2">
+                           <p className="text-white/20 text-[8px] uppercase tracking-[0.4em] font-black font-mono">Identity Pulse (Aadhaar)</p>
+                           <p className="text-emerald-400/60 font-mono text-xs tracking-[0.2em] font-black uppercase">
+                              {event.aadhaar_id || "MISSING"}
+                           </p>
+                        </div>
+                     </div>
+
+                     {event.ticket_links && event.ticket_links.length > 0 && (
+                        <div className="space-y-2">
+                           <p className="text-white/20 text-[8px] uppercase tracking-[0.4em] font-black font-mono">Authorized Channels</p>
+                           <div className="flex flex-wrap gap-2">
+                              {event.ticket_links.map((link: any, i: number) => (
+                                <div key={i} className="px-3 py-1 bg-white/[0.03] border border-white/5 rounded-full flex items-center gap-2">
+                                   <span className="text-white/40 font-mono text-[8px] uppercase tracking-widest">{link.name || "Link"}</span>
+                                   <span className="text-purple-400 font-mono text-[7px] truncate max-w-[100px]">{link.url}</span>
+                                </div>
+                              ))}
+                           </div>
+                        </div>
+                     )}
+
                      <div className="flex items-center gap-3 py-2 px-4 bg-white/[0.02] border border-white/5 rounded-full w-fit">
                         <User size={12} className="text-white/20" />
                         <span className="font-mono text-[9px] text-white/40 uppercase tracking-widest">
