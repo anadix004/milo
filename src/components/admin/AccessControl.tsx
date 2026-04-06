@@ -10,14 +10,14 @@ import {
   Loader2, 
   CheckCircle,
   Clock,
-  ExternalLink
+  ExternalLink,
+  Search
 } from "lucide-react";
 import { supabase } from "@/utils/supabase";
 import { useAuth } from "@/components/AuthContext";
 import { useNotifications } from "@/components/NotificationContext";
 import EventSubmission from "@/components/EventSubmission";
 import clsx from "clsx";
-import { Search } from "lucide-react";
 
 export default function AccessControl() {
   const { session } = useAuth();
@@ -130,7 +130,7 @@ export default function AccessControl() {
   };
 
   return (
-    <div className="flex-1 overflow-y-auto no-scrollbar scroll-smooth">
+    <div className="w-full">
       <div className="max-w-4xl mx-auto px-6 py-20 pb-40 space-y-24">
         
         {/* THE WHITELISTER (VIP BOUNCER) */}

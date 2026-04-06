@@ -108,7 +108,7 @@ export default function AdminPortal() {
   // --- LOGIN GATE (DEEP SPACE BLACK) ---
   if (!isAuthorized) {
     return (
-      <div className="fixed inset-0 z-[200] bg-[#050505] flex items-center justify-center p-6 overflow-hidden">
+      <div className="fixed inset-0 z-[200] bg-[#050505] flex items-center justify-center p-6 overflow-y-auto no-scrollbar py-20">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.02),transparent_100%)]" />
         
         <motion.div 
@@ -235,7 +235,7 @@ export default function AdminPortal() {
         </header>
 
         {/* DYNAMIC TAB CONTENT */}
-        <div className="flex-1 relative overflow-hidden">
+        <div className="flex-1 relative overflow-y-auto no-scrollbar scroll-smooth">
           <AnimatePresence mode="wait">
              <motion.div
                key={currentTab}
@@ -243,7 +243,7 @@ export default function AdminPortal() {
                animate={{ opacity: 1, y: 0 }}
                exit={{ opacity: 0, y: -5 }}
                transition={{ duration: 0.3, ease: "easeInOut" }}
-               className="absolute inset-0 flex flex-col overflow-hidden"
+               className="min-h-full"
              >
                {currentTab === "queue" && <ModerationQueue />}
                {currentTab === "pulse" && <PlatformPulse />}

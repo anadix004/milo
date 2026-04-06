@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { X, PlusCircle, Globe, ShieldCheck, Lock, Upload, Video, Image as ImageIcon, CheckCircle2, Loader2 } from "lucide-react";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useAuth } from "./AuthContext";
 import { supabase } from "@/utils/supabase";
 import { useNotifications } from "./NotificationContext";
@@ -37,6 +37,18 @@ export default function EventSubmission({ isOpen, onClose, onAuthRedirect }: Eve
   const [ticketLinks, setTicketLinks] = useState([{ name: "", url: "" }]);
   
   const [media, setMedia] = useState<{ photo: File | null; video: File | null }>({ photo: null, video: null });
+  
+  // --- BINARY SCROLL-LOCK PROTOCOL ---
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isOpen]);
 
   // --- GATEKEEPER: MEDIA VALIDATION ---
   const validateMedia = async (e: React.ChangeEvent<HTMLInputElement>, type: "photo" | "video") => {

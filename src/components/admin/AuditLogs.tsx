@@ -57,7 +57,7 @@ export default function AuditLogs() {
   }, []);
 
   return (
-    <div className="flex-1 overflow-y-auto no-scrollbar scroll-smooth">
+    <div className="w-full">
       <div className="max-w-4xl mx-auto px-6 py-20 pb-40 space-y-16">
         
         {/* HEADER */}

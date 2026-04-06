@@ -85,7 +85,7 @@ export default function ModerationQueue() {
   }
 
   return (
-    <div className="flex-1 overflow-y-auto no-scrollbar scroll-smooth">
+    <div className="w-full">
       <div className="max-w-2xl mx-auto px-6 py-20 pb-40 space-y-16">
         {/* HEADER */}
         <div className="space-y-4 text-center">

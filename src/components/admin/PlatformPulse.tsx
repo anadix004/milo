@@ -58,7 +58,7 @@ export default function PlatformPulse() {
   }, []);
 
   return (
-    <div className="flex-1 overflow-y-auto no-scrollbar scroll-smooth">
+    <div className="w-full">
       <div className="max-w-6xl mx-auto px-6 py-20 pb-40 space-y-24">
         
         {/* HEADER */}

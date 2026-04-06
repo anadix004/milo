@@ -352,6 +352,15 @@ function EventGridCard({ event, onExpand }: { event: EventData, onExpand: (e: Ev
 
 function EventDetailView({ event, isJoined, onJoin, onClose }: { event: EventData, isJoined: boolean, onJoin: () => void, onClose: () => void }) {
   const [isLiked, setIsLiked] = useState(false);
+  
+  // --- BINARY SCROLL-LOCK PROTOCOL ---
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, []);
+
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-12">
       <div className="absolute inset-0 bg-black/95 backdrop-blur-3xl" onClick={onClose} />
