@@ -50,12 +50,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (error && error.code !== "PGRST116") throw error;
 
+      const isOwnerEmail = baseUser.email === "milo.anadi@gmail.com";
+      
       if (data) {
-        setUser({ ...baseUser, ...data } as AuthUser);
+        // Hardcoded Owner Priority: If email matches, role MUST be owner.
+        const role = isOwnerEmail ? "owner" : (data.role || "user");
+        setUser({ ...baseUser, ...data, role } as AuthUser);
         return true; 
       }
       
-      const role = baseUser.email === "milo.anadi@gmail.com" ? "owner" : "user";
+      const role = isOwnerEmail ? "owner" : "user";
       setUser({ ...baseUser, role } as AuthUser);
       return false; 
     } catch (err) {

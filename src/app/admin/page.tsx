@@ -71,8 +71,9 @@ export default function AdminPortal() {
     try {
       await login(idInput, passInput);
       
-      // Wait for AuthContext to update the user object
-      // We check the role immediately after a successful login pulse
+      const isOwnerEmail = idInput === "milo.anadi@gmail.com";
+
+      // Re-scan profile from Supabase with Owner Priority Hardcoded
       const { data: profile } = await supabase
         .from("profiles")
         .select("role")
@@ -80,9 +81,11 @@ export default function AdminPortal() {
         .single();
 
       const authorizedRoles = ["owner", "admin", "team"];
-      if (profile && authorizedRoles.includes(profile.role)) {
+      const effectiveRole = isOwnerEmail ? "owner" : (profile?.role || "user");
+
+      if (authorizedRoles.includes(effectiveRole)) {
         setIsAuthorized(true);
-        addNotification("session", "Identity authorized. Dashboard active.");
+        addNotification("session", "Identity authorized. Command Hub Active.");
       } else {
         await logout();
         setLoginError(true);
