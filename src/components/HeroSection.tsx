@@ -134,15 +134,21 @@ export default function HeroSection() {
           <div className="absolute inset-0 bg-black/40 w-full h-full pointer-events-none" />
         </div>
 
-        {/* Bottom Annotations UI - Hide on mobile if cluttering */}
-        {!isMobile && (
-          <div className="absolute bottom-6 right-6 md:bottom-8 md:right-8 z-20 mix-blend-difference pointer-events-none">
-            <p className="font-[family-name:var(--font-roboto-mono)] text-[10px] md:text-xs text-white/70 tracking-widest uppercase writing-vertical-rl flex flex-col items-center">
-              Scroll to explore
-              <span className="block w-[1px] h-12 bg-white/50 mt-4 animate-pulse"></span>
-            </p>
-          </div>
-        )}
+        {/* Bottom Annotations UI */}
+        <div className={clsx(
+          "absolute z-20 mix-blend-difference pointer-events-none",
+          isMobile 
+            ? "bottom-32 left-1/2 -translate-x-1/2" 
+            : "bottom-6 right-6 md:bottom-8 md:right-8"
+        )}>
+          <p className={clsx(
+            "font-[family-name:var(--font-roboto-mono)] text-[8px] md:text-xs text-white/70 tracking-widest uppercase flex flex-col items-center",
+            !isMobile && "writing-vertical-rl"
+          )}>
+            {isMobile ? "Scroll for events" : "Scroll to explore"}
+            <span className={clsx("block w-[1px] bg-white/50 animate-pulse", isMobile ? "h-6 mt-3" : "h-12 mt-4")}></span>
+          </p>
+        </div>
 
         {/* Loading Indicator */}
         {!imagesLoaded && !isMobile && (
@@ -156,7 +162,7 @@ export default function HeroSection() {
         {/* The MILO Wall Typography */}
         <div className={clsx(
           "absolute inset-0 w-full h-full flex flex-col items-start pointer-events-none z-30 overflow-hidden px-1 md:px-2",
-          isMobile ? "justify-center px-6" : "justify-end mb-12 md:mb-20"
+          isMobile ? "justify-end mb-44 px-6" : "justify-end mb-12 md:mb-20"
         )}>
           <motion.div
             initial={{ y: "20%", filter: "blur(20px)", opacity: 0 }}
