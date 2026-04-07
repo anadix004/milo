@@ -18,16 +18,18 @@ export default function BottomNav({ onProfileClick, onEventClick, onNotification
   const { unreadCount } = useNotifications();
   const { isAuthenticated } = useAuth();
 
+  // Perfect 5-Column Symmetry: Center the (+) trigger
   const tabs = [
     { icon: Home, label: "Home", href: "/", active: pathname === "/" },
+    { icon: Search, label: "Radar", href: "/events", active: pathname === "/events" },
+    { icon: PlusCircle, label: "Scan", action: onEventClick, primary: true },
     { icon: Bell, label: "Alerts", action: onNotificationsClick, badge: unreadCount },
-    { icon: PlusCircle, label: "Add", action: onEventClick, primary: true },
     { icon: User, label: isAuthenticated ? "Profile" : "Log In", action: onProfileClick },
   ];
 
   return (
     <nav
-      className="fixed bottom-0 inset-x-0 z-[100] flex items-center justify-around bg-black/90 border-t border-white/10 backdrop-blur-xl md:hidden"
+      className="fixed bottom-0 inset-x-0 z-[100] flex items-center justify-between bg-black/90 border-t border-white/10 backdrop-blur-xl md:hidden px-2"
       style={{ paddingBottom: "max(12px, env(safe-area-inset-bottom))" }}
     >
       {tabs.map((tab, i) => {
@@ -38,29 +40,32 @@ export default function BottomNav({ onProfileClick, onEventClick, onNotification
           <motion.div
             whileTap={{ scale: 0.85 }}
             className={clsx(
-              "flex flex-col items-center justify-center gap-1 py-3 px-4 relative",
-              tab.primary && "relative"
+              "flex flex-col items-center justify-center gap-1.5 py-4 px-2 relative h-full",
+              tab.primary && "z-10"
             )}
           >
             {tab.primary ? (
-              <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center -mt-8 shadow-[0_0_20px_rgba(255,255,255,0.3)]">
-                <Icon size={22} className="text-black" />
+              <div className="w-14 h-14 rounded-full bg-white flex items-center justify-center -mt-10 shadow-[0_0_30px_rgba(255,255,255,0.4)] border-4 border-black ring-1 ring-white/10">
+                <Icon size={24} className="text-black" />
               </div>
             ) : (
-              <>
-                <Icon size={20} className={isActive ? "text-white" : "text-white/40"} />
+              <div className="relative">
+                <Icon size={22} className={isActive ? "text-white" : "text-white/40"} />
                 {tab.badge && tab.badge > 0 && (
-                  <span className="absolute top-2 right-2 w-4 h-4 bg-purple-500 rounded-full text-[8px] font-black flex items-center justify-center text-white">
+                  <span className="absolute -top-1 -right-2 w-4 h-4 bg-purple-500 rounded-full text-[8px] font-black flex items-center justify-center text-white ring-2 ring-black">
                     {tab.badge}
                   </span>
                 )}
-              </>
+              </div>
             )}
-            {!tab.primary && (
-              <span className={clsx("text-[9px] uppercase tracking-widest font-black", isActive ? "text-white" : "text-white/30")}>
-                {tab.label}
-              </span>
-            )}
+            
+            <span className={clsx(
+              "text-[8px] uppercase tracking-widest font-black transition-all",
+              isActive ? "text-white" : "text-white/30",
+              tab.primary && "mt-1.5"
+            )}>
+              {tab.label}
+            </span>
           </motion.div>
         );
 

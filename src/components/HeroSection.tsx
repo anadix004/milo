@@ -155,8 +155,8 @@ export default function HeroSection() {
 
         {/* The MILO Wall Typography */}
         <div className={clsx(
-          "absolute inset-0 w-full h-full flex flex-col justify-end items-start pointer-events-none z-30 overflow-hidden px-1 md:px-2",
-          isMobile ? "mb-24 px-6 pb-safe-bottom" : "mb-12 md:mb-20"
+          "absolute inset-0 w-full h-full flex flex-col items-start pointer-events-none z-30 overflow-hidden px-1 md:px-2",
+          isMobile ? "justify-center px-6" : "justify-end mb-12 md:mb-20"
         )}>
           <motion.div
             initial={{ y: "20%", filter: "blur(20px)", opacity: 0 }}
