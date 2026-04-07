@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Eye, 
@@ -21,9 +21,6 @@ import AuditLogs from "@/components/admin/AuditLogs";
 type AdminTab = "queue" | "pulse" | "access" | "audit";
 
 const SPRING_CONFIG = { stiffness: 70, damping: 15 };
-const OWNER_PASS = "milo_owner_vault_2026"; 
-const OWNER_ID = "owner_milo"; 
-const TEAM_PASS = "milo_team_secure_2026";
 
 export default function AdminClient() {
   const supabase = createClient();
@@ -37,34 +34,67 @@ export default function AdminClient() {
   const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState(false);
   const [currentTab, setCurrentTab] = useState<AdminTab>("queue");
+  
+  // Consolidate Auth: If Supabase session is an admin/owner, bypass secondary wall
+  useEffect(() => {
+    const checkAdmin = async () => {
+      if (isAuthenticated && (isAdmin || user?.email?.includes('owner_milo'))) {
+        setIsAuthorized(true);
+        addNotification("session", "Bridge established via secure session.");
+      }
+    };
+    checkAdmin();
+  }, [isAuthenticated, isAdmin, user, addNotification]);
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoginError(false);
     
-    if (idInput === OWNER_ID && passInput === OWNER_PASS) {
-      setIsAuthorized(true);
-      addNotification("session", "Root Command: Direct Bridge Established.");
-      return;
+    // 1. Check server-side admin credentials
+    try {
+      const res = await fetch("/api/admin/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: idInput, password: passInput }),
+      });
+      const data = await res.json();
+
+      if (data.authorized) {
+        if (data.method === "team") {
+          // Verify the user has team/admin role in the database
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("role")
+            .eq("email", idInput)
+            .single();
+
+          const authorizedRoles = ["owner", "admin", "team"];
+          if (profile && authorizedRoles.includes(profile.role)) {
+            setIsAuthorized(true);
+            addNotification("session", "Team Access: Direct Bridge Authorized.");
+            return;
+          }
+        } else {
+          setIsAuthorized(true);
+          addNotification("session", "Root Command: Direct Bridge Established.");
+          return;
+        }
+      }
+    } catch (err) {
+      console.error("Admin verify API error:", err);
     }
 
-    if (passInput === TEAM_PASS) {
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("role")
-        .eq("email", idInput)
-        .single();
-
-      const authorizedRoles = ["owner", "admin", "team"];
-      if (profile && authorizedRoles.includes(profile.role)) {
-        setIsAuthorized(true);
-        addNotification("session", "Team Access: Direct Bridge Authorized.");
+    // 2. Fall back to Supabase email/password login
+    try {
+      const { error } = await supabase.auth.signInWithPassword({ 
+        email: idInput, 
+        password: passInput 
+      });
+      if (error) {
+        setLoginError(true);
+        setTimeout(() => setLoginError(false), 2000);
         return;
       }
-    }
-
-    try {
-      await login(idInput, passInput);
       setIsAuthorized(true);
       addNotification("session", "Identity authorized. Command Hub Active.");
       router.refresh();

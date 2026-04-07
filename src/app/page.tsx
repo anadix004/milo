@@ -19,6 +19,7 @@ import Header from "@/components/Header";
 import ProfileSidebar from "@/components/ProfileSidebar";
 import EventSubmission from "@/components/EventSubmission";
 import AuthModal from "@/components/AuthModal";
+import NotificationSidebar from "@/components/NotificationSidebar";
 
 import BottomNav from "@/components/mobile/BottomNav";
 
@@ -36,9 +37,9 @@ export default function Home() {
 
     const preload = async () => {
       const isMobile = window.innerWidth < 768;
-      // Skip heavy city images on mobile to save ~24MB of data
+      // On mobile we use <video>, not canvas — skip ALL frame images
       const assetsToLoad = isMobile 
-        ? HERO_FRAMES.filter((_, i) => i % 2 === 0).map(f => `/sequence/frames/${f}`)
+        ? CITY_IMAGES
         : allAssets;
 
       const promises = assetsToLoad.map((src) => {
@@ -82,6 +83,7 @@ export default function Home() {
       <Header 
         onProfileClick={() => setActiveModal("profile")}
         onEventClick={() => handleAuthGate(() => setActiveModal("event"))}
+        onNotificationsClick={() => setActiveModal("notifications")}
         isSidebarOpen={activeModal === "profile"} 
       />
       
@@ -100,6 +102,11 @@ export default function Home() {
       <AuthModal 
         isOpen={activeModal === "auth"}
         onClose={() => setActiveModal(null)}
+      />
+
+      <NotificationSidebar
+        isOpen={activeModal === "notifications"}
+        onClose={closeModals}
       />
 
       <BottomNav 

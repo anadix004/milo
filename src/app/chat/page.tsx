@@ -2,7 +2,8 @@
 
 import { motion } from "framer-motion";
 import { Send, Users, Search } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import { createClient } from "@/utils/supabase/client";
 import Header from "@/components/Header";
 import ProfileSidebar from "@/components/ProfileSidebar";
 import EventSubmission from "@/components/EventSubmission";
@@ -18,26 +19,121 @@ const MOCK_FRIENDS = [
   { id: 4, name: "Alpha_Group", status: "online", bio: "8 members active", type: "group" }
 ];
 
-const MOCK_EVENTS = [
-  { id: "e1", name: "Rooftop Party", active: 45, icon: "🏙️" },
-  { id: "e2", name: "Tech Summit Alpha", active: 128, icon: "🛸" },
-  { id: "e3", name: "Art District Meetup", active: 22, icon: "🎨" }
-];
+interface Message {
+  id: string;
+  text: string;
+  user: string;
+  profile_id?: string;
+  isSystem?: boolean;
+  time?: string;
+  created_at: string;
+}
+
+interface ChatEvent {
+  id: string;
+  name: string;
+  active: number;
+  icon: string;
+}
 
 export default function ChatPage() {
-  const { isAuthenticated } = useAuth();
-  const [messages, setMessages] = useState([
-    { id: 1, text: "Wait, is the Rooftop party in Delhi NCR still on?", user: "CyberNomad", time: "2m ago" },
-    { id: 2, text: "Yes! 🏙️ Getting everything ready now. See you there.", user: "Milo_Admin", isSystem: true },
-    { id: 3, text: "The Tech Summit Alpha starts in 10 minutes.", user: "DataVoyager", time: "Just now" }
-  ]);
+  const supabase = createClient();
+  const { isAuthenticated, user } = useAuth();
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [events, setEvents] = useState<ChatEvent[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [activeModal, setActiveModal] = useState<"profile" | "event" | "auth" | null>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
-  const handleSend = () => {
-    if (!inputValue.trim()) return;
-    setMessages([...messages, { id: Date.now(), text: inputValue, user: "You", time: "Just now" }]);
-    setInputValue("");
+  const fetchInitialData = async () => {
+    // 1. Fetch Events
+    const { data: eventData } = await supabase
+      .from("events")
+      .select("id, title, category")
+      .eq("is_verified", true)
+      .limit(5);
+    
+    if (eventData) {
+      setEvents(eventData.map(e => ({
+        id: e.id,
+        name: e.title,
+        active: Math.floor(Math.random() * 50) + 5,
+        icon: e.category.includes("Music") ? "🎵" : e.category.includes("Tech") ? "🛸" : "📍"
+      })));
+    }
+
+    // 2. Fetch Messages
+    const { data: msgData } = await supabase
+      .from("messages")
+      .select(`
+        *,
+        profile:profiles(username, display_name)
+      `)
+      .order("created_at", { ascending: true })
+      .limit(50);
+
+    if (msgData) {
+      setMessages(msgData.map(m => ({
+        ...m,
+        user: m.is_system ? "Milo_Admin" : (m.profile?.display_name || m.profile?.username || "Pigeon"),
+        time: new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      })));
+    }
+  };
+
+  useEffect(() => {
+    fetchInitialData();
+
+    const channel = supabase
+      .channel("milo_hub_chat")
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages" }, async (payload) => {
+        const newMessage = payload.new as any;
+        
+        // Fetch profile for the new message
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("username, display_name")
+          .eq("id", newMessage.profile_id)
+          .single();
+
+        const formattedMsg: Message = {
+          ...newMessage,
+          user: newMessage.is_system ? "Milo_Admin" : (profile?.display_name || profile?.username || "Pigeon"),
+          time: new Date(newMessage.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        };
+
+        setMessages(prev => [...prev, formattedMsg]);
+      })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, []);
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [messages]);
+
+  const handleSend = async () => {
+    if (!inputValue.trim() || !user) {
+      if (!isAuthenticated) setActiveModal("auth");
+      return;
+    }
+
+    const { error } = await supabase
+      .from("messages")
+      .insert({
+        text: inputValue,
+        profile_id: user.id,
+        is_system: false
+      });
+
+    if (error) {
+      console.error("Chat error:", error);
+    } else {
+      setInputValue("");
+    }
   };
 
   const closeModals = () => setActiveModal(null);
@@ -58,6 +154,7 @@ export default function ChatPage() {
       <Header 
         onProfileClick={() => setActiveModal("profile")}
         onEventClick={() => handleAuthGate(() => setActiveModal("event"))}
+        onNotificationsClick={() => setActiveModal("auth")}
         isSidebarOpen={activeModal === "profile"} 
       />
 
@@ -142,38 +239,44 @@ export default function ChatPage() {
             </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-6 md:p-10 space-y-8 no-scrollbar scroll-smooth">
-            {messages.map((m) => (
-              <motion.div 
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                key={m.id} 
-                className={clsx(
-                  "flex flex-col max-w-[85%] md:max-w-[70%]",
-                  m.user === "You" ? "ml-auto items-end text-right" : "items-start text-left"
-                )}
-              >
-                <div className="flex items-center gap-3 mb-2 px-2">
-                  <span className={clsx(
-                    "text-[10px] font-black uppercase tracking-[0.2em] drop-shadow-md",
-                    m.isSystem ? "text-cyan-500" : "text-white/40"
+          <div 
+            ref={scrollRef}
+            className="flex-1 overflow-y-auto p-6 md:p-10 space-y-8 no-scrollbar scroll-smooth"
+          >
+            {messages.map((m) => {
+              const isMe = m.profile_id === user?.id;
+              return (
+                <motion.div 
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  key={m.id} 
+                  className={clsx(
+                    "flex flex-col max-w-[85%] md:max-w-[70%]",
+                    isMe ? "ml-auto items-end text-right" : "items-start text-left"
+                  )}
+                >
+                  <div className="flex items-center gap-3 mb-2 px-2">
+                    <span className={clsx(
+                      "text-[10px] font-black uppercase tracking-[0.2em] drop-shadow-md",
+                      m.isSystem ? "text-cyan-500" : "text-white/40"
+                    )}>
+                      {isMe ? "You" : m.user}
+                    </span>
+                    {m.time && <span className="text-[9px] text-white/20 font-mono tracking-widest">{m.time}</span>}
+                  </div>
+                  <div className={clsx(
+                    "p-5 md:p-6 rounded-[1.5rem] md:rounded-[2rem] text-sm md:text-base leading-relaxed shadow-2xl backdrop-blur-md",
+                    isMe 
+                      ? "bg-white text-black font-semibold rounded-tr-none shadow-white/5" 
+                      : m.isSystem 
+                        ? "bg-cyan-500/10 border border-cyan-500/20 text-cyan-100 rounded-tl-none" 
+                        : "bg-white/[0.05] border border-white/10 text-white rounded-tl-none font-light"
                   )}>
-                    {m.user}
-                  </span>
-                  {m.time && <span className="text-[9px] text-white/20 font-mono tracking-widest">{m.time}</span>}
-                </div>
-                <div className={clsx(
-                  "p-5 md:p-6 rounded-[1.5rem] md:rounded-[2rem] text-sm md:text-base leading-relaxed shadow-2xl backdrop-blur-md",
-                  m.user === "You" 
-                    ? "bg-white text-black font-semibold rounded-tr-none shadow-white/5" 
-                    : m.isSystem 
-                      ? "bg-cyan-500/10 border border-cyan-500/20 text-cyan-100 rounded-tl-none" 
-                      : "bg-white/[0.05] border border-white/10 text-white rounded-tl-none font-light"
-                )}>
-                  {m.text}
-                </div>
-              </motion.div>
-            ))}
+                    {m.text}
+                  </div>
+                </motion.div>
+              );
+            })}
           </div>
 
           <div className="p-6 md:p-8 bg-white/[0.01] border-t border-white/5">
@@ -208,11 +311,11 @@ export default function ChatPage() {
             <div className="w-2 h-2 bg-red-600 rounded-full animate-pulse" />
           </div>
           <div className="space-y-4 overflow-y-auto no-scrollbar">
-            {MOCK_EVENTS.map(event => (
+            {events.map(event => (
               <div key={event.id} className="group p-4 rounded-2xl border border-white/5 bg-white/0 hover:bg-white/5 transition-all cursor-pointer relative overflow-hidden">
                 <div className="relative z-10 flex flex-col gap-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-black text-white/60 group-hover:text-white transition-colors leading-tight drop-shadow-sm">{event.name}</span>
+                    <span className="text-xs font-black text-white/60 group-hover:text-white transition-colors leading-tight drop-shadow-sm line-clamp-1">{event.name}</span>
                     <span className="text-[14px]">{event.icon}</span>
                   </div>
                   <div className="flex items-center gap-2">

@@ -19,7 +19,7 @@ body {
   touch-action: manipulation;
 }
 
-button, a, [role="button"] {
+button:not(.no-min-size), a:not(.no-min-size), [role="button"]:not(.no-min-size) {
   min-height: 44px;
   min-width: 44px;
 }

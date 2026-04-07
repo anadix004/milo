@@ -4,23 +4,35 @@ import { useAuth } from "./AuthContext";
 import { User, Plus, Bell, MessageSquare } from "lucide-react";
 import Link from "next/link";
 import clsx from "clsx";
-import { motion } from "framer-motion";
+import { motion, useScroll, useMotionValueEvent } from "framer-motion";
+import { useState } from "react";
 
 interface HeaderProps {
   onProfileClick: () => void;
   onEventClick: () => void;
+  onNotificationsClick: () => void;
   isSidebarOpen: boolean;
 }
 
-export default function Header({ onProfileClick, onEventClick, isSidebarOpen }: HeaderProps) {
+export default function Header({ onProfileClick, onEventClick, onNotificationsClick, isSidebarOpen }: HeaderProps) {
   const { user, isAuthenticated } = useAuth();
+  const [isScrolled, setIsScrolled] = useState(false);
+  const { scrollY } = useScroll();
+
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    setIsScrolled(latest > 100);
+  });
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (
-    <header className="fixed top-0 inset-x-0 w-full pt-4 pl-4 pr-2 md:pt-6 md:pl-8 md:pr-4 flex justify-between items-start z-[100] pointer-events-none mix-blend-screen">
+    <header className={clsx(
+      "fixed top-0 inset-x-0 w-full z-[100] transition-all duration-700 ease-in-out",
+      isScrolled ? "bg-black/60 backdrop-blur-2xl border-b border-white/5 py-4" : "pt-4 md:pt-6 py-6"
+    )}>
+      <div className="max-w-[1800px] mx-auto px-4 md:px-8 flex justify-between items-center">
       {/* Top Left: Profile & Logo (Left) - Hidden on Mobile */}
       <div className="flex items-center gap-6 pointer-events-auto">
         <button 
@@ -75,10 +87,14 @@ export default function Header({ onProfileClick, onEventClick, isSidebarOpen }: 
           <Plus size={18} strokeWidth={3} />
         </button>
         
-        <button className="hidden md:flex items-center justify-center w-10 h-10 rounded-full bg-black/20 border border-white/10 text-white/40 hover:text-white hover:border-white/30 hover:bg-white/10 transition-all duration-500 relative backdrop-blur-md">
+        <button 
+          onClick={onNotificationsClick}
+          className="hidden md:flex items-center justify-center w-10 h-10 rounded-full bg-black/20 border border-white/10 text-white/40 hover:text-white hover:border-white/30 hover:bg-white/10 transition-all duration-500 relative backdrop-blur-md"
+        >
           <Bell size={18} />
           <div className="absolute top-0 right-0 w-2.5 h-2.5 bg-purple-500 rounded-full border-2 border-black" />
         </button>
+      </div>
       </div>
     </header>
   );

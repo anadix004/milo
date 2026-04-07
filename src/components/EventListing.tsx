@@ -139,6 +139,7 @@ export default function EventListing({ selectedCity, onAuthRequired }: { selecte
   const [searchQuery, setSearchQuery] = useState("");
   const [timeFilter, setTimeFilter] = useState("All");
   const [joinedEvents, setJoinedEvents] = useState<Set<string>>(new Set());
+  const { user } = useAuth();
 
   const fetchEvents = async () => {
     setIsLoading(true);
@@ -158,8 +159,26 @@ export default function EventListing({ selectedCity, onAuthRequired }: { selecte
     }
   };
 
+  const fetchJoined = async () => {
+    if (!user) return;
+    try {
+      const { data, error } = await supabase
+        .from("rsvps")
+        .select("event_id")
+        .eq("profile_id", user.id)
+        .eq("type", "join");
+      
+      if (error) throw error;
+      setJoinedEvents(new Set(data.map(r => r.event_id)));
+    } catch (err) {
+      console.error("Error fetching joined events:", err);
+    }
+  };
+
   useEffect(() => {
     fetchEvents();
+    if (isAuthenticated) fetchJoined();
+
     const channel = supabase.channel("radar_live")
       .on("postgres_changes", { event: "*", schema: "public", table: "events" }, (payload) => {
         if (payload.eventType === "INSERT" || payload.eventType === "UPDATE") {
@@ -190,14 +209,29 @@ export default function EventListing({ selectedCity, onAuthRequired }: { selecte
   }, [events]);
 
   const isJoined = (id: string) => joinedEvents.has(id);
-  const joinEvent = (id: string) => {
-    if (!isAuthenticated) {
+  const joinEvent = async (id: string) => {
+    if (!isAuthenticated || !user) {
       onAuthRequired();
       return;
     }
-    setJoinedEvents((prev) => new Set(prev).add(id));
-    const event = events.find(e => e.id === id);
-    if (event) addNotification("radar", `Plan joined: ${event.name} added to your list.`);
+
+    try {
+      const { error } = await supabase
+        .from("rsvps")
+        .insert({
+          event_id: id,
+          profile_id: user.id,
+          type: 'join'
+        });
+
+      if (error && error.code !== '23505') throw error; // Ignore if already joined
+
+      setJoinedEvents((prev) => new Set(prev).add(id));
+      const event = events.find(e => e.id === id);
+      if (event) addNotification("radar", `Plan joined: ${event.name} added to your list.`);
+    } catch (err: any) {
+      addNotification("system", `Join failed: ${err.message}`);
+    }
   };
 
   const todayStr = new Date().toISOString().split("T")[0];
@@ -236,7 +270,7 @@ export default function EventListing({ selectedCity, onAuthRequired }: { selecte
   };
 
   return (
-    <section className="relative w-full bg-black py-20 z-30">
+    <section id="event-listing" className="relative w-full bg-black py-20 z-30">
       <div className="absolute top-0 inset-x-0 h-48 bg-gradient-to-b from-black to-transparent pointer-events-none z-10" />
       
       <div className="max-w-[1440px] mx-auto px-6 mb-12">

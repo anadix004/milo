@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Lexend, Roboto_Mono, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { NotificationProvider } from "@/components/NotificationContext";
@@ -25,12 +25,13 @@ const robotoMono = Roboto_Mono({
 export const metadata: Metadata = {
   title: "Milo | Cinematic Event Radar",
   description: "High-end, immersive city event discovery.",
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 1,
-    viewportFit: "cover",
-  },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({

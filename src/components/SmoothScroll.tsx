@@ -7,7 +7,10 @@ export default function SmoothScroll({ children }: { children: ReactNode }) {
   
   useEffect(() => {
     // Disable Lenis on mobile to permit native momentum scroll
-    setIsMobile(window.innerWidth < 768);
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
   if (isMobile) return <>{children}</>;

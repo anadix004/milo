@@ -12,6 +12,7 @@ interface AuthUser extends User {
   display_name?: string;
   avatar_url?: string;
   role?: string;
+  is_ghost?: boolean;
 }
 
 interface AuthContextType {
@@ -25,6 +26,7 @@ interface AuthContextType {
   signUp: (email: string, pass: string, data: any) => Promise<void>;
   logout: () => Promise<void>;
   refreshProfile: () => Promise<void>;
+  updateProfile: (updates: Partial<AuthUser>) => Promise<void>;
   recoverPassword: (email: string) => Promise<void>;
   loginWithGoogle: () => Promise<void>;
 }
@@ -161,6 +163,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     addNotification("session", "Identity purged. Nexus disconnected.");
   };
 
+  const updateProfile = async (updates: Partial<AuthUser>) => {
+    if (!user) return;
+    try {
+      const { error } = await supabase
+        .from("profiles")
+        .update(updates)
+        .eq("id", user.id);
+      
+      if (error) throw error;
+      
+      setUser({ ...user, ...updates });
+      addNotification("session", "Profile synchronized with Nexus.");
+    } catch (err) {
+      console.error("Profile update error:", err);
+      addNotification("system", "Profile synchronization failed.");
+    }
+  };
+
   const recoverPassword = async (email: string) => {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/auth/reset-password`,
@@ -188,6 +208,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       signUp, 
       logout,
       refreshProfile,
+      updateProfile,
       recoverPassword,
       loginWithGoogle
     }}>

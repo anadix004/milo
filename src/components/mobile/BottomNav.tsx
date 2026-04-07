@@ -19,9 +19,18 @@ export default function BottomNav({ onProfileClick, onEventClick, onNotification
   const { isAuthenticated } = useAuth();
 
   // Perfect 5-Column Symmetry: Center the (+) trigger
+  const handleRadarClick = () => {
+    if (pathname === "/") {
+      const el = document.getElementById("event-listing");
+      if (el) el.scrollIntoView({ behavior: "smooth" });
+    } else {
+      window.location.href = "/";
+    }
+  };
+
   const tabs = [
     { icon: Home, label: "Home", href: "/", active: pathname === "/" },
-    { icon: Search, label: "Radar", href: "/events", active: pathname === "/events" },
+    { icon: Search, label: "Radar", action: handleRadarClick },
     { icon: PlusCircle, label: "Scan", action: onEventClick, primary: true },
     { icon: Bell, label: "Alerts", action: onNotificationsClick, badge: unreadCount },
     { icon: User, label: isAuthenticated ? "Profile" : "Log In", action: onProfileClick },

@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { User, Mail, Globe, Image as ImageIcon, QrCode, LogOut, X, ChevronRight, ShieldCheck, Camera, Loader2, Shield } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import clsx from "clsx";
 import { createClient } from "@/utils/supabase/client";
@@ -28,10 +28,42 @@ export default function ProfileSidebar({ isOpen, onClose, onAuthClick }: Profile
   const isTeam = user?.role === "team";
   const hasAdminAccess = isAdmin || isOwner || isTeam;
   const [isUploading, setIsUploading] = useState(false);
-  const [isGhostMode, setIsGhostMode] = useState(false);
-  const [showPass, setShowPass] = useState(false);
   const [isUpdatingAvatar, setIsUpdatingAvatar] = useState(false);
   const [updateMode, setUpdateMode] = useState<"camera" | "upload" | null>(null);
+  const [showPass, setShowPass] = useState(false);
+  const [rsvps, setRsvps] = useState<any[]>([]);
+  const { updateProfile } = useAuth();
+  const isGhostMode = !!user?.is_ghost;
+
+  const fetchRSVPs = async () => {
+    if (!user) return;
+    try {
+      const { data, error } = await supabase
+        .from("rsvps")
+        .select(`
+          id,
+          type,
+          event:events (
+            title,
+            location,
+            date,
+            "cityId"
+          )
+        `)
+        .eq("profile_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(3);
+
+      if (error) throw error;
+      setRsvps(data || []);
+    } catch (err) {
+      console.error("Error fetching RSVPs:", err);
+    }
+  };
+
+  useEffect(() => {
+    if (isAuthenticated) fetchRSVPs();
+  }, [isAuthenticated, user?.id]);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -260,7 +292,13 @@ export default function ProfileSidebar({ isOpen, onClose, onAuthClick }: Profile
                     className="overflow-hidden"
                   >
                     <div className="p-8 bg-white rounded-[2rem] flex flex-col items-center space-y-6">
-                      <div className="w-full aspect-square bg-[radial-gradient(circle_at_50%_50%,#000_20%,transparent_0%),radial-gradient(circle_at_50%_50%,#000_10%,transparent_0%)] bg-[length:12px_12px] opacity-90 rounded-2xl" />
+                      <div className="p-2 bg-white rounded-xl border-4 border-black/5 shadow-2xl">
+                         <img 
+                            src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=milo:${user?.id || 'guest'}&bgcolor=ffffff&color=000000`} 
+                            alt="Milo Pass QR"
+                            className="w-48 h-48"
+                         />
+                      </div>
                       <div className="flex flex-col items-center gap-2">
                          <ShieldCheck className="text-black" size={24} />
                          <p className="text-[8px] font-mono text-black font-black uppercase tracking-[0.4em]">Verified // Active</p>
@@ -274,7 +312,7 @@ export default function ProfileSidebar({ isOpen, onClose, onAuthClick }: Profile
             <div className="space-y-4">
               <h3 className="text-white/40 text-[9px] uppercase tracking-widest px-2 font-black font-mono">Privacy Shield</h3>
               <button 
-                onClick={() => setIsGhostMode(!isGhostMode)}
+                onClick={() => updateProfile({ is_ghost: !isGhostMode })}
                 className={clsx(
                   "w-full p-5 rounded-[1.5rem] border flex items-center justify-between transition-all duration-500",
                   isGhostMode 
@@ -297,18 +335,23 @@ export default function ProfileSidebar({ isOpen, onClose, onAuthClick }: Profile
 
             <div className="space-y-4">
               <h3 className="text-white/40 text-[9px] uppercase tracking-widest px-2 font-black font-mono">Recent Activity</h3>
-              {[
-                { name: "Milo Festival '26", city: "Delhi", day: "Tomorrow" },
-                { name: "Code & Craft", city: "Mumbai", day: "Sat" }
-              ].map((h, i) => (
+              {rsvps.length > 0 ? rsvps.map((rsvp, i) => (
                 <div key={i} className="p-5 bg-white/5 rounded-[1.5rem] border border-white/5 flex justify-between items-center group cursor-pointer hover:border-white/20 transition-all">
                   <div>
-                    <p className="text-[10px] text-white font-black tracking-widest uppercase">{h.name}</p>
-                    <p className="text-[8px] text-white/20 uppercase font-mono">{h.city} // {h.day}</p>
+                    <p className="text-[10px] text-white font-black tracking-widest uppercase">{rsvp.event?.title}</p>
+                    <p className="text-[8px] text-white/20 uppercase font-mono">{rsvp.event?.location} // {rsvp.type}</p>
                   </div>
-                  <div className="w-2 h-2 rounded-full bg-purple-500 opacity-20 group-hover:opacity-100 transition-opacity" />
+                  <div className={clsx(
+                    "w-2 h-2 rounded-full transition-opacity",
+                    rsvp.type === 'join' ? 'bg-cyan-500' : 'bg-purple-500',
+                    "opacity-20 group-hover:opacity-100"
+                  )} />
                 </div>
-              ))}
+              )) : (
+                <div className="p-6 border border-dashed border-white/10 rounded-[1.5rem] text-center">
+                  <p className="text-[8px] text-white/20 uppercase tracking-[0.2em] font-black">No missions assigned</p>
+                </div>
+              )}
             </div>
           </div>
         )}

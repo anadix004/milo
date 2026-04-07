@@ -95,6 +95,11 @@ export default function FinalCTA({ selectedCity }: FinalCTAProps) {
 
         {/* Access Button */}
         <button 
+          onClick={() => {
+            const el = document.getElementById("event-listing");
+            if (el) el.scrollIntoView({ behavior: "smooth" });
+            else window.scrollTo({ top: window.innerHeight * 4, behavior: "smooth" });
+          }}
           className="group relative px-12 py-6 rounded-full bg-white text-black font-black tracking-[0.4em] uppercase text-xs md:text-sm overflow-hidden transition-all hover:scale-105 active:scale-95"
         >
           <div 

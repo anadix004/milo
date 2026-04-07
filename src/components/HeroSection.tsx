@@ -107,7 +107,7 @@ export default function HeroSection() {
   });
 
   return (
-    <section ref={containerRef} className={clsx("relative w-full", isMobile ? "h-screen" : "h-[400vh]")}>
+    <section ref={containerRef} className={clsx("relative w-full", isMobile ? "h-[200vh]" : "h-[400vh]")}>
       {/* Sticky tracking viewport */}
       <div className="sticky top-0 w-full h-screen overflow-hidden">
         
@@ -136,9 +136,9 @@ export default function HeroSection() {
 
         {/* Bottom Annotations UI */}
         <div className={clsx(
-          "absolute z-20 mix-blend-difference pointer-events-none",
+          "absolute z-30 mix-blend-difference pointer-events-none",
           isMobile 
-            ? "bottom-32 left-1/2 -translate-x-1/2" 
+            ? "bottom-24 left-1/2 -translate-x-1/2" 
             : "bottom-6 right-6 md:bottom-8 md:right-8"
         )}>
           <p className={clsx(
@@ -161,8 +161,8 @@ export default function HeroSection() {
 
         {/* The MILO Wall Typography */}
         <div className={clsx(
-          "absolute inset-0 w-full h-full flex flex-col items-start pointer-events-none z-30 overflow-hidden px-1 md:px-2",
-          isMobile ? "justify-end mb-44 px-6" : "justify-end mb-12 md:mb-20"
+          "absolute inset-0 w-full h-full flex flex-col items-start pointer-events-none z-40 overflow-hidden px-1 md:px-2",
+          isMobile ? "justify-center px-6" : "justify-end mb-12 md:mb-20"
         )}>
           <motion.div
             initial={{ y: "20%", filter: "blur(20px)", opacity: 0 }}
@@ -180,7 +180,7 @@ export default function HeroSection() {
                 "text-[32vw] md:text-[24vw]",
                 "font-extrabold text-white lowercase text-left",
                 "leading-[0.7] tracking-[-0.05em] m-0 p-0",
-                "drop-shadow-[0_0_40px_rgba(255,255,255,0.2)]"
+                "drop-shadow-[0_4px_20px_rgba(0,0,0,0.8)] [text-shadow:_0_0_60px_rgba(255,255,255,0.3)]" 
               )}
               style={{ WebkitFontSmoothing: "antialiased" }}
             >
