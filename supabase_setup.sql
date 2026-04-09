@@ -76,15 +76,25 @@ CREATE POLICY "Authenticated users can insert events"
   ON public.events FOR INSERT
   WITH CHECK (auth.uid() IS NOT NULL);
 
+-- SEC-01 FIX: Only the event owner or admin/owner-role users can update events
 DROP POLICY IF EXISTS "Admins can update events" ON public.events;
-CREATE POLICY "Admins can update events"
+DROP POLICY IF EXISTS "Users can update their own events" ON public.events;
+CREATE POLICY "Users can update their own events"
   ON public.events FOR UPDATE
-  USING (auth.uid() IS NOT NULL);
+  USING (
+    auth.uid() = user_id
+    OR (SELECT role FROM public.profiles WHERE id = auth.uid()) IN ('admin', 'owner')
+  );
 
+-- SEC-01 FIX: Only the event owner or admin/owner-role users can delete events
 DROP POLICY IF EXISTS "Admins can delete events" ON public.events;
-CREATE POLICY "Admins can delete events"
+DROP POLICY IF EXISTS "Users can delete their own events" ON public.events;
+CREATE POLICY "Users can delete their own events"
   ON public.events FOR DELETE
-  USING (auth.uid() IS NOT NULL);
+  USING (
+    auth.uid() = user_id
+    OR (SELECT role FROM public.profiles WHERE id = auth.uid()) IN ('admin', 'owner')
+  );
 
 -- 3. AUTO-CREATE PROFILE ON SIGNUP
 CREATE OR REPLACE FUNCTION public.handle_new_user()
@@ -123,5 +133,58 @@ DROP POLICY IF EXISTS "Authenticated users can upload event assets" ON storage.o
 CREATE POLICY "Authenticated users can upload event assets"
   ON storage.objects FOR INSERT
   WITH CHECK (bucket_id = 'event-assets' AND auth.uid() IS NOT NULL);
+
+-- ============================================
+-- DB-01 FIX: Missing RSVPS table
+-- ============================================
+
+CREATE TABLE IF NOT EXISTS public.rsvps (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  event_id UUID REFERENCES public.events(id) ON DELETE CASCADE,
+  profile_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
+  type TEXT DEFAULT 'join',
+  created_at TIMESTAMPTZ DEFAULT now(),
+  UNIQUE(event_id, profile_id)
+);
+
+ALTER TABLE public.rsvps ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Users can read their own RSVPs" ON public.rsvps;
+CREATE POLICY "Users can read their own RSVPs"
+  ON public.rsvps FOR SELECT
+  USING (auth.uid() = profile_id);
+
+DROP POLICY IF EXISTS "Users can insert their own RSVPs" ON public.rsvps;
+CREATE POLICY "Users can insert their own RSVPs"
+  ON public.rsvps FOR INSERT
+  WITH CHECK (auth.uid() = profile_id);
+
+DROP POLICY IF EXISTS "Users can delete their own RSVPs" ON public.rsvps;
+CREATE POLICY "Users can delete their own RSVPs"
+  ON public.rsvps FOR DELETE
+  USING (auth.uid() = profile_id);
+
+-- ============================================
+-- DB-01 FIX: Missing AVATARS storage bucket
+-- ============================================
+
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('avatars', 'avatars', true)
+ON CONFLICT (id) DO NOTHING;
+
+DROP POLICY IF EXISTS "Anyone can view avatars" ON storage.objects;
+CREATE POLICY "Anyone can view avatars"
+  ON storage.objects FOR SELECT
+  USING (bucket_id = 'avatars');
+
+DROP POLICY IF EXISTS "Authenticated users can upload avatars" ON storage.objects;
+CREATE POLICY "Authenticated users can upload avatars"
+  ON storage.objects FOR INSERT
+  WITH CHECK (bucket_id = 'avatars' AND auth.uid() IS NOT NULL);
+
+DROP POLICY IF EXISTS "Users can update their own avatar" ON storage.objects;
+CREATE POLICY "Users can update their own avatar"
+  ON storage.objects FOR UPDATE
+  USING (bucket_id = 'avatars' AND auth.uid()::text = (storage.foldername(name))[1]);
 
 -- Done! Your fresh Milo backend is ready.

@@ -81,7 +81,7 @@ export default function Home() {
       <Preloader progress={progress} isReady={isReady} />
       
       <Header 
-        onProfileClick={() => setActiveModal("profile")}
+        onProfileClick={() => handleAuthGate(() => setActiveModal("profile"))}
         onEventClick={() => handleAuthGate(() => setActiveModal("event"))}
         onNotificationsClick={() => setActiveModal("notifications")}
         isSidebarOpen={activeModal === "profile"} 
@@ -110,7 +110,7 @@ export default function Home() {
       />
 
       <BottomNav 
-        onProfileClick={() => setActiveModal("profile")}
+        onProfileClick={() => handleAuthGate(() => setActiveModal("profile"))}
         onEventClick={() => handleAuthGate(() => setActiveModal("event"))}
         onNotificationsClick={() => setActiveModal("notifications")}
       />
