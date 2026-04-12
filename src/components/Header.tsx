@@ -6,6 +6,7 @@ import Link from "next/link";
 import clsx from "clsx";
 import { motion, useScroll, useMotionValueEvent } from "framer-motion";
 import { useState } from "react";
+import BrandLogo from "./BrandLogo";
 
 interface HeaderProps {
   onProfileClick: () => void;
@@ -56,18 +57,15 @@ export default function Header({ onProfileClick, onEventClick, onNotificationsCl
           <motion.div
             animate={{ 
               textShadow: [
-                "0 0 10px rgba(255,255,255,0.2)",
-                "0 0 20px rgba(255,255,255,0.4)",
-                "0 0 10px rgba(255,255,255,0.2)"
+                "0 0 10px rgba(255,255,255,0.1)",
+                "0 0 15px rgba(255,255,255,0.2)",
+                "0 0 10px rgba(255,255,255,0.1)"
               ]
             }}
             transition={{ duration: 3, repeat: Infinity }}
-            className="flex flex-col items-center"
+            className="flex items-center"
           >
-            <h1 className="font-[family-name:var(--font-lexend)] text-2xl md:text-3xl font-black uppercase tracking-[0.4em] text-white italic">
-              MILO
-            </h1>
-            <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-white/40 to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-700" />
+            <BrandLogo size="md" />
           </motion.div>
         </Link>
       </div>
