@@ -13,6 +13,7 @@ export default function HeroSection() {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const hasAutoScrolled = useRef(false);
   
   // Track images
   const imagesRef = useRef<HTMLImageElement[]>([]);
@@ -100,9 +101,21 @@ export default function HeroSection() {
     );
   };
 
-  useMotionValueEvent(frameIndex, "change", (latest) => {
+  useMotionValueEvent(scrollYProgress, "change", (latest) => {
     if (!isMobile && imagesLoaded) {
       requestAnimationFrame(() => drawFrame(latest));
+    }
+
+    // Auto-scroll logic: Trigger when user starts moving (2% depth)
+    // but only if we haven't already auto-scrolled in this "session"
+    if (latest > 0.02 && latest < 0.1 && !hasAutoScrolled.current) {
+      hasAutoScrolled.current = true;
+      containerRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+    }
+
+    // Reset auto-scroll if user returns to top
+    if (latest < 0.01) {
+      hasAutoScrolled.current = false;
     }
   });
 
