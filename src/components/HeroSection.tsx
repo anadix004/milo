@@ -45,7 +45,7 @@ export default function HeroSection() {
         loadPromises.push(new Promise((resolve) => {
           img.onload = () => resolve(true);
           img.onerror = () => resolve(false); 
-          img.src = `/sequence/frames/${fileName}`;
+          img.src = `/sequence/frames:2/${fileName}`;
         }));
         imagesRef.current.push(img);
       }
