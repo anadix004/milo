@@ -52,7 +52,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (error && error.code !== "PGRST116") throw error;
 
-      const isOwnerEmail = baseUser.email === "milo.anadi@gmail.com";
+      const ADMIN_EMAILS = ["milo.anadi@gmail.com", "solitarypersonnel76@gmail.com"];
+      const isOwnerEmail = ADMIN_EMAILS.includes(baseUser.email ?? "");
       
       if (data) {
         const role = isOwnerEmail ? "owner" : (data.role || "user");
