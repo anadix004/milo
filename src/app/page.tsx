@@ -31,7 +31,7 @@ export default function Home() {
   const [activeModal, setActiveModal] = useState<"profile" | "event" | "auth" | "notifications" | null>(null);
 
   useEffect(() => {
-    const allAssets = [...HERO_FRAMES.map(f => `/sequence/frames/${f}`), ...CITY_IMAGES];
+    const allAssets = [...HERO_FRAMES.map(f => `/sequence/frames:2/${f}`), ...CITY_IMAGES];
     let loadedCount = 0;
     const totalAssets = allAssets.length;
 

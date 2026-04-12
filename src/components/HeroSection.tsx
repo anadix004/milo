@@ -100,7 +100,7 @@ export default function HeroSection() {
     );
   };
 
-  useMotionValueEvent(scrollYProgress, "change", (latest) => {
+  useMotionValueEvent(frameIndex, "change", (latest) => {
     if (!isMobile && imagesLoaded) {
       requestAnimationFrame(() => drawFrame(latest));
     }
