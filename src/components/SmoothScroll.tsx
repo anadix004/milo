@@ -18,7 +18,7 @@ export default function SmoothScroll({ children }: { children: ReactNode }) {
   return (
     <ReactLenis root options={{ 
         lerp: 0.1, 
-        duration: 1.5, 
+        duration: 1.425, 
         smoothWheel: true 
     }}>
       {/* @ts-ignore - Version mismatch between React 19 and Lenis peer types */}
