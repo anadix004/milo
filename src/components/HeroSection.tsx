@@ -86,11 +86,11 @@ export default function HeroSection() {
 
     const hRatio = canvas.width / img.naturalWidth;
     const vRatio = canvas.height / img.naturalHeight;
-    const ZOOM_FACTOR = 1.12;
+    const ZOOM_FACTOR = 1.05;
     const ratio = Math.max(hRatio, vRatio) * ZOOM_FACTOR;
     
     const centerShift_x = (canvas.width - img.naturalWidth * ratio) / 2;
-    const centerShift_y = (canvas.height - img.naturalHeight * ratio) / 2;
+    const centerShift_y = (canvas.height - img.naturalHeight * ratio) * 0.1;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(
