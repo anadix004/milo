@@ -5,17 +5,14 @@ import { useEffect, useRef, useState } from "react";
 import clsx from "clsx";
 import { HERO_FRAMES } from "@/constants/frames";
 import { useIsMobile } from "@/hooks/useMediaQuery";
-import { useLenis } from "lenis/react";
 
 const FRAME_COUNT = HERO_FRAMES.length;
 
 export default function HeroSection() {
   const isMobile = useIsMobile();
-  const lenis = useLenis();
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const hasAutoScrolled = useRef(false);
   
   // Track images
   const imagesRef = useRef<HTMLImageElement[]>([]);
@@ -106,28 +103,6 @@ export default function HeroSection() {
   useMotionValueEvent(scrollYProgress, "change", (latest) => {
     if (!isMobile && imagesLoaded) {
       requestAnimationFrame(() => drawFrame(latest));
-    }
-
-    // Auto-scroll logic: Trigger when user starts moving (2% depth)
-    // but only if we haven't already auto-scrolled in this "session"
-    if (latest > 0.02 && latest < 0.1 && !hasAutoScrolled.current) {
-      hasAutoScrolled.current = true;
-      
-      const targetScroll = (containerRef.current?.offsetTop || 0) + (containerRef.current?.offsetHeight || 0);
-
-      if (lenis) {
-        lenis.scrollTo(targetScroll, { 
-          duration: 1.5,
-          lock: true // Temporarily lock to ensure it reaches destination
-        });
-      } else {
-        window.scrollTo({ top: targetScroll, behavior: "smooth" });
-      }
-    }
-
-    // Reset auto-scroll if user returns to top
-    if (latest < 0.01) {
-      hasAutoScrolled.current = false;
     }
   });
 
