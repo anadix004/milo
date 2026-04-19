@@ -379,5 +379,44 @@ export const EVENTS: EventData[] = [
     price: "₹999",
     color: "#FFFFFF",
     date: "2026-04-11", // This Week
+  },
+  // Delhi Events Added
+  {
+    id: "del-11", name: "Delhi Food Walk", category: "CULTURE / FOOD", image: "https://images.unsplash.com/photo-1548013146-72479768bada?w=800", cityId: "del", description: "Food walk in Delhi.", price: "₹500", color: "#a855f7", date: "2026-04-05", featured: false
+  },
+  {
+    id: "del-12", name: "Standup Comedy Night", category: "ENTERTAINMENT", image: "https://images.unsplash.com/photo-1587474260584-136574528ed5?w=800", cityId: "del", description: "Laughing night at CP.", price: "₹600", color: "#a855f7", date: "2026-04-06", featured: false
+  },
+  {
+    id: "del-13", name: "Art Exhibition", category: "ARTS", image: "https://images.unsplash.com/photo-1570160897040-3043bae3b8c1?w=800", cityId: "del", description: "Modern art exhibition.", price: "₹1000", color: "#a855f7", date: "2026-04-07", featured: false
+  },
+  {
+    id: "del-14", name: "Tech Meetup", category: "TECH", image: "https://images.unsplash.com/photo-1552533685-685846395376?w=800", cityId: "del", description: "Tech networking event.", price: "FREE", color: "#a855f7", date: "2026-04-08", featured: false
+  },
+  // Bangalore Events Added
+  {
+    id: "blr-11", name: "Startup Pitch", category: "TECH / BUSINESS", image: "https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=800", cityId: "blr", description: "Pitch your ideas to top VCs.", price: "₹200", color: "#22c55e", date: "2026-04-05", featured: false
+  },
+  {
+    id: "blr-12", name: "Indie Rock Night", category: "MUSIC", image: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=800", cityId: "blr", description: "Local rock bands performing live.", price: "₹800", color: "#22c55e", date: "2026-04-06", featured: false
+  },
+  {
+    id: "blr-13", name: "Web3 Assembly", category: "TECH / CRYPTO", image: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=800", cityId: "blr", description: "Crypto and Web3 discussions.", price: "FREE", color: "#22c55e", date: "2026-04-07", featured: false
+  },
+  {
+    id: "blr-14", name: "Garden Yoga", category: "HEALTH", image: "https://images.unsplash.com/photo-1453722758971-da0f4c017366?w=800", cityId: "blr", description: "Morning yoga session at Cubbon Park.", price: "₹300", color: "#22c55e", date: "2026-04-08", featured: false
+  },
+  // Mumbai Events Added
+  {
+    id: "mum-11", name: "Film Festival", category: "ARTS / CINEMA", image: "https://images.unsplash.com/photo-1570160897040-3043bae3b8c1?w=800", cityId: "mum", description: "Screening of unreleased indie films.", price: "₹1500", color: "#06b6d4", date: "2026-04-05", featured: false
+  },
+  {
+    id: "mum-12", name: "Beach Clean Drive", category: "COMMUNITY", image: "https://images.unsplash.com/photo-1566552881560-0be862a7c445?w=800", cityId: "mum", description: "Help clean Juhu beach.", price: "FREE", color: "#06b6d4", date: "2026-04-06", featured: false
+  },
+  {
+    id: "mum-13", name: "Theatre Drama", category: "ARTS", image: "https://images.unsplash.com/photo-1514525253344-934d701df637?w=800", cityId: "mum", description: "A famous play by local artists.", price: "₹1200", color: "#06b6d4", date: "2026-04-07", featured: false
+  },
+  {
+    id: "mum-14", name: "Midnight Cycling", category: "SPORTS", image: "https://images.unsplash.com/photo-1557683311-eac922347aa1?w=800", cityId: "mum", description: "Exploring South Bombay on wheels.", price: "₹400", color: "#06b6d4", date: "2026-04-08", featured: false
   }
 ];

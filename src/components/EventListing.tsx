@@ -10,6 +10,7 @@ import { useAuth } from "./AuthContext";
 import { parsePrice } from "@/utils/price";
 import { METRO_CITIES, getCityName } from "@/constants/cities";
 import Comments from "@/components/events/Comments";
+import { EVENTS } from "@/constants/events";
 import { useIsMobile } from "@/hooks/useMediaQuery";
 import BottomSheet from "@/components/mobile/BottomSheet";
 
@@ -149,11 +150,17 @@ export default function EventListing({ selectedCity, onAuthRequired }: { selecte
         .select("*")
         .eq("is_verified", true);
 
-      if (error) throw error;
-      const mapped = (data || []).map(e => ({ ...e, name: e.title }));
-      setEvents(mapped);
+      let fetchedEvents: EventData[] = [];
+      if (!error && data) {
+         fetchedEvents = data.map(e => ({ ...e, name: e.title }));
+      }
+      
+      const localMapped = EVENTS.map(e => ({ ...e, title: e.name, time: "18:00", location: "Various", is_verified: true })) as unknown as EventData[];
+      setEvents([...localMapped, ...fetchedEvents]);
     } catch (err: any) {
-      addNotification("system", `Failed to load events: ${err.message}`);
+      addNotification("system", `Failed to load online events: ${err.message}`);
+      const localMapped = EVENTS.map(e => ({ ...e, title: e.name, time: "18:00", location: "Various", is_verified: true })) as unknown as EventData[];
+      setEvents(localMapped);
     } finally {
       setIsLoading(false);
     }
