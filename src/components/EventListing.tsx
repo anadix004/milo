@@ -447,64 +447,95 @@ function EventDetailView({ event, isJoined, onJoin, onClose }: { event: EventDat
   }, [isMobile]);
 
   const renderContent = () => (
-    <div className={clsx("flex flex-col h-full", !isMobile && "md:flex-row")}>
-      <div className={clsx("relative shrink-0", isMobile ? "w-full aspect-video" : "w-1/2 h-full")}>
-        <img src={event.image} alt={event.title} className="w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-r from-black via-transparent to-transparent hidden md:block" />
-        {isMobile && (
-           <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent" />
-        )}
-      </div>
-      <div className={clsx("flex-1 flex flex-col gap-8", isMobile ? "p-6" : "p-8 md:p-16 overflow-y-auto no-scrollbar")}>
-        <div className={isMobile ? "mt-[-40px] relative z-10" : ""}>
-          <span className="text-white/40 text-[10px] font-mono uppercase tracking-[0.4em] mb-4 block">{event.category} // {event.date}</span>
-          <h2 className={clsx("font-black text-white uppercase tracking-tighter leading-none mb-4", isMobile ? "text-3xl" : "text-4xl md:text-6xl")}>{event.title}</h2>
-        </div>
-        
-        <div className="space-y-4">
-           <p className="text-white/40 text-[9px] uppercase tracking-[0.4em] font-black font-mono">Mission Broadcast Details</p>
-           <p className="text-white/60 font-mono text-xs md:text-sm leading-relaxed max-w-md">{event.description}</p>
-        </div>
-
-        {event.venue_address && (
-          <div className="space-y-2">
-             <p className="text-white/20 text-[9px] uppercase tracking-[0.4em] font-black font-mono">Authorized Venue</p>
-             <p className="text-white/80 font-mono text-[10px] md:text-xs leading-relaxed uppercase tracking-wider">{event.venue_address}</p>
-          </div>
-        )}
-
-        {event.ticket_links && event.ticket_links.length > 0 && (
-          <div className="space-y-4">
-             <p className="text-white/20 text-[9px] uppercase tracking-[0.4em] font-black font-mono">Booking Channels</p>
-             <div className="flex flex-wrap gap-3">
-                {event.ticket_links.map((link, i) => (
-                  <a 
-                    key={i} 
-                    href={link.url} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full text-[9px] font-black text-white hover:bg-white/10 hover:border-white/20 transition-all uppercase tracking-widest"
-                  >
-                    <Ticket size={12} className="text-purple-400" />
-                    {link.name || "Book Now"}
-                  </a>
-                ))}
+    <div className="flex flex-col w-full pb-20">
+      {/* Header Section */}
+      <div className="px-6 md:px-16 pt-12 md:pt-16 pb-8 md:pb-10 flex flex-col gap-6 md:gap-8 z-10">
+         <h2 className="text-4xl md:text-6xl lg:text-7xl font-black text-white uppercase tracking-tighter leading-[0.9] pr-12">
+            {event.title}
+         </h2>
+         
+         <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 pt-4 md:pt-8 border-t border-white/10">
+           {/* Left: Avatar & Info */}
+           <div className="flex items-center gap-4">
+             <div className="w-12 h-12 md:w-14 md:h-14 bg-white text-black rounded-full flex items-center justify-center font-black text-xl shrink-0">
+               M
              </div>
-          </div>
-        )}
-        
-        <div className={clsx("flex items-center justify-between pt-8 border-t border-white/5", isMobile ? "mt-auto pb-12" : "")}>
-          <div>
-            <p className="text-white/20 text-[10px] font-mono tracking-widest mb-1 uppercase">Tier</p>
-            <p className="text-2xl font-black text-white">{event.price}</p>
-          </div>
-          <div className="flex items-center gap-4">
-             <button onClick={() => setIsLiked(!isLiked)} className={clsx("p-4 rounded-full border border-white/10", isLiked ? "bg-rose-500 text-white border-rose-500" : "text-white/40")}><Heart size={20} fill={isLiked ? "currentColor" : "none"} /></button>
-             <button onClick={onJoin} disabled={isJoined} className={clsx("px-8 md:px-12 py-5 rounded-full font-black uppercase tracking-widest text-[10px] transition-all", isJoined ? "bg-emerald-500 text-black" : "bg-white text-black")}>{isJoined ? "JOINED" : "JOIN PLAN"}</button>
-          </div>
+             <div>
+               <p className="font-bold text-white text-sm md:text-base tracking-widest uppercase">MILO Curated</p>
+               <p className="text-white/40 text-[10px] md:text-xs font-mono uppercase tracking-[0.3em] mt-1">{event.category} • {event.date}</p>
+             </div>
+           </div>
+
+           {/* Right: Actions */}
+           <div className="flex flex-wrap items-center gap-3 md:gap-4">
+             <button onClick={() => setIsLiked(!isLiked)} className="w-12 h-12 md:w-14 md:h-14 rounded-full border border-white/10 flex items-center justify-center text-white/40 hover:border-white/40 hover:text-white transition-colors bg-white/5 shrink-0">
+               <Heart size={20} fill={isLiked ? "currentColor" : "none"} className={isLiked ? "text-rose-500" : ""} />
+             </button>
+             <button className="w-12 h-12 md:w-14 md:h-14 rounded-full border border-white/10 flex items-center justify-center text-white/40 hover:border-white/40 hover:text-white transition-colors bg-white/5 shrink-0">
+               <Share2 size={20} />
+             </button>
+             <button onClick={onJoin} disabled={isJoined} className={clsx("px-8 md:px-12 h-12 md:h-14 rounded-full font-black text-[10px] md:text-xs uppercase tracking-widest transition-all", isJoined ? "bg-emerald-500 text-black" : "bg-white text-black hover:bg-neutral-200")}>
+               {isJoined ? "Joined" : "Get Tickets"}
+             </button>
+           </div>
+         </div>
+      </div>
+
+      {/* Hero Image Section */}
+      <div className="px-4 md:px-12 w-full">
+        <div className="w-full aspect-[4/3] md:aspect-[21/9] bg-neutral-900 rounded-[2rem] md:rounded-[3rem] overflow-hidden relative group">
+          <img src={event.image} alt={event.title} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-80" />
         </div>
-        
-        {!isMobile && <Comments isJoined={isJoined} />}
+      </div>
+      
+      {/* Details Grid Section */}
+      <div className="mt-12 md:mt-16 px-6 md:px-16 grid grid-cols-1 lg:grid-cols-3 gap-12 lg:gap-16">
+         {/* Main Content (Left) */}
+         <div className="lg:col-span-2 space-y-12">
+           <div>
+             <h3 className="text-white/40 text-[10px] font-mono uppercase tracking-[0.4em] mb-4">Mission Broadcast Details</h3>
+             <p className="text-white/80 font-mono text-sm md:text-base leading-relaxed whitespace-pre-line">{event.description}</p>
+           </div>
+           
+           <div className="pt-8 border-t border-white/5">
+              <Comments isJoined={isJoined} /> 
+           </div>
+         </div>
+         
+         {/* Sidebar Info (Right) */}
+         <div className="space-y-8 lg:pl-8 lg:border-l border-white/5">
+           <div>
+             <h3 className="text-white/20 text-[10px] font-mono uppercase tracking-[0.4em] mb-2">Time</h3>
+             <p className="font-mono text-white text-sm md:text-base uppercase tracking-wider">{event.time}</p>
+           </div>
+           
+           {event.venue_address && (
+             <div>
+               <h3 className="text-white/20 text-[10px] font-mono uppercase tracking-[0.4em] mb-2">Authorized Venue</h3>
+               <p className="font-mono text-white text-sm md:text-base uppercase tracking-wider">{event.venue_address}</p>
+             </div>
+           )}
+
+           <div>
+             <h3 className="text-white/20 text-[10px] font-mono uppercase tracking-[0.4em] mb-2">Access Tier</h3>
+             <p className="font-black text-white text-2xl md:text-3xl tracking-tighter">{event.price}</p>
+           </div>
+
+           {event.ticket_links && event.ticket_links.length > 0 && (
+              <div>
+                <h3 className="text-white/20 text-[10px] font-mono uppercase tracking-[0.4em] mb-4">Booking Channels</h3>
+                <div className="flex flex-col gap-3">
+                   {event.ticket_links.map((link, i) => (
+                     <a key={i} href={link.url} target="_blank" rel="noopener noreferrer" className="flex items-center justify-between px-6 py-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl transition-all group">
+                       <span className="font-black text-white text-xs uppercase tracking-widest">{link.name || "Book Now"}</span>
+                       <Ticket size={16} className="text-purple-400 group-hover:scale-110 transition-transform" />
+                     </a>
+                   ))}
+                </div>
+              </div>
+           )}
+         </div>
       </div>
     </div>
   );
@@ -518,10 +549,18 @@ function EventDetailView({ event, isJoined, onJoin, onClose }: { event: EventDat
   }
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-12">
-      <div className="absolute inset-0 bg-black/95 backdrop-blur-3xl" onClick={onClose} />
-      <motion.div initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 20 }} transition={SPRING_CONFIG} className="relative w-full max-w-6xl h-full md:max-h-[85vh] bg-neutral-950 border border-white/10 rounded-[2.5rem] overflow-hidden flex flex-col md:flex-row shadow-2xl">
-        <button onClick={onClose} className="absolute top-8 right-8 z-50 p-2 text-white/20 hover:text-white transition-colors"><X size={32} /></button>
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[100] flex justify-center pt-12 md:pt-20">
+      <div className="absolute inset-0 bg-black/90 backdrop-blur-md" onClick={onClose} />
+      <motion.div 
+        initial={{ opacity: 0, y: "100%" }} 
+        animate={{ opacity: 1, y: 0 }} 
+        exit={{ opacity: 0, y: "100%" }} 
+        transition={SPRING_CONFIG} 
+        className="relative w-full max-w-6xl bg-[#0a0a0a] border-t border-l border-r border-white/10 rounded-t-[2.5rem] overflow-y-auto no-scrollbar flex flex-col shadow-[0_-20px_50px_rgba(0,0,0,0.5)]"
+      >
+        <button onClick={onClose} className="absolute top-8 right-8 z-50 p-3 bg-white/5 hover:bg-white/10 rounded-full text-white/60 hover:text-white transition-colors">
+          <X size={24} />
+        </button>
         {renderContent()}
       </motion.div>
     </motion.div>
