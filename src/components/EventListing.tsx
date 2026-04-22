@@ -267,10 +267,12 @@ export default function EventListing({ selectedCity, onAuthRequired }: { selecte
       if (sortOrder === "price-high") return parsePrice(b.price) - parsePrice(a.price);
       return (a.featured ? -1 : 1);
     });
-  }, [events, selectedCity, selectedCat, sortOrder, searchQuery, timeFilter, todayStr, tomorrowStr, weekStr, monthStr]);
+  }, [events, selectedCity, selectedCat, sortOrder, searchQuery, timeFilter, priceFilter, budgetFilter, todayStr, tomorrowStr, weekStr, monthStr]);
+
+  const hasActiveFilters = selectedCat !== "All" || searchQuery.trim() !== "" || timeFilter !== "All" || priceFilter !== "All" || budgetFilter !== "All" || sortOrder !== "featured";
 
   const homepageSections = useMemo(() => {
-    if (selectedCity) return null;
+    if (selectedCity || hasActiveFilters) return null;
     
     return [
       { title: "Happening Today", events: events.filter(e => e.date === todayStr) },
@@ -278,7 +280,7 @@ export default function EventListing({ selectedCity, onAuthRequired }: { selecte
       { title: "Free Events", events: events.filter(e => parsePrice(e.price) === 0) },
       { title: "Trending Now", events: events.filter(e => e.featured) },
     ];
-  }, [events, selectedCity, todayStr, weekStr]);
+  }, [events, selectedCity, hasActiveFilters, todayStr, weekStr]);
 
   const handleEventClick = (event: EventData) => {
     if (!isAuthenticated) {
