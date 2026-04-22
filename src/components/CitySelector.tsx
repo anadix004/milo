@@ -166,9 +166,9 @@ export default function CitySelector({ selectedCity, onSelect }: CitySelectorPro
 
       {/* Technical HUD Details */}
       <div className="mt-12 flex gap-8 md:gap-12 font-[family-name:var(--font-roboto-mono)] text-[8px] tracking-[0.6em] uppercase text-white/5 items-center px-4 text-center">
-        <span>Identity Scan: ACTIVE</span>
+        <span>System: ACTIVE</span>
         <div className="hidden md:block w-24 h-px bg-white/10" />
-        <span className={clsx(isMobile ? "text-[6px]" : "hidden md:inline")}>City synchronization Required</span>
+        <span className={clsx(isMobile ? "text-[6px]" : "hidden md:inline")}>City Selection Required</span>
       </div>
     </section>
   );

@@ -42,7 +42,7 @@ export default function LoginClient() {
     setErrorStatus(null);
     if (currentStep === "signup-credentials") {
       if (!formData.email || !formData.password) {
-        setErrorStatus("Identity Credentials Required");
+        setErrorStatus("Login Required");
         return;
       }
       
@@ -71,7 +71,7 @@ export default function LoginClient() {
       });
       if (error) throw error;
       
-      addNotification("session", "Identity verified. Redirecting to Radar...");
+      addNotification("session", "Login successful. Redirecting...");
       router.refresh();
       router.push("/");
     } catch (err: any) {
@@ -98,7 +98,7 @@ export default function LoginClient() {
       });
       if (error) throw error;
       
-      addNotification("session", "Profile initialized. Welcome to the Radar.");
+      addNotification("session", "Profile created. Welcome!");
       router.refresh();
       router.push("/");
     } catch (err: any) {
@@ -156,7 +156,7 @@ export default function LoginClient() {
                        <UserIcon size={28} className="text-white/40" />
                     </div>
                     <h2 className="font-lexend text-4xl font-black uppercase tracking-tighter text-white italic">MILO ACCESS</h2>
-                    <p className="font-mono text-[9px] text-white/20 uppercase tracking-[0.5em] font-black">Authorized Entry Required</p>
+                    <p className="font-mono text-[9px] text-white/20 uppercase tracking-[0.5em] font-black">Login to Continue</p>
                   </div>
 
                   <div className="space-y-4 pt-4">
@@ -202,7 +202,7 @@ export default function LoginClient() {
                 >
                   <div className="text-center space-y-4">
                      <h2 className="font-lexend text-3xl font-black uppercase tracking-tighter text-white">RE-ENTRY</h2>
-                     <p className="font-mono text-[9px] text-white/20 uppercase tracking-[0.5em] font-black">Authorized Personnel Only</p>
+                     <p className="font-mono text-[9px] text-white/20 uppercase tracking-[0.5em] font-black">Members Only</p>
                   </div>
 
                   <form onSubmit={executeLogin} className="space-y-6">
@@ -252,7 +252,7 @@ export default function LoginClient() {
                 >
                   <div className="text-center space-y-4">
                      <h2 className="font-lexend text-3xl font-black uppercase tracking-tighter text-white italic">NEW PROFILE</h2>
-                     <p className="font-mono text-[9px] text-white/20 uppercase tracking-[0.5em] font-black">Initialize Identity</p>
+                     <p className="font-mono text-[9px] text-white/20 uppercase tracking-[0.5em] font-black">Create Profile</p>
                   </div>
 
                   <div className="space-y-8">
@@ -288,7 +288,7 @@ export default function LoginClient() {
                 >
                   <div className="text-center space-y-4">
                      <h2 className="font-lexend text-3xl font-black uppercase tracking-tighter text-white italic">HANDLE NEXUS</h2>
-                     <p className="font-mono text-[9px] text-white/20 uppercase tracking-[0.5em] font-black">Choose your Radar Identity</p>
+                     <p className="font-mono text-[9px] text-white/20 uppercase tracking-[0.5em] font-black">Choose your Username</p>
                   </div>
 
                   <form onSubmit={executeSignUp} className="space-y-8">
@@ -308,7 +308,7 @@ export default function LoginClient() {
                      {errorStatus && <p className="text-center text-red-500 font-mono text-[10px] uppercase font-black tracking-widest animate-pulse">{errorStatus}</p>}
 
                      <button disabled={isSyncing} className="w-full bg-emerald-500 text-black py-6 rounded-full font-black uppercase tracking-widest text-[10px] hover:scale-[1.02] active:scale-95 transition-all shadow-2xl shadow-emerald-500/20 flex items-center justify-center gap-3">
-                        {isSyncing ? <Loader2 className="animate-spin" size={16} /> : "Join the Radar"}
+                        {isSyncing ? <Loader2 className="animate-spin" size={16} /> : "Sign Up"}
                         <ArrowRight size={16} />
                      </button>
                   </form>

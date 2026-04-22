@@ -462,20 +462,20 @@ function EventDetailView({ event, isJoined, onJoin, onClose }: { event: EventDat
         </div>
         
         <div className="space-y-4">
-           <p className="text-white/40 text-[9px] uppercase tracking-[0.4em] font-black font-mono">Mission Broadcast Details</p>
+           <p className="text-white/40 text-[9px] uppercase tracking-[0.4em] font-black font-mono">Event Description</p>
            <p className="text-white/60 font-mono text-xs md:text-sm leading-relaxed max-w-md">{event.description}</p>
         </div>
 
         {event.venue_address && (
           <div className="space-y-2">
-             <p className="text-white/20 text-[9px] uppercase tracking-[0.4em] font-black font-mono">Authorized Venue</p>
+             <p className="text-white/20 text-[9px] uppercase tracking-[0.4em] font-black font-mono">Venue</p>
              <p className="text-white/80 font-mono text-[10px] md:text-xs leading-relaxed uppercase tracking-wider">{event.venue_address}</p>
           </div>
         )}
 
         {event.ticket_links && event.ticket_links.length > 0 && (
           <div className="space-y-4">
-             <p className="text-white/20 text-[9px] uppercase tracking-[0.4em] font-black font-mono">Booking Channels</p>
+             <p className="text-white/20 text-[9px] uppercase tracking-[0.4em] font-black font-mono">Tickets & Booking</p>
              <div className="flex flex-wrap gap-3">
                 {event.ticket_links.map((link, i) => (
                   <a 
@@ -495,7 +495,7 @@ function EventDetailView({ event, isJoined, onJoin, onClose }: { event: EventDat
         
         <div className={clsx("flex items-center justify-between pt-8 border-t border-white/5", isMobile ? "mt-auto pb-12" : "")}>
           <div>
-            <p className="text-white/20 text-[10px] font-mono tracking-widest mb-1 uppercase">Tier</p>
+            <p className="text-white/20 text-[10px] font-mono tracking-widest mb-1 uppercase">Price / Tier</p>
             <p className="text-2xl font-black text-white">{event.price}</p>
           </div>
           <div className="flex items-center gap-4">

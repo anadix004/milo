@@ -122,7 +122,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (error) {
       addNotification("system", `Login failed: ${error.message}`);
     } else {
-      addNotification("session", "Identity verified. Redirecting...");
+      addNotification("session", "Login successful. Redirecting...");
       router.refresh();
       router.push("/");
     }
@@ -161,7 +161,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setSession(null);
     router.refresh();
     router.push("/");
-    addNotification("session", "Identity purged. Nexus disconnected.");
+    addNotification("session", "Logged out successfully.");
   };
 
   const updateProfile = async (updates: Partial<AuthUser>) => {

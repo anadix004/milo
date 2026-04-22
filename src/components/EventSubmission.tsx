@@ -79,7 +79,7 @@ export default function EventSubmission({ isOpen, onClose, onAuthRedirect }: Eve
        video.onloadedmetadata = () => {
          window.URL.revokeObjectURL(video.src);
          if (video.duration > 10.5) {
-            addNotification("system", "Temporal Violation: Broadcast must be 10.5s or less.");
+            addNotification("system", "Error: Video must be 10.5s or less.");
             e.target.value = "";
          } else {
             setMedia(prev => ({ ...prev, video: file }));
@@ -134,7 +134,7 @@ export default function EventSubmission({ isOpen, onClose, onAuthRedirect }: Eve
 
       if (dbError) throw dbError;
 
-      addNotification("radar", "Mission pulse reaches 100% synchronization. Awaiting Admin verification.");
+      addNotification("radar", "Event submitted. Awaiting verification.");
       resetAndClose();
     } catch (err: any) {
       addNotification("system", `Identification Sync Failed: ${err.message}`);
@@ -156,10 +156,10 @@ export default function EventSubmission({ isOpen, onClose, onAuthRedirect }: Eve
 
   const renderStep1 = () => (
     <div className="space-y-8">
-      <InputGroup label="Mission Title" placeholder="What's happening?" value={formData.title} onChange={(v: string) => setFormData({...formData, title: v})} />
+      <InputGroup label="Event Title" placeholder="What's happening?" value={formData.title} onChange={(v: string) => setFormData({...formData, title: v})} />
       <InputGroup label="Temporal Sync (Date)" placeholder="YYYY-MM-DD" type="date" value={formData.date} onChange={(v: string) => setFormData({...formData, date: v})} />
       <div className="space-y-4">
-        <label className="text-[10px] text-white/30 uppercase tracking-[0.4em] ml-2 font-black">Mission Narrative</label>
+        <label className="text-[10px] text-white/30 uppercase tracking-[0.4em] ml-2 font-black">Event Description</label>
         <textarea value={formData.description} onChange={(e) => setFormData({...formData, description: e.target.value})} placeholder="Synchronization details..." className="w-full bg-white/[0.03] border border-white/10 rounded-[2rem] p-6 text-sm text-white placeholder:text-white/10 outline-none focus:border-white/30 h-32 no-scrollbar font-black tracking-widest" required />
       </div>
     </div>
@@ -214,7 +214,7 @@ export default function EventSubmission({ isOpen, onClose, onAuthRedirect }: Eve
   const renderStep3 = () => (
     <div className="space-y-8">
       <div className="space-y-3">
-        <label className="text-[10px] text-white/30 uppercase tracking-[0.4em] ml-2 font-black">Identity Verification (Aadhaar ID)</label>
+        <label className="text-[10px] text-white/30 uppercase tracking-[0.4em] ml-2 font-black">ID Verification (Aadhaar ID)</label>
         <input 
           required 
           placeholder="XXXX XXXX XXXX" 
@@ -266,8 +266,8 @@ export default function EventSubmission({ isOpen, onClose, onAuthRedirect }: Eve
         <div className="flex items-center gap-4">
           <div className="w-12 h-12 bg-purple-500/20 rounded-full flex items-center justify-center text-purple-400"><PlusCircle size={24} /></div>
           <div>
-            <h2 className="text-white text-xl font-black uppercase tracking-tight">Initiate Radar</h2>
-            <p className="text-[10px] text-purple-500 uppercase tracking-[0.4em] mt-1 font-black">Mission Entry Hub</p>
+            <h2 className="text-white text-xl font-black uppercase tracking-tight">Submit Event</h2>
+            <p className="text-[10px] text-purple-500 uppercase tracking-[0.4em] mt-1 font-black">Event Submission</p>
           </div>
         </div>
         {!isMobile && (
@@ -280,7 +280,7 @@ export default function EventSubmission({ isOpen, onClose, onAuthRedirect }: Eve
           <div className="py-20 flex flex-col items-center justify-center text-center space-y-8">
             <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center border border-white/10"><Lock size={40} className="text-white/20" /></div>
             <h3 className="text-2xl font-black uppercase tracking-tight text-white">Identification Required</h3>
-            <p className="text-white/40 text-sm max-w-xs font-mono">Authenticate your Milo identity to broadcast missions to the Live Radar.</p>
+            <p className="text-white/40 text-sm max-w-xs font-mono">Log in to your account to submit new events.</p>
             <button onClick={() => { onClose(); onAuthRedirect(); }} className="bg-white text-black px-12 py-5 rounded-full font-black text-xs uppercase tracking-widest hover:scale-105 transition-all">Identify Pulse</button>
           </div>
         ) : (
@@ -333,7 +333,7 @@ export default function EventSubmission({ isOpen, onClose, onAuthRedirect }: Eve
                   {renderStep4()}
                 </div>
                 <button disabled={isSubmitting} className="w-full bg-white text-black py-8 rounded-full font-black uppercase tracking-widest text-xs hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50">
-                  {isSubmitting ? <Loader2 className="animate-spin mx-auto" /> : "Authorize Broadcast"}
+                  {isSubmitting ? <Loader2 className="animate-spin mx-auto" /> : "Submit Event"}
                 </button>
               </div>
             )}

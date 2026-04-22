@@ -154,7 +154,7 @@ export default function HeroSection() {
         {!imagesLoaded && !isMobile && (
           <div className="absolute inset-0 w-full h-full flex items-center justify-center z-30 bg-black">
             <p className="text-white/50 animate-pulse font-[family-name:var(--font-roboto-mono)] uppercase tracking-widest text-sm">
-              Loading Experience...
+              Loading...
             </p>
           </div>
         )}

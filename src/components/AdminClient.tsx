@@ -40,7 +40,7 @@ export default function AdminClient() {
     const checkAdmin = async () => {
       if (isAuthenticated && (isAdmin || user?.email?.includes('owner_milo'))) {
         setIsAuthorized(true);
-        addNotification("session", "Bridge established via secure session.");
+        addNotification("session", "Admin session verified.");
       }
     };
     checkAdmin();
@@ -71,7 +71,7 @@ export default function AdminClient() {
           const authorizedRoles = ["owner", "admin", "team"];
           if (profile && authorizedRoles.includes(profile.role)) {
             setIsAuthorized(true);
-            addNotification("session", "Team Access: Direct Bridge Authorized.");
+            addNotification("session", "Team access granted.");
             return;
           }
         } else {
@@ -96,7 +96,7 @@ export default function AdminClient() {
         return;
       }
       setIsAuthorized(true);
-      addNotification("session", "Identity authorized. Command Hub Active.");
+      addNotification("session", "Login successful. Admin dashboard ready.");
       router.refresh();
     } catch (err) {
       setLoginError(true);
@@ -125,7 +125,7 @@ export default function AdminClient() {
         >
           <div className="space-y-4">
             <h1 className="font-lexend text-4xl font-black text-white uppercase tracking-tighter italic">MILO ADMIN</h1>
-            <p className="font-mono text-[9px] text-white/20 uppercase tracking-[0.5em] font-black">Authorized Access Required</p>
+            <p className="font-mono text-[9px] text-white/20 uppercase tracking-[0.5em] font-black">Admin Access Required</p>
           </div>
 
           <form onSubmit={handleAuth} className="space-y-6">

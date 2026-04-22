@@ -14,7 +14,7 @@ interface Comment {
 
 const MOCK_COMMENTS: Comment[] = [
   { id: "c1", user: "Aravind_Z", text: "Is the venue accessible for the 3D rigs?", time: "2m ago" },
-  { id: "c2", user: "Milo_Dev", text: "Identity scan fully operational. See you there.", time: "5m ago" },
+  { id: "c2", user: "Milo_Dev", text: "Login verified. See you there.", time: "5m ago" },
   { id: "c3", user: "Sarah_Nexus", text: "Best tech mixer in Mumbai yet.", time: "12m ago" },
 ];
 
@@ -40,8 +40,8 @@ export default function Comments({ isJoined }: CommentsProps) {
                <Lock className="text-white/40" size={24} />
             </div>
             <div className="space-y-2">
-              <h4 className="font-lexend text-white text-sm font-black uppercase tracking-widest">Identity Scan Required</h4>
-              <p className="font-mono text-white/40 text-[10px] uppercase tracking-[0.2em] max-w-[200px]">Join plan to satisfy identification and access comms</p>
+              <h4 className="font-lexend text-white text-sm font-black uppercase tracking-widest">Login Required</h4>
+              <p className="font-mono text-white/40 text-[10px] uppercase tracking-[0.2em] max-w-[200px]">Join this event to read and post comments</p>
             </div>
           </motion.div>
         )}
@@ -49,10 +49,10 @@ export default function Comments({ isJoined }: CommentsProps) {
 
       {/* Header */}
       <div className="px-6 py-4 border-b border-white/5 flex items-center justify-between">
-        <h4 className="font-lexend text-[10px] text-white/60 font-black uppercase tracking-widest">Secure Communication Channel</h4>
+        <h4 className="font-lexend text-[10px] text-white/60 font-black uppercase tracking-widest">Event Chat</h4>
         <div className="flex items-center gap-2">
            <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-           <span className="text-[8px] font-mono text-white/20 uppercase tracking-widest">Channel Operational</span>
+           <span className="text-[8px] font-mono text-white/20 uppercase tracking-widest">Live Chat</span>
         </div>
       </div>
 
@@ -76,7 +76,7 @@ export default function Comments({ isJoined }: CommentsProps) {
         <div className="relative">
           <input 
             type="text" 
-            placeholder={isJoined ? "Type a message..." : "Identification Required"}
+            placeholder={isJoined ? "Type a message..." : "Login to type..."}
             disabled={!isJoined}
             value={commentText}
             onChange={(e) => setCommentText(e.target.value)}
