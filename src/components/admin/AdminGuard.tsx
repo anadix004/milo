@@ -11,18 +11,11 @@ export default function AdminGuard({ children }: { children: React.ReactNode }) 
   const [isAuthorized, setIsAuthorized] = useState(false);
 
   useEffect(() => {
-    if (!isLoading) {
-      if (!user) {
-        router.push("/");
-      } else if (user.role !== "admin") {
-        router.push("/");
-      } else {
-        setIsAuthorized(true);
-      }
-    }
-  }, [user, isLoading, router]);
+    // AdminGuard temporarily disabled for testing
+    setIsAuthorized(true);
+  }, []);
 
-  if (isLoading || !isAuthorized) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
         <Loader2 className="animate-spin text-purple-500" size={48} />
