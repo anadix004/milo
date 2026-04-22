@@ -159,38 +159,6 @@ export default function HeroSection() {
           </div>
         )}
 
-        {/* The MILO Wall Typography */}
-        <div className={clsx(
-          "absolute inset-0 w-full h-full flex flex-col items-start pointer-events-none z-40 overflow-hidden px-1 md:px-2",
-          isMobile ? "justify-center px-6" : "justify-end mb-12 md:mb-20"
-        )}>
-          <motion.div
-            initial={{ y: "20%", filter: "blur(20px)", opacity: 0 }}
-            animate={{ y: "0%", filter: "blur(0px)", opacity: 1 }}
-            transition={{ 
-              duration: 1.2, 
-              ease: [0.19, 1, 0.22, 1],
-              delay: 0.5 
-            }}
-            className="flex flex-col items-start mix-blend-normal"
-          >
-            <h1
-              className={clsx(
-                "font-[family-name:var(--font-lexend)]",
-                "text-[32vw] md:text-[24vw]",
-                "font-extrabold text-white lowercase text-left",
-                "leading-[0.7] tracking-[-0.05em] m-0 p-0",
-                "drop-shadow-[0_4px_20px_rgba(0,0,0,0.8)] [text-shadow:_0_0_60px_rgba(255,255,255,0.3)]" 
-              )}
-              style={{ WebkitFontSmoothing: "antialiased" }}
-            >
-              milo
-            </h1>
-            <p className="font-[family-name:var(--font-lexend)] text-white/90 text-[10px] md:text-sm uppercase tracking-[0.4em] ml-1 mt-2 md:mt-4 opacity-80 drop-shadow-lg">
-              your local city event radar
-            </p>
-          </motion.div>
-        </div>
 
         {/* Bottom Fade-out transition */}
         <div className="absolute inset-x-0 bottom-0 h-48 md:h-64 bg-gradient-to-t from-black to-transparent z-20 pointer-events-none" />
