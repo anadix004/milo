@@ -13,6 +13,7 @@ import { METRO_CITIES, getCityName } from "@/constants/cities";
 import { EVENTS } from "@/constants/events";
 import { useIsMobile } from "@/hooks/useMediaQuery";
 import BottomSheet from "@/components/mobile/BottomSheet";
+import VibeCheck from "@/components/VibeCheck";
 
 // --- SPRING CONFIG SYNC ---
 const SPRING_CONFIG = { stiffness: 70, damping: 15 };
@@ -516,6 +517,23 @@ function EventDetailView({ event, isJoined, onJoin, onClose, allEvents, onSelect
            <p className="text-white/40 text-[9px] uppercase tracking-[0.4em] font-black font-mono">Event Description</p>
            <p className="text-white/60 font-mono text-xs md:text-sm leading-relaxed max-w-md">{event.description}</p>
         </div>
+
+        {/* Social FOMO Component */}
+        <div className="flex items-center gap-4 bg-white/[0.02] border border-white/5 p-4 rounded-2xl w-fit mt-6 mb-6">
+           <div className="flex -space-x-3 shrink-0">
+             <img src="https://i.pravatar.cc/100?img=12" className="w-8 h-8 rounded-full border-2 border-black object-cover" />
+             <img src="https://i.pravatar.cc/100?img=4" className="w-8 h-8 rounded-full border-2 border-black object-cover" />
+             <img src="https://i.pravatar.cc/100?img=9" className="w-8 h-8 rounded-full border-2 border-black object-cover" />
+             <div className="w-8 h-8 rounded-full border-2 border-black bg-gradient-to-tr from-purple-500 to-cyan-500 flex items-center justify-center text-[8px] font-black text-white relative z-10">+{Math.floor(Math.random() * 200) + 50}</div>
+           </div>
+           <div className="flex-1">
+             <p className="text-[10px] font-black text-white uppercase tracking-widest leading-none">Friends & Others</p>
+             <p className="text-[8px] text-white/50 font-mono tracking-wider uppercase mt-1">Are attending this event</p>
+           </div>
+        </div>
+
+        {/* Vibe Check Component */}
+        <VibeCheck eventId={event.id} />
 
         {event.venue_address && (
           <div className="space-y-2">
