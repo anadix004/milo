@@ -72,12 +72,6 @@ export default function Header({ onProfileClick, onEventClick, onNotificationsCl
 
       {/* Global Command Center (Right) */}
       <div className="flex items-center gap-2 md:gap-4 pointer-events-auto">
-        <Link href="/chat" className="group flex items-center gap-2 bg-black/20 border border-white/10 backdrop-blur-md rounded-full px-4 py-2 transition-all duration-500 hover:border-white/30 hover:bg-white/10">
-          <div className="w-1.5 h-1.5 rounded-full bg-cyan-500 shadow-[0_0_8px_rgba(6,182,212,0.5)] group-hover:animate-pulse" />
-          <span className="font-[family-name:var(--font-lexend)] text-[9px] font-black uppercase tracking-[0.1em] text-white/60 group-hover:text-white">Pigeon</span>
-          <MessageSquare size={12} className="text-white/20 group-hover:text-white transition-colors" />
-        </Link>
-
         <button 
           onClick={onEventClick}
           className="hidden md:flex items-center justify-center w-10 h-10 rounded-full bg-white text-black hover:scale-110 active:scale-95 transition-all duration-500 shadow-[0_0_20px_rgba(255,255,255,0.2)]"

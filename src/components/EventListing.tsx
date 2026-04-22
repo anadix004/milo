@@ -9,7 +9,7 @@ import { useNotifications } from "./NotificationContext";
 import { useAuth } from "./AuthContext";
 import { parsePrice } from "@/utils/price";
 import { METRO_CITIES, getCityName } from "@/constants/cities";
-import Comments from "@/components/events/Comments";
+
 import { EVENTS } from "@/constants/events";
 import { useIsMobile } from "@/hooks/useMediaQuery";
 import BottomSheet from "@/components/mobile/BottomSheet";
@@ -571,8 +571,6 @@ function EventDetailView({ event, isJoined, onJoin, onClose, allEvents, onSelect
             ))}
           </div>
         </div>
-        
-        {!isMobile && <Comments isJoined={isJoined} />}
       </div>
     </div>
   );
