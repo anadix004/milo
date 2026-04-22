@@ -139,6 +139,8 @@ export default function EventListing({ selectedCity, onAuthRequired }: { selecte
   const [sortOrder, setSortOrder] = useState<SortOrder>("featured");
   const [searchQuery, setSearchQuery] = useState("");
   const [timeFilter, setTimeFilter] = useState("All");
+  const [priceFilter, setPriceFilter] = useState("All"); // All, Free, Paid
+  const [budgetFilter, setBudgetFilter] = useState("All"); // All, < 500, < 2000, 2000+
   const [joinedEvents, setJoinedEvents] = useState<Set<string>>(new Set());
   const { user } = useAuth();
 
@@ -206,14 +208,7 @@ export default function EventListing({ selectedCity, onAuthRequired }: { selecte
     return () => { supabase.removeChannel(channel); };
   }, []);
 
-  const ALL_CATEGORIES = useMemo(() => {
-    const cats = new Set<string>();
-    cats.add("All");
-    events.forEach(e => {
-      if (e.category) e.category.split(" / ").forEach(c => cats.add(c.trim()));
-    });
-    return Array.from(cats).sort();
-  }, [events]);
+  const FIXED_CATEGORIES = ["All", "Music", "College", "Workshops", "Nightlife", "Networking"];
 
   const isJoined = (id: string) => joinedEvents.has(id);
   const joinEvent = async (id: string) => {
@@ -258,6 +253,15 @@ export default function EventListing({ selectedCity, onAuthRequired }: { selecte
     else if (timeFilter === "Week") result = result.filter(e => e.date >= todayStr && e.date <= weekStr);
     else if (timeFilter === "Month") result = result.filter(e => e.date >= todayStr && e.date <= monthStr);
 
+    // Price Filter
+    if (priceFilter === "Free") result = result.filter(e => parsePrice(e.price) === 0);
+    else if (priceFilter === "Paid") result = result.filter(e => parsePrice(e.price) > 0);
+
+    // Budget Filter
+    if (budgetFilter === "< 500") result = result.filter(e => parsePrice(e.price) < 500);
+    else if (budgetFilter === "< 2000") result = result.filter(e => parsePrice(e.price) < 2000);
+    else if (budgetFilter === "2000+") result = result.filter(e => parsePrice(e.price) >= 2000);
+
     return result.sort((a, b) => {
       if (sortOrder === "price-low") return parsePrice(a.price) - parsePrice(b.price);
       if (sortOrder === "price-high") return parsePrice(b.price) - parsePrice(a.price);
@@ -265,8 +269,16 @@ export default function EventListing({ selectedCity, onAuthRequired }: { selecte
     });
   }, [events, selectedCity, selectedCat, sortOrder, searchQuery, timeFilter, todayStr, tomorrowStr, weekStr, monthStr]);
 
-  const featuredEvents = useMemo(() => filteredEvents.filter(e => e.featured), [filteredEvents]);
-  const standardEvents = useMemo(() => filteredEvents.filter(e => !e.featured), [filteredEvents]);
+  const homepageSections = useMemo(() => {
+    if (selectedCity) return null;
+    
+    return [
+      { title: "Happening Today", events: events.filter(e => e.date === todayStr) },
+      { title: "This Weekend Picks", events: events.filter(e => e.date >= todayStr && e.date <= weekStr) },
+      { title: "Free Events", events: events.filter(e => parsePrice(e.price) === 0) },
+      { title: "Trending Now", events: events.filter(e => e.featured) },
+    ];
+  }, [events, selectedCity, todayStr, weekStr]);
 
   const handleEventClick = (event: EventData) => {
     if (!isAuthenticated) {
@@ -311,7 +323,7 @@ export default function EventListing({ selectedCity, onAuthRequired }: { selecte
             isMobile ? "overflow-x-auto no-scrollbar pb-2 px-1" : "flex-wrap md:flex-nowrap items-center"
           )}>
             {isMobile ? (
-              ALL_CATEGORIES.map(cat => (
+              FIXED_CATEGORIES.map(cat => (
                 <button
                   key={cat}
                   onClick={() => setSelectedCat(cat)}
@@ -327,8 +339,10 @@ export default function EventListing({ selectedCity, onAuthRequired }: { selecte
               ))
             ) : (
               <>
-                <Dropdown label="Categories" value={selectedCat} options={ALL_CATEGORIES} onChange={setSelectedCat} icon={<Filter size={14} />} />
+                <Dropdown label="Categories" value={selectedCat} options={FIXED_CATEGORIES} onChange={setSelectedCat} icon={<Filter size={14} />} />
                 <Dropdown label="Timeframe" value={timeFilter} options={["All", "Today", "Tomorrow", "Week", "Month"]} onChange={setTimeFilter} icon={<Calendar size={14} />} />
+                <Dropdown label="Access" value={priceFilter} options={["All", "Free", "Paid"]} onChange={setPriceFilter} icon={<Star size={14} />} />
+                <Dropdown label="Budget" value={budgetFilter} options={["All", "< 500", "< 2000", "2000+"]} onChange={setBudgetFilter} icon={<ArrowUpDown size={14} />} />
                 <Dropdown label="Sort By" value={sortOrder === "featured" ? "Featured" : sortOrder === "price-low" ? "Price: Low" : "Price: High"} options={["Featured", "Price: Low", "Price: High"]} onChange={(val) => setSortOrder(val === "Featured" ? "featured" : val === "Price: Low" ? "price-low" : "price-high")} />
               </>
             )}
@@ -359,11 +373,29 @@ export default function EventListing({ selectedCity, onAuthRequired }: { selecte
         <div className="py-40 flex items-center justify-center text-white/20">
           <Loader2 className="animate-spin" size={40} />
         </div>
+      ) : homepageSections ? (
+        <div className="space-y-24 py-12">
+          {homepageSections.map((section, idx) => section.events.length > 0 && (
+            <div key={idx} className="space-y-8">
+               <div className="max-w-[1440px] mx-auto px-6 flex items-center justify-between">
+                  <h3 className="font-lexend text-white text-xl md:text-3xl font-black uppercase tracking-tight italic">{section.title}</h3>
+                  <button className="text-[9px] font-mono text-white/40 uppercase tracking-widest hover:text-white transition-colors flex items-center gap-2">View All <ChevronRight size={12} /></button>
+               </div>
+               <div className="flex gap-6 overflow-x-auto no-scrollbar px-6 md:px-[5%]">
+                  {section.events.map(event => (
+                    <div key={event.id} className="min-w-[300px] md:min-w-[450px] shrink-0">
+                       <EventGridCard event={event} onExpand={handleEventClick} />
+                    </div>
+                  ))}
+               </div>
+            </div>
+          ))}
+        </div>
       ) : (
         <>
-          {featuredEvents.length > 0 && (
+          {filteredEvents.filter(e => e.featured).length > 0 && (
             <div className="mb-24 scale-in overflow-hidden">
-               <FeaturedCarousel items={featuredEvents} onExpand={handleEventClick} />
+               <FeaturedCarousel items={filteredEvents.filter(e => e.featured)} onExpand={handleEventClick} />
             </div>
           )}
 
@@ -377,7 +409,7 @@ export default function EventListing({ selectedCity, onAuthRequired }: { selecte
                 transition={{ duration: 0.6, ease: [0.19, 1, 0.22, 1] }}
                 className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12"
               >
-                {standardEvents.map((event) => (
+                {filteredEvents.filter(e => !e.featured).map((event) => (
                   <EventGridCard key={event.id} event={event} onExpand={handleEventClick} />
                 ))}
               </motion.div>
@@ -393,6 +425,8 @@ export default function EventListing({ selectedCity, onAuthRequired }: { selecte
             isJoined={isJoined(expandedEvent.id)}
             onJoin={() => joinEvent(expandedEvent.id)}
             onClose={() => setExpandedEvent(null)} 
+            allEvents={events}
+            onSelectEvent={handleEventClick}
           />
         )}
       </AnimatePresence>
@@ -435,7 +469,7 @@ function EventGridCard({ event, onExpand }: { event: EventData, onExpand: (e: Ev
   );
 }
 
-function EventDetailView({ event, isJoined, onJoin, onClose }: { event: EventData, isJoined: boolean, onJoin: () => void, onClose: () => void }) {
+function EventDetailView({ event, isJoined, onJoin, onClose, allEvents, onSelectEvent }: { event: EventData, isJoined: boolean, onJoin: () => void, onClose: () => void, allEvents: EventData[], onSelectEvent: (e: EventData) => void }) {
   const isMobile = useIsMobile();
   const [isLiked, setIsLiked] = useState(false);
   
@@ -500,7 +534,41 @@ function EventDetailView({ event, isJoined, onJoin, onClose }: { event: EventDat
           </div>
           <div className="flex items-center gap-4">
              <button onClick={() => setIsLiked(!isLiked)} className={clsx("p-4 rounded-full border border-white/10", isLiked ? "bg-rose-500 text-white border-rose-500" : "text-white/40")}><Heart size={20} fill={isLiked ? "currentColor" : "none"} /></button>
-             <button onClick={onJoin} disabled={isJoined} className={clsx("px-8 md:px-12 py-5 rounded-full font-black uppercase tracking-widest text-[10px] transition-all", isJoined ? "bg-emerald-500 text-black" : "bg-white text-black")}>{isJoined ? "JOINED" : "JOIN PLAN"}</button>
+             {event.ticket_links?.[0]?.url && (
+               <a 
+                 href={event.ticket_links[0].url} 
+                 target="_blank" 
+                 rel="noopener noreferrer"
+                 className="px-6 md:px-10 py-5 rounded-full font-black uppercase tracking-widest text-[9px] transition-all bg-purple-600 text-white hover:bg-purple-500 shadow-xl shadow-purple-500/20"
+               >
+                 Book Tickets
+               </a>
+             )}
+             <button onClick={onJoin} disabled={isJoined} className={clsx("px-8 md:px-12 py-5 rounded-full font-black uppercase tracking-widest text-[9px] transition-all", isJoined ? "bg-emerald-500 text-black" : "bg-white text-black")}>{isJoined ? "JOINED" : "JOIN PLAN"}</button>
+          </div>
+        </div>
+
+        <p className="mt-4 text-[7px] font-mono text-white/20 uppercase tracking-[0.2em] text-center">
+          Tickets handled by official partner platform
+        </p>
+
+        {/* Related Events Section */}
+        <div className="mt-12 space-y-6">
+          <h4 className="font-lexend text-white text-[10px] font-black uppercase tracking-[0.3em]">Related Events</h4>
+          <div className="grid grid-cols-2 gap-4">
+            {allEvents.filter(e => e.id !== event.id && e.category === event.category).slice(0, 2).map(re => (
+              <div 
+                key={re.id} 
+                className="group relative aspect-video rounded-2xl overflow-hidden cursor-pointer border border-white/5" 
+                onClick={() => { onClose(); onSelectEvent(re); }}
+              >
+                <img src={re.image} className="absolute inset-0 w-full h-full object-cover transition-transform group-hover:scale-105" />
+                <div className="absolute inset-0 bg-black/60 group-hover:bg-black/40 transition-colors" />
+                <div className="absolute inset-0 p-4 flex flex-col justify-end">
+                  <p className="text-white font-black text-[9px] uppercase tracking-tight leading-tight">{re.title}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
         

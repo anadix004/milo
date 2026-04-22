@@ -108,8 +108,8 @@ export default function FinalCTA({ selectedCity }: FinalCTAProps) {
               background: `linear-gradient(45deg, transparent, ${city.color}22, transparent)` 
             }}
           />
-          <span className="relative z-10 flex items-center gap-4">
-            ACCESS {city.name.split(' ')[0]} HUB
+          <span className="relative z-10 flex items-center gap-4 text-center">
+            NOTIFY ME WHEN MILO APP LAUNCHES
             <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current group-hover:translate-x-1 transition-transform" xmlns="http://www.w3.org/2000/svg">
               <path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/>
             </svg>

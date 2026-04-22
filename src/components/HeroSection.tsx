@@ -24,6 +24,9 @@ export default function HeroSection() {
     offset: ["start start", "end end"],
   });
 
+  const headlineOpacity = useTransform(scrollYProgress, [0, 0.05], [1, 0]);
+  const headlineY = useTransform(scrollYProgress, [0, 0.05], [0, -50]);
+
   // Transform 0-1 into an integer index between 0 and FRAME_COUNT - 1
   const frameIndex = useTransform(scrollYProgress, [0, 1], [0, FRAME_COUNT - 1]);
 
@@ -131,7 +134,24 @@ export default function HeroSection() {
             />
           )}
           {/* Subtle dark overlay */}
-          <div className="absolute inset-0 bg-black/40 w-full h-full pointer-events-none" />
+          <div className="absolute inset-0 bg-black/60 w-full h-full pointer-events-none" />
+        </div>
+
+        {/* Main Title Section */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center z-40 px-6 text-center pointer-events-none">
+          <motion.div
+            style={{ opacity: headlineOpacity, y: headlineY }}
+            className="space-y-6"
+          >
+            <h1 className="font-[family-name:var(--font-lexend)] text-white text-4xl md:text-8xl font-black uppercase tracking-tighter leading-[0.9] italic">
+              Discover Everything <br />
+              <span className="text-white/40 not-italic tracking-normal">Happening In</span> <br />
+              Your City
+            </h1>
+            <p className="font-[family-name:var(--font-roboto-mono)] text-[8px] md:text-xs text-white/50 uppercase tracking-[0.5em] font-black">
+              Your city's live social radar.
+            </p>
+          </motion.div>
         </div>
 
         {/* Bottom Annotations UI */}
