@@ -30,6 +30,7 @@ export interface EventData {
   price: string;
   category: string;
   image: string;
+  video_url?: string;
   featured: boolean;
   cityId: string;
   is_verified?: boolean;
@@ -444,7 +445,11 @@ function FeaturedCarousel({ items, onExpand }: { items: EventData[], onExpand: (
       <div className="flex transition-transform duration-1000 ease-[cubic-bezier(0.23,1,0.32,1)]" style={{ transform: `translateX(-${currentIndex * 85}%)`, marginLeft: "5%" }}>
         {items.map((item, idx) => (
           <motion.div key={item.id} onClick={() => onExpand(item)} className={clsx("relative min-w-[85vw] md:min-w-[60vw] aspect-[16/9] md:aspect-[21/9] mr-6 rounded-2xl overflow-hidden cursor-pointer group shrink-0", currentIndex === idx ? "opacity-100 scale-100" : "opacity-40 scale-95")}>
-            <img src={item.image} alt={item.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+            {item.video_url ? (
+              <video src={item.video_url} autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+            ) : (
+              <img src={item.image} alt={item.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+            )}
             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
             <div className="absolute inset-x-0 bottom-0 p-8">
               <span className="font-mono text-[10px] tracking-[0.3em] text-white/70 uppercase mb-2 block">{item.category}</span>
@@ -460,7 +465,11 @@ function FeaturedCarousel({ items, onExpand }: { items: EventData[], onExpand: (
 function EventGridCard({ event, onExpand }: { event: EventData, onExpand: (e: EventData) => void }) {
   return (
     <motion.div onClick={() => onExpand(event)} whileHover={{ scale: 1.02 }} className="relative w-full aspect-[1.2/1] md:aspect-video rounded-3xl overflow-hidden cursor-pointer group bg-neutral-900 border border-white/5">
-      <img src={event.image} alt={event.title} className="absolute inset-0 w-full h-full object-cover grayscale transition-all duration-700 group-hover:grayscale-0 group-hover:scale-105" />
+      {event.video_url ? (
+        <video src={event.video_url} autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover grayscale transition-all duration-700 group-hover:grayscale-0 group-hover:scale-105" />
+      ) : (
+        <img src={event.image} alt={event.title} className="absolute inset-0 w-full h-full object-cover grayscale transition-all duration-700 group-hover:grayscale-0 group-hover:scale-105" />
+      )}
       <div className="absolute inset-0 bg-black/60 group-hover:bg-black/40 transition-colors" />
       <div className="absolute inset-x-0 bottom-0 p-8 z-10">
         <span className="font-mono text-[10px] tracking-widest text-white/60 uppercase mb-2 block">{event.category}</span>
@@ -487,7 +496,11 @@ function EventDetailView({ event, isJoined, onJoin, onClose, allEvents, onSelect
   const renderContent = () => (
     <div className={clsx("flex flex-col h-full", !isMobile && "md:flex-row")}>
       <div className={clsx("relative shrink-0", isMobile ? "w-full aspect-video" : "w-1/2 h-full")}>
-        <img src={event.image} alt={event.title} className="w-full h-full object-cover" />
+        {event.video_url ? (
+           <video src={event.video_url} autoPlay muted loop playsInline className="w-full h-full object-cover" />
+        ) : (
+           <img src={event.image} alt={event.title} className="w-full h-full object-cover" />
+        )}
         <div className="absolute inset-0 bg-gradient-to-r from-black via-transparent to-transparent hidden md:block" />
         {isMobile && (
            <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent" />
