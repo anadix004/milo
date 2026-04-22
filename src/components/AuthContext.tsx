@@ -19,8 +19,6 @@ interface AuthContextType {
   user: AuthUser | null;
   session: Session | null;
   isLoading: boolean;
-  isAdmin: boolean;
-  isOwner: boolean;
   isAuthenticated: boolean;
   login: (email: string, pass: string) => Promise<void>;
   signUp: (email: string, pass: string, data: any) => Promise<void>;
@@ -52,17 +50,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (error && error.code !== "PGRST116") throw error;
 
-      const ADMIN_EMAILS = ["milo.anadi@gmail.com", "solitarypersonnel76@gmail.com"];
-      const isOwnerEmail = ADMIN_EMAILS.includes(baseUser.email ?? "");
-      
       if (data) {
-        const role = isOwnerEmail ? "owner" : (data.role || "user");
-        setUser({ ...baseUser, ...data, role } as AuthUser);
+        setUser({ ...baseUser, ...data, role: data.role || "user" } as AuthUser);
         return true; 
       }
       
-      const role = isOwnerEmail ? "owner" : "user";
-      setUser({ ...baseUser, role } as AuthUser);
+      setUser({ ...baseUser, role: "user" } as AuthUser);
       return false; 
     } catch (err) {
       console.error("Profile sync error:", err);
@@ -193,8 +186,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const isAdmin = user?.role === "admin" || user?.role === "owner";
-  const isOwner = user?.role === "owner";
   const isAuthenticated = !!session;
 
   return (
@@ -202,8 +193,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       user, 
       session, 
       isLoading, 
-      isAdmin, 
-      isOwner, 
       isAuthenticated,
       login, 
       signUp, 
