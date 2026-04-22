@@ -15,12 +15,12 @@ export default function HeroSection() {
             muted
             loop
             playsInline
-            className="w-full h-full object-cover opacity-60"
+            className="w-full h-full object-cover opacity-70"
           >
             <source src="/city event/long event.mp4" type="video/mp4" />
           </video>
           {/* Subtle dark overlay */}
-          <div className="absolute inset-0 bg-black/60 w-full h-full pointer-events-none" />
+          <div className="absolute inset-0 bg-black/50 w-full h-full pointer-events-none" />
         </div>
 
         {/* Main Title Section */}
