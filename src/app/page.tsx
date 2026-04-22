@@ -6,7 +6,6 @@ import CitySelector from "@/components/CitySelector";
 import EventListing from "@/components/EventListing";
 import FinalCTA from "@/components/FinalCTA";
 import Preloader from "@/components/Preloader";
-import { HERO_FRAMES } from "@/constants/frames";
 import { useAuth } from "@/components/AuthContext";
 
 const CITY_IMAGES = [
@@ -31,35 +30,28 @@ export default function Home() {
   const [activeModal, setActiveModal] = useState<"profile" | "event" | "auth" | "notifications" | null>(null);
 
   useEffect(() => {
-    const allAssets = [...HERO_FRAMES.map(f => `/sequence/frames:2/${f}`), ...CITY_IMAGES];
     let loadedCount = 0;
-    const totalAssets = allAssets.length;
 
     const preload = async () => {
-      const isMobile = window.innerWidth < 768;
-      // On mobile we use <video>, not canvas — skip ALL frame images
-      const assetsToLoad = isMobile 
-        ? CITY_IMAGES
-        : allAssets;
-
-      const promises = assetsToLoad.map((src) => {
+      const promises = CITY_IMAGES.map((src) => {
         return new Promise((resolve) => {
           const img = new Image();
           img.src = src;
           img.onload = () => {
             loadedCount++;
-            setProgress((loadedCount / assetsToLoad.length) * 100);
+            setProgress((loadedCount / CITY_IMAGES.length) * 100);
             resolve(true);
           };
           img.onerror = () => {
             loadedCount++;
-            setProgress((loadedCount / assetsToLoad.length) * 100);
+            setProgress((loadedCount / CITY_IMAGES.length) * 100);
             resolve(true);
           };
         });
       });
 
       await Promise.all(promises);
+      const isMobile = window.innerWidth < 768;
       setTimeout(() => setIsReady(true), isMobile ? 600 : 1200);
     };
 
