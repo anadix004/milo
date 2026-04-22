@@ -12,7 +12,10 @@ const CITY_DATA: Record<string, { name: string; qr: string; color: string; brigh
   mum: { name: "MUMBAI", qr: "/QR/Mumbai_QR.png", color: "#06b6d4", brightness: "shadow-cyan-500/50" },
 };
 
+import { useIsMobile } from "@/hooks/useMediaQuery";
+
 export default function FinalCTA({ selectedCity }: FinalCTAProps) {
+  const isMobile = useIsMobile();
   const city = (selectedCity && CITY_DATA[selectedCity]) ? CITY_DATA[selectedCity] : CITY_DATA.del;
 
   return (
@@ -23,22 +26,24 @@ export default function FinalCTA({ selectedCity }: FinalCTAProps) {
           viewBox="0 0 1920 1080" 
           preserveAspectRatio="none" 
           className="w-full h-full"
-          style={{ filter: "url(#gooey)" }}
+          style={{ filter: isMobile ? "none" : "url(#gooey)" }}
         >
-          <defs>
-            <filter id="gooey">
-              <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
-              <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7" result="goo" />
-              <feComposite in="SourceGraphic" in2="goo" operator="atop"/>
-            </filter>
-          </defs>
+          {!isMobile && (
+            <defs>
+              <filter id="gooey">
+                <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
+                <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7" result="goo" />
+                <feComposite in="SourceGraphic" in2="goo" operator="atop"/>
+              </filter>
+            </defs>
+          )}
           <path
             d="M0,0 Q960,1200 1920,0 L1920,1080 Q960,1150 0,1080 Z"
             fill={city.color}
             fillOpacity={0.8}
             className="backdrop-blur-2xl"
             style={{ 
-              filter: `drop-shadow(0 0 20px ${city.color}44)` 
+              filter: isMobile ? "none" : `drop-shadow(0 0 20px ${city.color}44)` 
             }}
           />
         </svg>

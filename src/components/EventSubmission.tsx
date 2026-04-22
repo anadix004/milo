@@ -37,7 +37,7 @@ export default function EventSubmission({ isOpen, onClose, onAuthRedirect }: Eve
     date: "", 
     description: "", 
     price: "Free",
-    category: "Culture",
+    category: "Music",
     venueAddress: "",
     aadhaarId: ""
   });
@@ -85,6 +85,11 @@ export default function EventSubmission({ isOpen, onClose, onAuthRedirect }: Eve
             setMedia(prev => ({ ...prev, video: file }));
             addNotification("system", "Kinetic Sequence Synchronized.");
          }
+       };
+       video.onerror = () => {
+         window.URL.revokeObjectURL(video.src);
+         addNotification("system", "Error: Failed to load video metadata.");
+         e.target.value = "";
        };
        video.src = URL.createObjectURL(file);
     }
@@ -147,7 +152,7 @@ export default function EventSubmission({ isOpen, onClose, onAuthRedirect }: Eve
     setCurrentStep(1);
     setFormData({ 
       title: "", cityId: "", zoneId: "", date: "", description: "", 
-      price: "Free", category: "Culture", venueAddress: "", aadhaarId: "" 
+      price: "Free", category: "Music", venueAddress: "", aadhaarId: "" 
     });
     setTicketLinks([{ name: "", url: "" }]);
     setMedia({ photo: null, video: null });
@@ -158,6 +163,19 @@ export default function EventSubmission({ isOpen, onClose, onAuthRedirect }: Eve
     <div className="space-y-8">
       <InputGroup label="Event Title" placeholder="What's happening?" value={formData.title} onChange={(v: string) => setFormData({...formData, title: v})} />
       <InputGroup label="Temporal Sync (Date)" placeholder="YYYY-MM-DD" type="date" value={formData.date} onChange={(v: string) => setFormData({...formData, date: v})} />
+      <div className="space-y-3">
+        <label className="text-[10px] text-white/30 uppercase tracking-[0.4em] ml-2 font-black">Category</label>
+        <select 
+          value={formData.category} 
+          onChange={(e) => setFormData({...formData, category: e.target.value})}
+          className="w-full bg-white/[0.03] border border-white/10 rounded-2xl p-6 text-sm text-white outline-none focus:border-white/30 transition-all font-black tracking-widest appearance-none"
+          required
+        >
+          {["Music", "College", "Workshops", "Nightlife", "Networking"].map(cat => (
+            <option key={cat} value={cat} className="bg-black text-white">{cat}</option>
+          ))}
+        </select>
+      </div>
       <div className="space-y-4">
         <label className="text-[10px] text-white/30 uppercase tracking-[0.4em] ml-2 font-black">Event Description</label>
         <textarea value={formData.description} onChange={(e) => setFormData({...formData, description: e.target.value})} placeholder="Synchronization details..." className="w-full bg-white/[0.03] border border-white/10 rounded-[2rem] p-6 text-sm text-white placeholder:text-white/10 outline-none focus:border-white/30 h-32 no-scrollbar font-black tracking-widest" required />

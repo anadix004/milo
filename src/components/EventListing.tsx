@@ -246,7 +246,7 @@ export default function EventListing({ selectedCity, onAuthRequired }: { selecte
     if (selectedCat !== "All") result = result.filter(e => e.category.includes(selectedCat));
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
-      result = result.filter(e => e.name?.toLowerCase().includes(q) || e.description.toLowerCase().includes(q));
+      result = result.filter(e => e.name?.toLowerCase().includes(q) || e.description?.toLowerCase().includes(q));
     }
     if (timeFilter === "Today") result = result.filter(e => e.date === todayStr);
     else if (timeFilter === "Tomorrow") result = result.filter(e => e.date === tomorrowStr);
@@ -476,8 +476,10 @@ function EventDetailView({ event, isJoined, onJoin, onClose, allEvents, onSelect
   useEffect(() => {
     if (!isMobile) {
       document.body.style.overflow = "hidden";
-      return () => { document.body.style.overflow = "unset"; };
+    } else {
+      document.body.style.overflow = "unset";
     }
+    return () => { document.body.style.overflow = "unset"; };
   }, [isMobile]);
 
   const renderContent = () => (
