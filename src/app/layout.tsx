@@ -4,6 +4,7 @@ import "./globals.css";
 import { NotificationProvider } from "@/components/NotificationContext";
 import { AuthProvider } from "@/components/AuthContext";
 import SmoothScroll from "@/components/SmoothScroll";
+import CookieConsent from "@/components/CookieConsent";
 
 const lexend = Lexend({
   subsets: ["latin"],
@@ -72,6 +73,7 @@ export default function RootLayout({
           <AuthProvider>
             <SmoothScroll>
               {children}
+              <CookieConsent />
             </SmoothScroll>
           </AuthProvider>
         </NotificationProvider>
