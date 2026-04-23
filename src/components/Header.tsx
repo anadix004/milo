@@ -36,18 +36,28 @@ export default function Header({ onProfileClick, onEventClick, onNotificationsCl
       <div className="max-w-[1800px] mx-auto px-4 md:px-8 flex justify-between items-center">
       {/* Top Left: Profile & Logo (Left) - Hidden on Mobile */}
       <div className="flex items-center gap-6 pointer-events-auto">
-        <button 
-          onClick={onProfileClick}
-          className={clsx(
-            "hidden md:flex relative px-4 py-2 rounded-full items-center justify-center gap-2 border border-white/10 backdrop-blur-md transition-all duration-500",
-            isSidebarOpen ? "bg-white text-black border-white" : "bg-black/20 text-white hover:bg-white/10"
-          )}
-        >
-          <User size={16} />
-          {!isAuthenticated && (
+        {isAuthenticated ? (
+          <Link 
+            href="/profile"
+            className={clsx(
+              "hidden md:flex relative px-4 py-2 rounded-full items-center justify-center gap-2 border border-white/10 backdrop-blur-md transition-all duration-500",
+              "bg-black/20 text-white hover:bg-white/10"
+            )}
+          >
+            <User size={16} />
+          </Link>
+        ) : (
+          <button 
+            onClick={onProfileClick}
+            className={clsx(
+              "hidden md:flex relative px-4 py-2 rounded-full items-center justify-center gap-2 border border-white/10 backdrop-blur-md transition-all duration-500",
+              isSidebarOpen ? "bg-white text-black border-white" : "bg-black/20 text-white hover:bg-white/10"
+            )}
+          >
+            <User size={16} />
             <span className="text-[10px] font-black uppercase tracking-widest hidden md:block">Log In</span>
-          )}
-        </button>
+          </button>
+        )}
 
         <Link 
           href="/" 
