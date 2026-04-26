@@ -7,6 +7,7 @@ import DashboardView from "@/components/admin/DashboardView";
 import ModerationStudio from "@/components/admin/ModerationStudio";
 import UserDirectory from "@/components/admin/UserDirectory";
 import BulkUploadStudio from "@/components/admin/BulkUploadStudio";
+import TeamPanel from "@/components/admin/TeamPanel";
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -22,6 +23,7 @@ export default function AdminDashboard() {
         {activeTab === "dashboard" && <DashboardView />}
         {activeTab === "approvals" && <ApprovalsGrid />}
         {activeTab === "moderation" && <ModerationStudio />}
+        {activeTab === "team" && <TeamPanel />}
         {activeTab === "users" && <UserDirectory />}
         {activeTab === "bulk" && <BulkUploadStudio />}
         

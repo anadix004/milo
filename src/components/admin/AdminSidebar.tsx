@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { LayoutDashboard, CheckCircle, Users, BarChart3, Calendar, Settings } from "lucide-react";
+import { LayoutDashboard, CheckCircle, Users, BarChart3, Calendar, Settings, Key } from "lucide-react";
 import clsx from "clsx";
 
 interface AdminSidebarProps {
@@ -14,6 +14,7 @@ export default function AdminSidebar({ activeTab, setActiveTab }: AdminSidebarPr
     { id: "dashboard", label: "DASHBOARD", icon: LayoutDashboard },
     { id: "approvals", label: "EVENT MANAGEMENT", icon: CheckCircle },
     { id: "moderation", label: "MODERATION", icon: Calendar },
+    { id: "team", label: "TEAM ACCESS", icon: Key },
     { id: "users", label: "USERS", icon: Users },
     { id: "analytics", label: "ANALYTICS", icon: BarChart3 },
     { id: "bulk", label: "BULK STUDIO", icon: Calendar },
