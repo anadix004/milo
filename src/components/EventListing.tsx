@@ -379,7 +379,7 @@ export default function EventListing({ selectedCity, onAuthRequired }: { selecte
 
           <div className={clsx(
             "flex gap-4 w-full lg:w-auto",
-            isMobile ? "overflow-x-auto no-scrollbar pb-2 px-1" : "flex-wrap md:flex-nowrap items-center"
+            isMobile ? "flex gap-3 overflow-x-auto no-scrollbar pb-4 px-2" : "flex-wrap md:flex-nowrap items-center"
           )}>
             {isMobile ? (
               FIXED_CATEGORIES.map(cat => (
@@ -387,7 +387,7 @@ export default function EventListing({ selectedCity, onAuthRequired }: { selecte
                   key={cat}
                   onClick={() => setSelectedCat(cat)}
                   className={clsx(
-                    "flex-shrink-0 px-6 py-3 rounded-full border text-[9px] font-black uppercase tracking-widest transition-all",
+                    "flex-shrink-0 px-6 py-3 rounded-full border text-[11px] font-black uppercase tracking-widest transition-all",
                     selectedCat === cat 
                       ? "bg-white text-black border-white" 
                       : "bg-white/5 text-white/40 border-white/10"
@@ -414,7 +414,7 @@ export default function EventListing({ selectedCity, onAuthRequired }: { selecte
                      key={time}
                      onClick={() => setTimeFilter(time === timeFilter ? "All" : time)}
                      className={clsx(
-                        "flex-shrink-0 px-5 py-3 rounded-full border text-[8px] font-black uppercase tracking-widest transition-all",
+                        "flex-shrink-0 px-5 py-3 rounded-full border text-[10px] font-black uppercase tracking-widest transition-all",
                         timeFilter === time 
                           ? "bg-purple-500 text-white border-purple-400" 
                           : "bg-white/5 text-white/20 border-white/5"
@@ -582,7 +582,7 @@ function EventDetailView({
            <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent" />
         )}
       </div>
-      <div className={clsx("flex-1 flex flex-col gap-8", isMobile ? "p-6" : "p-8 md:p-16 overflow-y-auto no-scrollbar")}>
+      <div className={clsx("flex-1 flex flex-col gap-8", isMobile ? "p-6" : "p-8 md:p-16 overflow-y-visible")}>
         <div className={isMobile ? "mt-[-40px] relative z-10" : ""}>
           <span className="text-white/40 text-[10px] font-mono uppercase tracking-[0.4em] mb-4 block">{event.category} // {event.date}</span>
           <h2 className={clsx("font-black text-white uppercase tracking-tighter leading-none mb-4", isMobile ? "text-3xl" : "text-4xl md:text-6xl")}>{event.title}</h2>
@@ -599,11 +599,11 @@ function EventDetailView({
              <img src="https://i.pravatar.cc/100?img=12" className="w-8 h-8 rounded-full border-2 border-black object-cover" />
              <img src="https://i.pravatar.cc/100?img=4" className="w-8 h-8 rounded-full border-2 border-black object-cover" />
              <img src="https://i.pravatar.cc/100?img=9" className="w-8 h-8 rounded-full border-2 border-black object-cover" />
-             <div className="w-8 h-8 rounded-full border-2 border-black bg-gradient-to-tr from-purple-500 to-cyan-500 flex items-center justify-center text-[8px] font-black text-white relative z-10">+{Math.floor(Math.random() * 200) + 50}</div>
+             <div className="w-8 h-8 rounded-full border-2 border-black bg-gradient-to-tr from-purple-500 to-cyan-500 flex items-center justify-center text-[10px] font-black text-white relative z-10">+{Math.floor(Math.random() * 200) + 50}</div>
            </div>
            <div className="flex-1">
              <p className="text-[10px] font-black text-white uppercase tracking-widest leading-none">Friends & Others</p>
-             <p className="text-[8px] text-white/50 font-mono tracking-wider uppercase mt-1">Are attending this event</p>
+             <p className="text-[10px] text-white/50 font-mono tracking-wider uppercase mt-1">Are attending this event</p>
            </div>
         </div>
 

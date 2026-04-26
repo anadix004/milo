@@ -51,7 +51,7 @@ export default function BottomSheet({ isOpen, onClose, children, snapHeight = "9
             <div className="flex justify-center pt-4 pb-2 cursor-grab active:cursor-grabbing">
               <div className="w-10 h-1 rounded-full bg-white/20" />
             </div>
-            <div className="overflow-y-auto h-full px-6 pb-20">
+            <div className="overflow-y-auto h-full px-6 pb-20 overscroll-contain" style={{ WebkitOverflowScrolling: "touch" }}>
               {children}
             </div>
           </motion.div>

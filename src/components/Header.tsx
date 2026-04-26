@@ -34,7 +34,7 @@ export default function Header({ onProfileClick, onEventClick, onNotificationsCl
       isScrolled ? "bg-black/60 backdrop-blur-2xl border-b border-white/5 py-4" : "pt-4 md:pt-6 py-6"
     )}>
       <div className="max-w-[1800px] mx-auto px-4 md:px-8 flex justify-between items-center">
-      {/* Top Left: Profile & Logo (Left) - Hidden on Mobile */}
+      {/* Top Left: Profile & Logo (Left) */}
       <div className="flex items-center gap-6 pointer-events-auto">
         {isAuthenticated ? (
           <Link 
