@@ -61,7 +61,7 @@ export default function BottomNav({ onProfileClick, onEventClick, onNotification
               <div className="relative">
                 <Icon size={22} className={isActive ? "text-white" : "text-white/40"} />
                 {tab.badge && tab.badge > 0 && (
-                  <span className="absolute -top-1 -right-2 w-4 h-4 bg-purple-500 rounded-full text-[8px] font-black flex items-center justify-center text-white ring-2 ring-black">
+                  <span className="absolute -top-2 -right-2 w-5 h-5 bg-rose-600 rounded-full text-[9px] font-black flex items-center justify-center text-white ring-2 ring-black z-20 shadow-lg">
                     {tab.badge}
                   </span>
                 )}
