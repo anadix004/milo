@@ -17,8 +17,10 @@ interface Story {
   id: string;
   type: "image" | "video";
   url: string;
-  userAvatar: string;
-  userName: string;
+  userAvatar?: string;
+  userName?: string;
+  user_avatar?: string;
+  user_name?: string;
 }
 
 // Temporary mocked initial stories for demonstration
