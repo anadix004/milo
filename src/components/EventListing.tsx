@@ -155,17 +155,13 @@ export default function EventListing({ selectedCity, onAuthRequired }: { selecte
         .select("*")
         .eq("is_verified", true);
 
-      let fetchedEvents: EventData[] = [];
-      if (!error && data) {
-         fetchedEvents = data.map(e => ({ ...e, name: e.title }));
-      }
+      if (error) throw error;
       
-      const localMapped = EVENTS.map(e => ({ ...e, title: e.name, time: "18:00", location: "Various", is_verified: true })) as unknown as EventData[];
-      setEvents([...localMapped, ...fetchedEvents]);
+      const fetchedEvents: EventData[] = (data || []).map(e => ({ ...e, name: e.title }));
+      setEvents(fetchedEvents);
     } catch (err: any) {
-      addNotification("system", `Failed to load online events: ${err.message}`);
-      const localMapped = EVENTS.map(e => ({ ...e, title: e.name, time: "18:00", location: "Various", is_verified: true })) as unknown as EventData[];
-      setEvents(localMapped);
+      addNotification("system", `Failed to load events: ${err.message}`);
+      setEvents([]);
     } finally {
       setIsLoading(false);
     }

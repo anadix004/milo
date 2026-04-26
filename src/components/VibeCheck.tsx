@@ -23,26 +23,10 @@ interface Story {
   user_name?: string;
 }
 
-// Temporary mocked initial stories for demonstration
-const INITIAL_STORIES: Story[] = [
-  {
-    id: "s1",
-    type: "image",
-    url: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=400&h=800&fit=crop",
-    userAvatar: "https://i.pravatar.cc/100?img=1",
-    userName: "Alex",
-  },
-  {
-    id: "s2",
-    type: "video",
-    url: "https://assets.mixkit.co/videos/preview/mixkit-crowd-dancing-at-a-party-with-flashing-lights-4293-large.mp4",
-    userAvatar: "https://i.pravatar.cc/100?img=5",
-    userName: "Jamie",
-  }
-];
+
 
 export default function VibeCheck({ eventId }: VibeCheckProps) {
-  const [stories, setStories] = useState<Story[]>(INITIAL_STORIES);
+  const [stories, setStories] = useState<Story[]>([]);
   const [activeStory, setActiveStory] = useState<Story | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const supabase = createClient();
@@ -58,7 +42,7 @@ export default function VibeCheck({ eventId }: VibeCheckProps) {
         .order("created_at", { ascending: false });
       
       if (!error && data) {
-        setStories([...data, ...INITIAL_STORIES]);
+        setStories(data);
       }
     };
     fetchStories();
