@@ -363,7 +363,7 @@ export default function EventListing({ selectedCity, onAuthRequired }: { selecte
           </div>
         </div>
 
-        <div className="flex flex-col lg:flex-row items-center gap-6 w-full overflow-hidden">
+        <div className="flex flex-col lg:flex-row items-center gap-6 w-full overflow-visible">
           <div className="w-full relative group">
             <div className="absolute inset-y-0 left-6 flex items-center pointer-events-none text-white/90 group-focus-within:text-white transition-colors">
               <SearchIcon size={18} />
