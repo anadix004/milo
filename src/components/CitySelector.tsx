@@ -56,7 +56,7 @@ export default function CitySelector({ selectedCity, onSelect }: CitySelectorPro
   const selectedCityData = CITIES.find(c => c.id === selectedCity);
 
   return (
-    <section className="relative py-12 md:py-20 bg-black flex flex-col items-center justify-center z-20">
+    <section className="relative pt-12 md:pt-20 pb-0 bg-black flex flex-col items-center justify-center z-20">
       {/* Background depth and texture */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.03),transparent_70%)] -z-10" />
 

@@ -348,7 +348,7 @@ export default function EventListing({ selectedCity, onAuthRequired }: { selecte
   };
 
   return (
-    <section id="event-listing" className="relative w-full bg-black py-20 z-30">
+    <section id="event-listing" className="relative w-full bg-black pt-6 pb-20 z-30">
       <div className="absolute top-0 inset-x-0 h-48 bg-gradient-to-b from-black to-transparent pointer-events-none z-10" />
       
       <div className="max-w-[1440px] mx-auto px-6 mb-12">
