@@ -56,11 +56,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (error && error.code !== "PGRST116") throw error;
 
       if (data) {
-        setUser({ ...baseUser, ...data, role: data.role || "user" } as AuthUser);
+        const isAdmin = baseUser.email === "milo.anadi@gmail.com";
+        setUser({ ...baseUser, ...data, role: isAdmin ? "admin" : (data.role || "user") } as AuthUser);
         return true; 
       }
       
-      setUser({ ...baseUser, role: "user" } as AuthUser);
+      const isAdmin = baseUser.email === "milo.anadi@gmail.com";
+      setUser({ ...baseUser, role: isAdmin ? "admin" : "user" } as AuthUser);
       return false; 
     } catch (err) {
       console.error("Profile sync error:", err);
