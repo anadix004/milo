@@ -171,6 +171,22 @@ export default function EventListing({ selectedCity, onAuthRequired }: { selecte
     }
   };
 
+  const fetchJoined = async () => {
+    if (!user) return;
+    try {
+      const { data, error } = await supabase
+        .from("rsvps")
+        .select("event_id")
+        .eq("profile_id", user.id)
+        .eq("type", "join");
+      
+      if (error) throw error;
+      setJoinedEvents(new Set(data.map(r => r.event_id)));
+    } catch (err) {
+      console.error("Error fetching joined events:", err);
+    }
+  };
+
   const fetchBookmarks = async () => {
     if (!user) return;
     try {
