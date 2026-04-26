@@ -5,6 +5,7 @@ import AdminSidebar from "@/components/admin/AdminSidebar";
 import ApprovalsGrid from "@/components/admin/ApprovalsGrid";
 import DashboardView from "@/components/admin/DashboardView";
 import ModerationStudio from "@/components/admin/ModerationStudio";
+import UserDirectory from "@/components/admin/UserDirectory";
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -20,10 +21,11 @@ export default function AdminDashboard() {
         {activeTab === "dashboard" && <DashboardView />}
         {activeTab === "approvals" && <ApprovalsGrid />}
         {activeTab === "moderation" && <ModerationStudio />}
+        {activeTab === "users" && <UserDirectory />}
         {activeTab === "bulk" && <BulkUploadStudio />}
         
         {/* Placeholder for other tabs */}
-        {["users", "analytics", "settings"].includes(activeTab) && (
+        {["analytics", "settings"].includes(activeTab) && (
           <div className="flex-1 flex flex-col items-center justify-center text-center">
             <h2 className="text-4xl font-black text-white/20 uppercase tracking-tighter mb-4">
               {activeTab} Module
