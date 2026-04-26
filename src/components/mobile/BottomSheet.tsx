@@ -38,19 +38,21 @@ export default function BottomSheet({ isOpen, onClose, children, snapHeight = "9
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            drag="y"
-            dragConstraints={{ top: 0 }}
-            dragElastic={{ top: 0, bottom: 0.3 }}
-            onDragEnd={(_, info) => {
-              if (info.velocity.y > 500 || info.offset.y > 150) onClose();
-            }}
             style={{ y, maxHeight: snapHeight, paddingBottom: "env(safe-area-inset-bottom)" }}
             className={`fixed bottom-0 inset-x-0 z-[120] bg-black border-t border-white/10 rounded-t-[2rem] overflow-hidden ${className}`}
           >
-            {/* Drag handle */}
-            <div className="flex justify-center pt-4 pb-2 cursor-grab active:cursor-grabbing">
+            {/* Drag handle — only this area is draggable */}
+            <motion.div 
+              drag="y"
+              dragConstraints={{ top: 0 }}
+              dragElastic={{ top: 0, bottom: 0.3 }}
+              onDragEnd={(_, info) => {
+                if (info.velocity.y > 500 || info.offset.y > 150) onClose();
+              }}
+              className="flex justify-center pt-4 pb-2 cursor-grab active:cursor-grabbing"
+            >
               <div className="w-10 h-1 rounded-full bg-white/20" />
-            </div>
+            </motion.div>
             <div className="overflow-y-auto h-full px-6 pb-20 overscroll-contain" style={{ WebkitOverflowScrolling: "touch" }}>
               {children}
             </div>

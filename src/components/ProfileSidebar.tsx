@@ -98,7 +98,7 @@ export default function ProfileSidebar({ isOpen, onClose, onAuthClick }: Profile
 
   const renderContent = () => (
     <div className={clsx("flex flex-col h-full", !isMobile && "p-0")}>
-      {/* Header - Desktop Only (BottomSheet has its own handle) */}
+      {/* Header - Desktop Only */}
       {!isMobile && (
         <div className="flex justify-between items-center mb-12">
           <h2 className="text-white text-xl font-black uppercase tracking-[0.2em]">My Profile</h2>

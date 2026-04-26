@@ -132,7 +132,7 @@ export default function VibeCheck({ eventId }: VibeCheckProps) {
           <div key={story.id} className="flex flex-col items-center gap-2 shrink-0 cursor-pointer group" onClick={() => setActiveStory(story)}>
             <div className="relative w-16 h-16 rounded-full p-[2px] bg-gradient-to-tr from-purple-500 to-cyan-500 group-hover:scale-105 transition-transform">
               <div className="w-full h-full rounded-full border-2 border-black overflow-hidden relative">
-                <img src={story.userAvatar} alt={story.userName} className="w-full h-full object-cover" />
+                <img src={story.user_avatar || story.userAvatar || "https://i.pravatar.cc/100"} alt={story.user_name || story.userName} className="w-full h-full object-cover" />
                 {story.type === "video" && (
                    <div className="absolute bottom-0 right-0 w-4 h-4 bg-purple-500 rounded-full flex items-center justify-center border border-black">
                      <Video size={8} className="text-white" />
@@ -152,7 +152,7 @@ export default function VibeCheck({ eventId }: VibeCheckProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-xl flex items-center justify-center"
+            className="fixed inset-0 z-[200] bg-black/90 backdrop-blur-xl flex items-center justify-center"
           >
             <button 
               onClick={() => setActiveStory(null)}
