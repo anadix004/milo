@@ -38,7 +38,7 @@ export default function BottomNav({ onProfileClick, onEventClick, onNotification
 
   return (
     <nav
-      className="fixed bottom-0 inset-x-0 z-[100] flex items-center justify-between bg-black/90 border-t border-white/10 backdrop-blur-xl md:hidden px-2"
+      className="fixed bottom-0 inset-x-0 z-[100] grid grid-cols-5 bg-black/90 border-t border-white/10 backdrop-blur-xl md:hidden"
       style={{ paddingBottom: "max(12px, env(safe-area-inset-bottom))" }}
     >
       {tabs.map((tab, i) => {
@@ -49,7 +49,7 @@ export default function BottomNav({ onProfileClick, onEventClick, onNotification
           <motion.div
             whileTap={{ scale: 0.85 }}
             className={clsx(
-              "flex flex-col items-center justify-center gap-1.5 py-4 px-2 relative h-full",
+              "flex flex-col items-center justify-center gap-1.5 py-4 relative h-full",
               tab.primary && "z-10"
             )}
           >
@@ -79,10 +79,10 @@ export default function BottomNav({ onProfileClick, onEventClick, onNotification
         );
 
         if (tab.href) {
-          return <Link key={i} href={tab.href} className="flex-1 flex justify-center">{content}</Link>;
+          return <Link key={i} href={tab.href} className="w-full flex justify-center">{content}</Link>;
         }
         return (
-          <button key={i} onClick={tab.action} className="flex-1 flex justify-center">
+          <button key={i} onClick={tab.action} className="w-full flex justify-center outline-none">
             {content}
           </button>
         );
