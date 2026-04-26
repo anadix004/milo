@@ -4,6 +4,7 @@ import { useState } from "react";
 import AdminSidebar from "@/components/admin/AdminSidebar";
 import ApprovalsGrid from "@/components/admin/ApprovalsGrid";
 import DashboardView from "@/components/admin/DashboardView";
+import ModerationStudio from "@/components/admin/ModerationStudio";
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -18,6 +19,7 @@ export default function AdminDashboard() {
         
         {activeTab === "dashboard" && <DashboardView />}
         {activeTab === "approvals" && <ApprovalsGrid />}
+        {activeTab === "moderation" && <ModerationStudio />}
         {activeTab === "bulk" && <BulkUploadStudio />}
         
         {/* Placeholder for other tabs */}

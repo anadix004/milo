@@ -12,7 +12,8 @@ interface AdminSidebarProps {
 export default function AdminSidebar({ activeTab, setActiveTab }: AdminSidebarProps) {
   const tabs = [
     { id: "dashboard", label: "DASHBOARD", icon: LayoutDashboard },
-    { id: "approvals", label: "APPROVALS", icon: CheckCircle },
+    { id: "approvals", label: "EVENT MANAGEMENT", icon: CheckCircle },
+    { id: "moderation", label: "MODERATION", icon: Calendar },
     { id: "users", label: "USERS", icon: Users },
     { id: "analytics", label: "ANALYTICS", icon: BarChart3 },
     { id: "bulk", label: "BULK STUDIO", icon: Calendar },
