@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Edit3, Instagram, Twitter, Music, MapPin, Award, Loader2 } from "lucide-react";
+import { Edit3, Music, MapPin, Award, Loader2 } from "lucide-react";
 import { useAuth } from "@/components/AuthContext";
 
 interface UserProfile {
@@ -128,12 +128,12 @@ export default function DigitalPassport() {
             <div className="flex gap-3">
               {profileData.socials.instagram && (
                 <button className="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/10 hover:border-pink-500/50 transition-all group">
-                  <Instagram size={20} className="group-hover:scale-110 transition-transform" />
+                  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="group-hover:scale-110 transition-transform"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
                 </button>
               )}
               {profileData.socials.twitter && (
                 <button className="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/10 hover:border-blue-400/50 transition-all group">
-                  <Twitter size={20} className="group-hover:scale-110 transition-transform" />
+                  <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" className="group-hover:scale-110 transition-transform"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
                 </button>
               )}
               {profileData.socials.spotify && (

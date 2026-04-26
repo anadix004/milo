@@ -11,7 +11,7 @@ interface SettingsModalProps {
 }
 
 export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
-  const { signOut } = useAuth();
+  const { logout } = useAuth();
 
   return (
     <AnimatePresence>
@@ -67,7 +67,7 @@ export default function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
               {/* Danger Zone */}
               <section className="pt-4">
                 <button 
-                  onClick={signOut}
+                  onClick={logout}
                   className="w-full flex items-center justify-between p-4 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-500 hover:bg-rose-500/20 transition-colors group"
                 >
                   <div className="flex items-center gap-3 font-black uppercase tracking-widest text-xs">
