@@ -18,7 +18,7 @@ import VibeCheck from "@/components/VibeCheck";
 // --- SPRING CONFIG SYNC ---
 const SPRING_CONFIG = { stiffness: 70, damping: 15 };
 
-type SortOrder = "featured" | "price-low" | "price-high";
+type SortOrder = "featured" | "popularity" | "price-low" | "price-high";
 
 export interface EventData {
   id: string;
@@ -322,6 +322,7 @@ export default function EventListing({ selectedCity, onAuthRequired }: { selecte
     return result.sort((a, b) => {
       if (sortOrder === "price-low") return parsePrice(a.price) - parsePrice(b.price);
       if (sortOrder === "price-high") return parsePrice(b.price) - parsePrice(a.price);
+      if (sortOrder === "popularity") return (a.featured ? -1 : 1); // Mock popularity by featured status for now
       return (a.featured ? -1 : 1);
     });
   }, [events, selectedCity, selectedCat, sortOrder, searchQuery, timeFilter, priceFilter, budgetFilter, todayStr, tomorrowStr, weekStr, monthStr]);
@@ -402,7 +403,20 @@ export default function EventListing({ selectedCity, onAuthRequired }: { selecte
                 <Dropdown label="Timeframe" value={timeFilter} options={["All", "Today", "Tomorrow", "Week", "Month"]} onChange={setTimeFilter} icon={<Calendar size={14} />} />
                 <Dropdown label="Access" value={priceFilter} options={["All", "Free", "Paid"]} onChange={setPriceFilter} icon={<Star size={14} />} />
                 <Dropdown label="Budget" value={budgetFilter} options={["All", "< 500", "< 2000", "2000+"]} onChange={setBudgetFilter} icon={<ArrowUpDown size={14} />} />
-                <Dropdown label="Sort By" value={sortOrder === "featured" ? "Featured" : sortOrder === "price-low" ? "Price: Low" : "Price: High"} options={["Featured", "Price: Low", "Price: High"]} onChange={(val) => setSortOrder(val === "Featured" ? "featured" : val === "Price: Low" ? "price-low" : "price-high")} />
+                <Dropdown 
+                  label="Sort By" 
+                  value={
+                    sortOrder === "featured" ? "Featured" : 
+                    sortOrder === "popularity" ? "Popularity" : 
+                    sortOrder === "price-low" ? "Price: Low" : "Price: High"
+                  } 
+                  options={["Featured", "Popularity", "Price: Low", "Price: High"]} 
+                  onChange={(val) => setSortOrder(
+                    val === "Featured" ? "featured" : 
+                    val === "Popularity" ? "popularity" :
+                    val === "Price: Low" ? "price-low" : "price-high"
+                  )} 
+                />
               </>
             )}
           </div>
