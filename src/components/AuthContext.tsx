@@ -13,6 +13,11 @@ interface AuthUser extends User {
   avatar_url?: string;
   role?: string;
   is_ghost?: boolean;
+  bio?: string;
+  location?: string;
+  instagram?: string;
+  twitter?: string;
+  spotify?: string;
 }
 
 interface AuthContextType {
