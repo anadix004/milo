@@ -144,6 +144,7 @@ export default function EventListing({ selectedCity, onAuthRequired }: { selecte
   const [priceFilter, setPriceFilter] = useState("All"); // All, Free, Paid
   const [budgetFilter, setBudgetFilter] = useState("All"); // All, < 500, < 2000, 2000+
   const [joinedEvents, setJoinedEvents] = useState<Set<string>>(new Set());
+  const [bookmarkedEvents, setBookmarkedEvents] = useState<Set<string>>(new Set());
   const { user } = useAuth();
 
   const fetchEvents = async () => {
@@ -170,25 +171,27 @@ export default function EventListing({ selectedCity, onAuthRequired }: { selecte
     }
   };
 
-  const fetchJoined = async () => {
+  const fetchBookmarks = async () => {
     if (!user) return;
     try {
       const { data, error } = await supabase
-        .from("rsvps")
+        .from("bookmarks")
         .select("event_id")
-        .eq("profile_id", user.id)
-        .eq("type", "join");
+        .eq("profile_id", user.id);
       
       if (error) throw error;
-      setJoinedEvents(new Set(data.map(r => r.event_id)));
+      setBookmarkedEvents(new Set(data.map(b => b.event_id)));
     } catch (err) {
-      console.error("Error fetching joined events:", err);
+      console.error("Error fetching bookmarks:", err);
     }
   };
 
   useEffect(() => {
     fetchEvents();
-    if (isAuthenticated) fetchJoined();
+    if (isAuthenticated) {
+      fetchJoined();
+      fetchBookmarks();
+    }
 
     const channel = supabase.channel("radar_live")
       .on("postgres_changes", { event: "*", schema: "public", table: "events" }, (payload) => {
@@ -212,7 +215,42 @@ export default function EventListing({ selectedCity, onAuthRequired }: { selecte
 
   const FIXED_CATEGORIES = ["All", "Music", "College", "Workshops", "Nightlife", "Networking"];
 
-  const isJoined = (id: string) => joinedEvents.has(id);
+  const isBookmarked = (id: string) => bookmarkedEvents.has(id);
+
+  const toggleBookmark = async (eventId: string) => {
+    if (!isAuthenticated) {
+      onAuthRequired();
+      return;
+    }
+    if (!user) return;
+
+    const bookmarked = isBookmarked(eventId);
+    try {
+      if (bookmarked) {
+        await supabase
+          .from("bookmarks")
+          .delete()
+          .eq("profile_id", user.id)
+          .eq("event_id", eventId);
+        
+        setBookmarkedEvents(prev => {
+          const next = new Set(prev);
+          next.delete(eventId);
+          return next;
+        });
+        addNotification("radar", "Event removed from your radar.");
+      } else {
+        await supabase
+          .from("bookmarks")
+          .insert({ profile_id: user.id, event_id: eventId });
+        
+        setBookmarkedEvents(prev => new Set(prev).add(eventId));
+        addNotification("radar", "Event saved to your radar.");
+      }
+    } catch (err: any) {
+      addNotification("system", `Pulse Error: ${err.message}`);
+    }
+  };
   const joinEvent = async (id: string) => {
     if (!isAuthenticated || !user) {
       onAuthRequired();
@@ -427,7 +465,9 @@ export default function EventListing({ selectedCity, onAuthRequired }: { selecte
           <EventDetailView 
             event={expandedEvent} 
             isJoined={isJoined(expandedEvent.id)}
+            isBookmarked={isBookmarked(expandedEvent.id)}
             onJoin={() => joinEvent(expandedEvent.id)}
+            onToggleBookmark={() => toggleBookmark(expandedEvent.id)}
             onClose={() => setExpandedEvent(null)} 
             allEvents={events}
             onSelectEvent={handleEventClick}
@@ -481,7 +521,25 @@ function EventGridCard({ event, onExpand }: { event: EventData, onExpand: (e: Ev
   );
 }
 
-function EventDetailView({ event, isJoined, onJoin, onClose, allEvents, onSelectEvent }: { event: EventData, isJoined: boolean, onJoin: () => void, onClose: () => void, allEvents: EventData[], onSelectEvent: (e: EventData) => void }) {
+function EventDetailView({ 
+  event, 
+  isJoined, 
+  isBookmarked, 
+  onJoin, 
+  onToggleBookmark, 
+  onClose, 
+  allEvents, 
+  onSelectEvent 
+}: { 
+  event: EventData, 
+  isJoined: boolean, 
+  isBookmarked: boolean, 
+  onJoin: () => void, 
+  onToggleBookmark: () => void, 
+  onClose: () => void, 
+  allEvents: EventData[], 
+  onSelectEvent: (e: EventData) => void 
+}) {
   const isMobile = useIsMobile();
   const [isLiked, setIsLiked] = useState(false);
   
@@ -568,7 +626,15 @@ function EventDetailView({ event, isJoined, onJoin, onClose, allEvents, onSelect
             <p className="text-2xl font-black text-white">{event.price}</p>
           </div>
           <div className="flex items-center gap-4">
-             <button onClick={() => setIsLiked(!isLiked)} className={clsx("p-4 rounded-full border border-white/10", isLiked ? "bg-rose-500 text-white border-rose-500" : "text-white/40")}><Heart size={20} fill={isLiked ? "currentColor" : "none"} /></button>
+             <button 
+               onClick={onToggleBookmark} 
+               className={clsx(
+                 "p-4 rounded-full border border-white/10 transition-all", 
+                 isBookmarked ? "bg-rose-500 text-white border-rose-500" : "text-white/40 hover:text-white/60"
+               )}
+             >
+               <Heart size={20} fill={isBookmarked ? "currentColor" : "none"} />
+             </button>
              {event.ticket_links?.[0]?.url && (
                <a 
                  href={event.ticket_links[0].url} 

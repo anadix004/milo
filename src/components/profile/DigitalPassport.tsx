@@ -47,10 +47,14 @@ export default function DigitalPassport() {
     name: user?.full_name || user?.email?.split('@')[0] || MOCK_USER.name,
     username: user?.username ? `@${user.username}` : MOCK_USER.username,
     avatar: user?.avatar_url || "https://i.pravatar.cc/300?img=12",
-    bio: MOCK_USER.bio, // Future: pull from user.bio if added to AuthUser
-    location: MOCK_USER.location,
+    bio: user?.bio || MOCK_USER.bio,
+    location: user?.location || MOCK_USER.location,
     rank: user?.role === "admin" ? "Admin" : MOCK_USER.rank,
-    socials: MOCK_USER.socials
+    socials: {
+      instagram: user?.instagram || MOCK_USER.socials.instagram,
+      twitter: user?.twitter || MOCK_USER.socials.twitter,
+      spotify: user?.spotify || MOCK_USER.socials.spotify
+    }
   };
 
   return (

@@ -12,49 +12,53 @@ type Tab = "passes" | "saved" | "history";
 export default function MyRadar() {
   const [activeTab, setActiveTab] = useState<Tab>("passes");
   const [rsvps, setRsvps] = useState<any[]>([]);
+  const [bookmarks, setBookmarks] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { user } = useAuth();
   const supabase = createClient();
 
-  useEffect(() => {
-    const fetchRSVPs = async () => {
+    const fetchData = async () => {
       if (!user) {
         setIsLoading(false);
         return;
       }
       try {
-        const { data, error } = await supabase
+        // Fetch RSVPs
+        const { data: rsvpData, error: rsvpError } = await supabase
           .from("rsvps")
           .select(`
             id,
-            event:events (
-              id,
-              title,
-              date,
-              location,
-              venue_address,
-              price,
-              image,
-              category
-            )
+            event:events (*)
           `)
-          .eq("profile_id", user.id)
-          .order("created_at", { ascending: false });
+          .eq("profile_id", user.id);
 
-        if (error) throw error;
-        setRsvps(data || []);
+        if (rsvpError) throw rsvpError;
+        setRsvps(rsvpData || []);
+
+        // Fetch Bookmarks
+        const { data: bookmarkData, error: bookmarkError } = await supabase
+          .from("bookmarks")
+          .select(`
+            id,
+            event:events (*)
+          `)
+          .eq("profile_id", user.id);
+
+        if (bookmarkError) throw bookmarkError;
+        setBookmarks(bookmarkData || []);
+
       } catch (err) {
-        console.error("Error fetching RSVPs:", err);
+        console.error("Error fetching data:", err);
       } finally {
         setIsLoading(false);
       }
     };
-    fetchRSVPs();
+    fetchData();
   }, [user]);
 
   // Extract events from RSVPs
   const passes = rsvps.map(r => r.event).filter(Boolean);
-  const saved: any[] = []; // Placeholder until saved table exists
+  const saved = bookmarks.map(b => b.event).filter(Boolean);
   const history: any[] = [];
 
   return (

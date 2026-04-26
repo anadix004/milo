@@ -2,7 +2,11 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Video, Image as ImageIcon, X } from "lucide-react";
+import { Plus, Video, Image as ImageIcon, X, Loader2 } from "lucide-react";
+import { createClient } from "@/utils/supabase/client";
+import { useAuth } from "./AuthContext";
+import { useNotifications } from "./NotificationContext";
+import { useEffect } from "react";
 import clsx from "clsx";
 
 interface VibeCheckProps {
@@ -38,22 +42,69 @@ const INITIAL_STORIES: Story[] = [
 export default function VibeCheck({ eventId }: VibeCheckProps) {
   const [stories, setStories] = useState<Story[]>(INITIAL_STORIES);
   const [activeStory, setActiveStory] = useState<Story | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const supabase = createClient();
+  const { user, isAuthenticated } = useAuth();
+  const { addNotification } = useNotifications();
 
-  const handleUpload = (e: React.ChangeEvent<HTMLInputElement>, type: "image" | "video") => {
+  useEffect(() => {
+    const fetchStories = async () => {
+      const { data, error } = await supabase
+        .from("vibe_checks")
+        .select("*")
+        .eq("event_id", eventId)
+        .order("created_at", { ascending: false });
+      
+      if (!error && data) {
+        setStories([...data, ...INITIAL_STORIES]);
+      }
+    };
+    fetchStories();
+
+    // Subscribe to new vibes
+    const channel = supabase.channel(`vibe_${eventId}`)
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "vibe_checks", filter: `event_id=eq.${eventId}` }, (payload) => {
+        setStories(prev => [payload.new as Story, ...prev]);
+      })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, [eventId, supabase]);
+
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>, type: "image" | "video") => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const newUrl = URL.createObjectURL(file);
-    const newStory: Story = {
-      id: Math.random().toString(),
-      type,
-      url: newUrl,
-      userAvatar: "https://i.pravatar.cc/100?img=12", // Mock user avatar
-      userName: "You",
-    };
+    if (!isAuthenticated) {
+      addNotification("system", "Authentication required to post vibes.");
+      return;
+    }
 
-    // Add to the front of the line
-    setStories([newStory, ...stories]);
+    setIsUploading(true);
+    try {
+      const ext = file.name.split(".").pop();
+      const fileName = `${Date.now()}_vibe.${ext}`;
+      const { error: uploadError } = await supabase.storage.from("event-assets").upload(fileName, file);
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage.from("event-assets").getPublicUrl(fileName);
+
+      const { error: dbError } = await supabase.from("vibe_checks").insert({
+        event_id: eventId,
+        profile_id: user?.id,
+        type,
+        url: publicUrl,
+        user_name: user?.full_name || user?.email?.split('@')[0] || "Anonymous",
+        user_avatar: user?.avatar_url || "https://i.pravatar.cc/100?img=12"
+      });
+
+      if (dbError) throw dbError;
+      addNotification("radar", "Vibe synchronized with the grid.");
+    } catch (err: any) {
+      addNotification("system", `Vibe Sync Failed: ${err.message}`);
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   return (
@@ -69,17 +120,23 @@ export default function VibeCheck({ eventId }: VibeCheckProps) {
         {/* Upload Button */}
         <div className="flex flex-col items-center gap-2 shrink-0">
           <div className="relative w-16 h-16 rounded-full border-2 border-dashed border-white/20 flex items-center justify-center hover:border-white/50 hover:bg-white/5 transition-all group overflow-hidden">
-            <Plus size={20} className="text-white/40 group-hover:text-white transition-colors" />
-            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center gap-2 backdrop-blur-sm transition-opacity">
-              <label className="cursor-pointer hover:scale-110 transition-transform">
-                <input type="file" accept="image/*" className="hidden" onChange={(e) => handleUpload(e, "image")} />
-                <ImageIcon size={14} className="text-cyan-400" />
-              </label>
-              <label className="cursor-pointer hover:scale-110 transition-transform">
-                <input type="file" accept="video/*" className="hidden" onChange={(e) => handleUpload(e, "video")} />
-                <Video size={14} className="text-purple-400" />
-              </label>
-            </div>
+            {isUploading ? (
+              <Loader2 size={20} className="text-purple-400 animate-spin" />
+            ) : (
+              <Plus size={20} className="text-white/40 group-hover:text-white transition-colors" />
+            )}
+            {!isUploading && (
+              <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center gap-2 backdrop-blur-sm transition-opacity">
+                <label className="cursor-pointer hover:scale-110 transition-transform">
+                  <input type="file" accept="image/*" className="hidden" onChange={(e) => handleUpload(e, "image")} />
+                  <ImageIcon size={14} className="text-cyan-400" />
+                </label>
+                <label className="cursor-pointer hover:scale-110 transition-transform">
+                  <input type="file" accept="video/*" className="hidden" onChange={(e) => handleUpload(e, "video")} />
+                  <Video size={14} className="text-purple-400" />
+                </label>
+              </div>
+            )}
           </div>
           <span className="text-[8px] font-mono uppercase text-white/60 tracking-widest">Add Yours</span>
         </div>
@@ -97,7 +154,7 @@ export default function VibeCheck({ eventId }: VibeCheckProps) {
                 )}
               </div>
             </div>
-            <span className="text-[8px] font-mono uppercase text-white/80 tracking-widest">{story.userName}</span>
+            <span className="text-[8px] font-mono uppercase text-white/80 tracking-widest truncate max-w-[64px]">{story.user_name || story.userName}</span>
           </div>
         ))}
       </div>
@@ -125,8 +182,8 @@ export default function VibeCheck({ eventId }: VibeCheckProps) {
               className="relative w-full max-w-sm aspect-[9/16] rounded-2xl overflow-hidden bg-black shadow-2xl shadow-purple-500/20"
             >
               <div className="absolute top-4 left-4 z-10 flex items-center gap-3">
-                <img src={activeStory.userAvatar} className="w-10 h-10 rounded-full border border-white/20" />
-                <span className="font-black text-white text-sm tracking-widest uppercase drop-shadow-md">{activeStory.userName}</span>
+                <img src={activeStory.user_avatar || activeStory.userAvatar} className="w-10 h-10 rounded-full border border-white/20" />
+                <span className="font-black text-white text-sm tracking-widest uppercase drop-shadow-md">{activeStory.user_name || activeStory.userName}</span>
               </div>
               
               {activeStory.type === "video" ? (
