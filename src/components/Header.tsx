@@ -7,6 +7,7 @@ import clsx from "clsx";
 import { motion, useScroll, useMotionValueEvent } from "framer-motion";
 import { useState } from "react";
 import BrandLogo from "./BrandLogo";
+import { useNotifications } from "./NotificationContext";
 
 interface HeaderProps {
   onProfileClick: () => void;
@@ -17,6 +18,7 @@ interface HeaderProps {
 
 export default function Header({ onProfileClick, onEventClick, onNotificationsClick, isSidebarOpen }: HeaderProps) {
   const { user, isAuthenticated } = useAuth();
+  const { unreadCount } = useNotifications();
   const [isScrolled, setIsScrolled] = useState(false);
   const { scrollY } = useScroll();
 
@@ -94,7 +96,9 @@ export default function Header({ onProfileClick, onEventClick, onNotificationsCl
           className="hidden md:flex items-center justify-center w-10 h-10 rounded-full bg-black/20 border border-white/10 text-white/40 hover:text-white hover:border-white/30 hover:bg-white/10 transition-all duration-500 relative backdrop-blur-md"
         >
           <Bell size={18} />
-          <div className="absolute top-0 right-0 w-2.5 h-2.5 bg-purple-500 rounded-full border-2 border-black" />
+          {unreadCount > 0 && (
+            <div className="absolute top-0 right-0 w-2.5 h-2.5 bg-purple-500 rounded-full border-2 border-black" />
+          )}
         </button>
       </div>
       </div>

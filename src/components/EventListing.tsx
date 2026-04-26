@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect, useRef } from "react";
+import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, MapPin, Calendar, Clock, Filter, Star, ChevronRight, X, Music, Trophy, Layout, Search as SearchIcon, Heart, Share2, Ticket, Check, ArrowUpDown, Send, Loader2 } from "lucide-react";
 import clsx from "clsx";
@@ -294,8 +294,19 @@ export default function EventListing({ selectedCity, onAuthRequired }: { selecte
   const weekStr = new Date(Date.now() + 604800000).toISOString().split("T")[0];
   const monthStr = new Date(Date.now() + 2592000000).toISOString().split("T")[0];
 
+  const CITY_ID_MAP: Record<string, string[]> = {
+    "del": ["del", "delhi-ncr", "delhi", "noida", "gurugram", "faridabad", "ghaziabad"],
+    "mum": ["mum", "mumbai", "south-mumbai", "western-suburbs", "eastern-suburbs", "navi-mumbai", "harbour-line", "thane"],
+    "blr": ["blr", "bangalore", "central-bangalore", "north-bangalore", "south-bangalore", "east-bangalore", "west-bangalore"],
+  };
+
   const filteredEvents = useMemo(() => {
-    let result = events.filter(e => e.cityId === "all" || !selectedCity || e.cityId === selectedCity);
+    let result = events.filter(e => {
+      if (!selectedCity) return true;
+      if (e.cityId === "all") return true;
+      const validIds = CITY_ID_MAP[selectedCity] || [selectedCity];
+      return validIds.includes(e.cityId);
+    });
     if (selectedCat !== "All") result = result.filter(e => e.category.includes(selectedCat));
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
@@ -447,7 +458,7 @@ export default function EventListing({ selectedCity, onAuthRequired }: { selecte
           {homepageSections.map((section, idx) => section.events.length > 0 && (
             <div key={idx} className="space-y-8">
                <div className="max-w-[1440px] mx-auto px-6 flex items-center justify-between">
-                  <h3 className="font-lexend text-white text-xl md:text-3xl font-black uppercase tracking-tight italic">{section.title}</h3>
+                  <h3 className="font-[family-name:var(--font-lexend)] text-white text-xl md:text-3xl font-black uppercase tracking-tight italic">{section.title}</h3>
                   <button className="text-[9px] font-mono text-white/40 uppercase tracking-widest hover:text-white transition-colors flex items-center gap-2">View All <ChevronRight size={12} /></button>
                </div>
                <div className="flex gap-6 overflow-x-auto no-scrollbar px-6 md:px-[5%]">
@@ -459,6 +470,17 @@ export default function EventListing({ selectedCity, onAuthRequired }: { selecte
                </div>
             </div>
           ))}
+        </div>
+      ) : filteredEvents.length === 0 ? (
+        <div className="max-w-[1440px] mx-auto px-6 py-32 flex flex-col items-center justify-center text-center">
+          <div className="w-20 h-20 rounded-full bg-white/[0.03] border border-white/10 flex items-center justify-center mb-8">
+            <Search size={32} className="text-white/15" />
+          </div>
+          <h3 className="font-[family-name:var(--font-lexend)] text-xl md:text-3xl font-black text-white/20 uppercase tracking-tight mb-4">No Events Found</h3>
+          <p className="text-white/30 font-mono text-[10px] md:text-xs uppercase tracking-[0.3em] max-w-sm mb-8">Be the first to put your city on the radar.</p>
+          <button onClick={() => onAuthRequired()} className="px-10 py-4 bg-white text-black rounded-full font-black uppercase tracking-widest text-[10px] hover:scale-105 active:scale-95 transition-all shadow-[0_0_30px_rgba(255,255,255,0.1)]">
+            Submit an Event
+          </button>
         </div>
       ) : (
         <>
@@ -506,13 +528,29 @@ export default function EventListing({ selectedCity, onAuthRequired }: { selecte
   );
 }
 
+function FomoCounter() {
+  const count = useMemo(() => Math.floor(Math.random() * 200) + 50, []);
+  return (
+    <div className="w-8 h-8 rounded-full border-2 border-black bg-gradient-to-tr from-purple-500 to-cyan-500 flex items-center justify-center text-[10px] font-black text-white relative z-10">+{count}</div>
+  );
+}
+
 function FeaturedCarousel({ items, onExpand }: { items: EventData[], onExpand: (e: EventData) => void }) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  
+  const goNext = useCallback(() => {
+    setCurrentIndex(prev => (prev + 1) % items.length);
+  }, [items.length]);
+  
+  const goPrev = useCallback(() => {
+    setCurrentIndex(prev => (prev - 1 + items.length) % items.length);
+  }, [items.length]);
+
   return (
-    <div className="relative w-full overflow-hidden">
+    <div className="relative w-full overflow-hidden group/carousel">
       <div className="flex transition-transform duration-1000 ease-[cubic-bezier(0.23,1,0.32,1)]" style={{ transform: `translateX(-${currentIndex * 85}%)`, marginLeft: "5%" }}>
         {items.map((item, idx) => (
-          <motion.div key={item.id} onClick={() => onExpand(item)} className={clsx("relative min-w-[85vw] md:min-w-[60vw] aspect-[16/9] md:aspect-[21/9] mr-6 rounded-2xl overflow-hidden cursor-pointer group shrink-0", currentIndex === idx ? "opacity-100 scale-100" : "opacity-40 scale-95")}>
+          <motion.div key={item.id} onClick={() => onExpand(item)} className={clsx("relative min-w-[85vw] md:min-w-[60vw] aspect-[16/9] md:aspect-[21/9] mr-6 rounded-2xl overflow-hidden cursor-pointer group shrink-0 transition-all duration-700", currentIndex === idx ? "opacity-100 scale-100" : "opacity-40 scale-95")}>
             {item.video_url ? (
               <video src={item.video_url} autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
             ) : (
@@ -526,6 +564,21 @@ function FeaturedCarousel({ items, onExpand }: { items: EventData[], onExpand: (
           </motion.div>
         ))}
       </div>
+      {items.length > 1 && (
+        <>
+          <button onClick={goPrev} className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-black/60 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/60 hover:text-white hover:bg-black/80 transition-all opacity-0 group-hover/carousel:opacity-100">
+            <ChevronRight size={20} className="rotate-180" />
+          </button>
+          <button onClick={goNext} className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-black/60 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/60 hover:text-white hover:bg-black/80 transition-all opacity-0 group-hover/carousel:opacity-100">
+            <ChevronRight size={20} />
+          </button>
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+            {items.map((_, idx) => (
+              <button key={idx} onClick={() => setCurrentIndex(idx)} className={clsx("w-2 h-2 rounded-full transition-all", currentIndex === idx ? "bg-white w-6" : "bg-white/30 hover:bg-white/50")} />
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 }
@@ -592,7 +645,7 @@ function EventDetailView({
            <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent" />
         )}
       </div>
-      <div className={clsx("flex-1 flex flex-col gap-8", isMobile ? "p-6" : "p-8 md:p-16 overflow-y-visible")}>
+      <div className={clsx("flex-1 flex flex-col gap-8", isMobile ? "p-6" : "p-8 md:p-16 overflow-y-auto no-scrollbar")}>
         <div className={isMobile ? "mt-[-40px] relative z-10" : ""}>
           <span className="text-white/40 text-[10px] font-mono uppercase tracking-[0.4em] mb-4 block">{event.category} // {event.date}</span>
           <h2 className={clsx("font-black text-white uppercase tracking-tighter leading-none mb-4", isMobile ? "text-3xl" : "text-4xl md:text-6xl")}>{event.title}</h2>
@@ -609,7 +662,7 @@ function EventDetailView({
              <img src="https://i.pravatar.cc/100?img=12" className="w-8 h-8 rounded-full border-2 border-black object-cover" />
              <img src="https://i.pravatar.cc/100?img=4" className="w-8 h-8 rounded-full border-2 border-black object-cover" />
              <img src="https://i.pravatar.cc/100?img=9" className="w-8 h-8 rounded-full border-2 border-black object-cover" />
-             <div className="w-8 h-8 rounded-full border-2 border-black bg-gradient-to-tr from-purple-500 to-cyan-500 flex items-center justify-center text-[10px] font-black text-white relative z-10">+{Math.floor(Math.random() * 200) + 50}</div>
+             <FomoCounter />
            </div>
            <div className="flex-1">
              <p className="text-[10px] font-black text-white uppercase tracking-widest leading-none">Friends & Others</p>
@@ -682,7 +735,7 @@ function EventDetailView({
 
         {/* Related Events Section */}
         <div className="mt-12 space-y-6">
-          <h4 className="font-lexend text-white text-[10px] font-black uppercase tracking-[0.3em]">Related Events</h4>
+          <h4 className="font-[family-name:var(--font-lexend)] text-white text-[10px] font-black uppercase tracking-[0.3em]">Related Events</h4>
           <div className="grid grid-cols-2 gap-4">
             {allEvents.filter(e => e.id !== event.id && e.category === event.category).slice(0, 2).map(re => (
               <div 

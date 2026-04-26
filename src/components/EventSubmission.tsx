@@ -330,7 +330,17 @@ export default function EventSubmission({ isOpen, onClose, onAuthRedirect }: Eve
                    ) : <div className="flex-1" />}
 
                    {currentStep < 4 ? (
-                     <button type="button" onClick={() => setCurrentStep((prev) => (prev + 1) as Step)} className="flex-[2] py-5 bg-white text-black rounded-2xl font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-2">
+                     <button type="button" onClick={() => {
+                       if (currentStep === 1 && (!formData.title || !formData.date || !formData.description)) {
+                         addNotification("system", "Please fill in all required fields before proceeding.");
+                         return;
+                       }
+                       if (currentStep === 2 && (!formData.cityId || !formData.venueAddress)) {
+                         addNotification("system", "Please select a city and enter a venue address.");
+                         return;
+                       }
+                       setCurrentStep((prev) => (prev + 1) as Step);
+                     }} className="flex-[2] py-5 bg-white text-black rounded-2xl font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-2">
                         Next Sequence <ArrowRight size={14} />
                      </button>
                    ) : (
