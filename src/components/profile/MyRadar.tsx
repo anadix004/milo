@@ -16,7 +16,7 @@ export default function MyRadar() {
   const [isLoading, setIsLoading] = useState(true);
   const { user } = useAuth();
   const supabase = createClient();
-
+  useEffect(() => {
     const fetchData = async () => {
       if (!user) {
         setIsLoading(false);
