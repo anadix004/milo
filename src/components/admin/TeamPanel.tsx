@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { motion } from "framer-motion";
-import { Shield, ShieldCheck, Mail, Loader2, Plus, UserX } from "lucide-react";
+import { Shield, ShieldCheck, ShieldAlert, Mail, Loader2, Plus, UserX } from "lucide-react";
 import clsx from "clsx";
 import { useNotifications } from "../NotificationContext";
 
