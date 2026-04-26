@@ -6,6 +6,7 @@ import ApprovalsGrid from "@/components/admin/ApprovalsGrid";
 import DashboardView from "@/components/admin/DashboardView";
 import ModerationStudio from "@/components/admin/ModerationStudio";
 import UserDirectory from "@/components/admin/UserDirectory";
+import BulkUploadStudio from "@/components/admin/BulkUploadStudio";
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("dashboard");
