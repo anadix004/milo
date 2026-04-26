@@ -231,6 +231,7 @@ export default function EventListing({ selectedCity, onAuthRequired }: { selecte
 
   const FIXED_CATEGORIES = ["All", "Music", "College", "Workshops", "Nightlife", "Networking"];
 
+  const isJoined = (id: string) => joinedEvents.has(id);
   const isBookmarked = (id: string) => bookmarkedEvents.has(id);
 
   const toggleBookmark = async (eventId: string) => {
