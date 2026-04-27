@@ -8,12 +8,6 @@ import FinalCTA from "@/components/FinalCTA";
 import Preloader from "@/components/Preloader";
 import { useAuth } from "@/components/AuthContext";
 
-const CITY_IMAGES = [
-  "/city selection/delhi.png",
-  "/city selection/banglore.png",
-  "/city selection/mumbai.png"
-];
-
 import Header from "@/components/Header";
 import dynamic from "next/dynamic";
 
@@ -32,32 +26,27 @@ export default function Home() {
   const [activeModal, setActiveModal] = useState<"profile" | "event" | "auth" | "notifications" | null>(null);
 
   useEffect(() => {
-    let loadedCount = 0;
-
-    const preload = async () => {
-      const promises = CITY_IMAGES.map((src) => {
-        return new Promise((resolve) => {
-          const img = new Image();
-          img.src = src;
-          img.onload = () => {
-            loadedCount++;
-            setProgress((loadedCount / CITY_IMAGES.length) * 100);
-            resolve(true);
-          };
-          img.onerror = () => {
-            loadedCount++;
-            setProgress((loadedCount / CITY_IMAGES.length) * 100);
-            resolve(true);
-          };
-        });
+    // Simulated cinematic preloading
+    const interval = setInterval(() => {
+      setProgress((prev) => {
+        if (prev >= 100) {
+          clearInterval(interval);
+          return 100;
+        }
+        return prev + 5;
       });
+    }, 50);
 
-      await Promise.all(promises);
-      const isMobile = window.innerWidth < 768;
-      setTimeout(() => setIsReady(true), isMobile ? 600 : 1200);
+    const isMobile = window.innerWidth < 768;
+    const timer = setTimeout(() => {
+      setIsReady(true);
+      setProgress(100);
+    }, isMobile ? 800 : 1500);
+
+    return () => {
+      clearInterval(interval);
+      clearTimeout(timer);
     };
-
-    preload();
   }, []);
 
   const closeModals = () => setActiveModal(null);

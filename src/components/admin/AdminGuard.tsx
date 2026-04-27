@@ -11,11 +11,38 @@ export default function AdminGuard({ children }: { children: React.ReactNode }) 
   const [isAuthorized, setIsAuthorized] = useState(false);
 
   useEffect(() => {
-    // AdminGuard temporarily disabled for testing
-    setIsAuthorized(true);
-  }, []);
+    async function checkRole() {
+      if (isLoading) return;
+      if (!user) {
+        router.push("/login");
+        return;
+      }
 
-  if (isLoading) {
+      try {
+        const supabase = createClient();
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("role")
+          .eq("id", user.id)
+          .single();
+
+        if (error || !data || !["admin", "owner", "team"].includes(data.role)) {
+          console.error("Unauthorized access attempt:", error);
+          router.push("/");
+          return;
+        }
+
+        setIsAuthorized(true);
+      } catch (err) {
+        console.error("AdminGuard check failed:", err);
+        router.push("/");
+      }
+    }
+
+    checkRole();
+  }, [user, isLoading, router]);
+
+  if (isLoading || !isAuthorized) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
         <Loader2 className="animate-spin text-purple-500" size={48} />

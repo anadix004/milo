@@ -32,20 +32,15 @@ export async function POST(request: Request) {
         if (error) throw error;
         return NextResponse.json({ success: true, message: 'Existing user promoted to Admin' });
       } else {
-        // User does not exist, send an invite
-        const { data, error } = await supabaseAdmin.auth.admin.inviteUserByEmail(email);
+        // User does not exist, send an invite with the 'admin' role in metadata
+        // The database trigger public.handle_new_user will handle profile creation
+        const { error } = await supabaseAdmin.auth.admin.inviteUserByEmail(email, {
+          data: { role: 'admin' }
+        });
         
         if (error) {
           return NextResponse.json({ error: error.message }, { status: 400 });
         }
-        
-        // Wait a short moment to ensure the database trigger creates the profile row
-        // before we try to update the role to 'admin'
-        setTimeout(async () => {
-           if (data?.user) {
-             await supabaseAdmin.from('profiles').update({ role: 'admin' }).eq('id', data.user.id);
-           }
-        }, 1500);
         
         return NextResponse.json({ success: true, message: 'Invitation sent and Admin access granted' });
       }

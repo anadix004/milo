@@ -95,6 +95,14 @@ export default function EventSubmission({ isOpen, onClose, onAuthRedirect }: Eve
     }
   };
 
+  const hashAadhaar = async (id: string) => {
+    if (!id) return "";
+    const msgUint8 = new TextEncoder().encode(id.trim());
+    const hashBuffer = await crypto.subtle.digest("SHA-256", msgUint8);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isAuthenticated || !user) return;
@@ -120,6 +128,8 @@ export default function EventSubmission({ isOpen, onClose, onAuthRedirect }: Eve
         videoUrl = supabase.storage.from("event-assets").getPublicUrl(fileName).data.publicUrl;
       }
 
+      const hashedAadhaar = await hashAadhaar(formData.aadhaarId);
+
       const { error: dbError } = await supabase.from("events").insert({
         title: formData.title,
         description: formData.description,
@@ -129,7 +139,7 @@ export default function EventSubmission({ isOpen, onClose, onAuthRedirect }: Eve
         price: formData.price,
         category: formData.category,
         venue_address: formData.venueAddress,
-        aadhaar_id: formData.aadhaarId,
+        aadhaar_id: hashedAadhaar,
         ticket_links: ticketLinks.filter(l => l.url.trim() !== ""),
         image: imageUrl || "https://images.unsplash.com/photo-1492684223066-81342ee5ff30",
         video_url: videoUrl,
