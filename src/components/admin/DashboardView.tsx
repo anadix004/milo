@@ -89,7 +89,7 @@ export default function DashboardView() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: idx * 0.1 }}
-            className="p-8 bg-white/[0.03] border border-white/10 rounded-[2rem] hover:bg-white/[0.05] transition-all group"
+            className="p-6 md:p-8 bg-white/[0.03] border border-white/10 rounded-[2rem] hover:bg-white/[0.05] transition-all group"
           >
             <div className={clsx("w-12 h-12 rounded-2xl flex items-center justify-center mb-6 transition-transform group-hover:scale-110", stat.bg, stat.color)}>
               {stat.icon}
@@ -104,7 +104,7 @@ export default function DashboardView() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Placeholder for Analytics Chart */}
-        <div className="p-8 bg-white/[0.03] border border-white/10 rounded-[2.5rem] h-[400px] flex flex-col items-center justify-center text-center">
+        <div className="p-6 md:p-8 bg-white/[0.03] border border-white/10 rounded-[2.5rem] h-[400px] flex flex-col items-center justify-center text-center">
           <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mb-4 text-white/20">
             <MapPin size={32} />
           </div>
@@ -112,7 +112,7 @@ export default function DashboardView() {
           <p className="text-white/10 font-mono text-[8px] uppercase tracking-widest mt-2">Chart module connecting...</p>
         </div>
 
-        <div className="p-8 bg-white/[0.03] border border-white/10 rounded-[2.5rem] h-[400px] flex flex-col items-center justify-center text-center">
+        <div className="p-6 md:p-8 bg-white/[0.03] border border-white/10 rounded-[2.5rem] h-[400px] flex flex-col items-center justify-center text-center">
           <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mb-4 text-white/20">
             <Activity size={32} />
           </div>

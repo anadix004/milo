@@ -103,77 +103,79 @@ export default function TeamPanel() {
         </div>
       </div>
 
-      <div className="flex gap-8 h-[calc(100%-80px)]">
+      <div className="flex flex-col md:flex-row gap-4 md:gap-8 h-full min-h-0 pb-20 md:pb-0">
         {/* Left Side: Admins List */}
-        <div className="flex-1 overflow-auto bg-neutral-950/50 rounded-3xl border border-white/5">
-          <div className="grid grid-cols-[2fr_1fr_1fr_1fr] gap-4 p-8 border-b border-white/10 text-[9px] font-mono uppercase tracking-[0.2em] text-white/40">
-            <div>Administrator</div>
-            <div>Role</div>
-            <div>Joined</div>
-            <div className="text-right">Actions</div>
-          </div>
+        <div className="flex-1 overflow-auto bg-neutral-950/50 rounded-3xl border border-white/5 order-last md:order-first">
+          <div className="min-w-[600px] md:min-w-0">
+            <div className="grid grid-cols-[2fr_1fr_1fr_1fr] gap-4 p-4 md:p-8 border-b border-white/10 text-[9px] font-mono uppercase tracking-[0.2em] text-white/40">
+              <div>Administrator</div>
+              <div>Role</div>
+              <div>Joined</div>
+              <div className="text-right">Actions</div>
+            </div>
 
-          {isLoading ? (
-            <div className="flex justify-center p-12">
-              <Loader2 className="animate-spin text-purple-500" size={32} />
-            </div>
-          ) : (
-            <div className="divide-y divide-white/5">
-              {admins.map((admin) => (
-                <motion.div 
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  key={admin.id} 
-                  className="grid grid-cols-[2fr_1fr_1fr_1fr] gap-4 p-8 items-center hover:bg-white/[0.02] transition-colors"
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-purple-500/20 to-cyan-500/20 flex items-center justify-center text-purple-400 font-black">
-                      <Shield size={18} />
-                    </div>
-                    <div>
-                      <p className="text-white font-black uppercase tracking-tight">@{admin.username || admin.email.split('@')[0]}</p>
-                      <p className="text-white/40 text-[10px] font-mono truncate max-w-[200px]">{admin.email}</p>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <span className={clsx(
-                      "px-4 py-1 rounded-full text-[8px] font-black uppercase tracking-[0.2em]",
-                      admin.role === "owner" 
-                        ? "bg-amber-500/20 text-amber-400 border border-amber-500/30" 
-                        : "bg-purple-500/20 text-purple-400 border border-purple-500/30"
-                    )}>
-                      {admin.role}
-                    </span>
-                  </div>
-                  
-                  <div className="text-white/40 font-mono text-[10px]">
-                    {new Date(admin.created_at).toLocaleDateString()}
-                  </div>
-                  
-                  <div className="flex justify-end">
-                    {admin.email !== "milo.anadi@gmail.com" ? (
-                      <button 
-                        onClick={() => revokeAccess(admin.email)}
-                        className="p-3 rounded-2xl bg-rose-500/10 text-rose-500 hover:bg-rose-500 hover:text-black transition-all"
-                        title="Revoke Access"
-                      >
-                        <UserX size={18} />
-                      </button>
-                    ) : (
-                      <div className="p-3 rounded-2xl bg-white/5 text-white/20" title="Core Owner (Cannot be removed)">
-                        <ShieldCheck size={18} />
+            {isLoading ? (
+              <div className="flex justify-center p-12">
+                <Loader2 className="animate-spin text-purple-500" size={32} />
+              </div>
+            ) : (
+              <div className="divide-y divide-white/5">
+                {admins.map((admin) => (
+                  <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    key={admin.id} 
+                    className="grid grid-cols-[2fr_1fr_1fr_1fr] gap-4 p-4 md:p-8 items-center hover:bg-white/[0.02] transition-colors"
+                  >
+                    <div className="flex items-center gap-2 md:gap-4 overflow-hidden">
+                      <div className="w-8 h-8 md:w-10 md:h-10 shrink-0 rounded-2xl bg-gradient-to-br from-purple-500/20 to-cyan-500/20 flex items-center justify-center text-purple-400 font-black">
+                        <Shield size={16} />
                       </div>
-                    )}
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          )}
+                      <div className="min-w-0">
+                        <p className="text-white font-black uppercase tracking-tight text-[10px] md:text-sm truncate">@{admin.username || admin.email.split('@')[0]}</p>
+                        <p className="text-white/40 text-[8px] md:text-[10px] font-mono truncate">{admin.email}</p>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <span className={clsx(
+                        "px-2 md:px-4 py-1 rounded-full text-[8px] font-black uppercase tracking-[0.2em]",
+                        admin.role === "owner" 
+                          ? "bg-amber-500/20 text-amber-400 border border-amber-500/30" 
+                          : "bg-purple-500/20 text-purple-400 border border-purple-500/30"
+                      )}>
+                        {admin.role}
+                      </span>
+                    </div>
+                    
+                    <div className="text-white/40 font-mono text-[8px] md:text-[10px]">
+                      {new Date(admin.created_at).toLocaleDateString()}
+                    </div>
+                    
+                    <div className="flex justify-end">
+                      {admin.email !== "milo.anadi@gmail.com" ? (
+                        <button 
+                          onClick={() => revokeAccess(admin.email)}
+                          className="p-2 md:p-3 rounded-xl md:rounded-2xl bg-rose-500/10 text-rose-500 hover:bg-rose-500 hover:text-black transition-all"
+                          title="Revoke Access"
+                        >
+                          <UserX size={16} />
+                        </button>
+                      ) : (
+                        <div className="p-2 md:p-3 rounded-xl md:rounded-2xl bg-white/5 text-white/20" title="Core Owner (Cannot be removed)">
+                          <ShieldCheck size={16} />
+                        </div>
+                      )}
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Right Side: Add New Admin */}
-        <div className="w-96 shrink-0 space-y-6">
+        <div className="w-full md:w-96 shrink-0 space-y-4 md:space-y-6">
           <div className="bg-white/[0.02] border border-white/5 rounded-3xl p-8">
             <h3 className="text-xl font-black text-white uppercase tracking-tight mb-2">Grant Access</h3>
             <p className="text-white/40 font-mono text-[10px] uppercase tracking-[0.2em] mb-8 leading-relaxed">

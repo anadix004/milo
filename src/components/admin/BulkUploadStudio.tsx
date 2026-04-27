@@ -283,7 +283,7 @@ export default function BulkUploadStudio() {
   return (
     <div className="flex flex-col h-full bg-black">
       {/* ── Header ── */}
-      <div className="flex items-start justify-between mb-6">
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6">
         <div>
           <h2 className="text-3xl font-black text-white uppercase tracking-tighter">
             Bulk Upload Studio
@@ -313,7 +313,7 @@ export default function BulkUploadStudio() {
       </div>
 
       {/* ── Mode Tabs ── */}
-      <div className="flex gap-2 mb-6">
+      <div className="flex flex-wrap gap-2 mb-6">
         {(["manual", "scrape"] as const).map((mode) => (
           <button
             key={mode}
@@ -350,7 +350,7 @@ export default function BulkUploadStudio() {
               <button
                 onClick={handlePublish}
                 disabled={isPublishing || events.length === 0}
-                className="flex items-center gap-2 px-8 py-3 bg-white text-black rounded-full font-black text-[10px] uppercase tracking-widest hover:scale-105 transition-all disabled:opacity-50 disabled:hover:scale-100"
+                className="w-full md:w-auto flex items-center justify-center gap-2 px-8 py-3 bg-white text-black rounded-full font-black text-[10px] uppercase tracking-widest hover:scale-105 transition-all disabled:opacity-50 disabled:hover:scale-100"
               >
                 {isPublishing ? (
                   <>
@@ -531,7 +531,7 @@ export default function BulkUploadStudio() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* File drop zone */}
                   <div className="flex flex-col gap-3">
                     <label className="text-[9px] font-black uppercase tracking-widest text-white/40">
@@ -716,7 +716,7 @@ export default function BulkUploadStudio() {
               >
                 {/* Summary stats */}
                 {scrapeSummary && (
-                  <div className="grid grid-cols-4 gap-4">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     {[
                       { label: "Total", value: scrapeSummary.total, color: "text-white" },
                       { label: "Synced", value: scrapeSummary.success, color: "text-emerald-400" },

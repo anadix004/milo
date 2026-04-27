@@ -50,7 +50,7 @@ export default function UserDirectory() {
 
   return (
     <div className="flex flex-col h-full bg-black">
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8">
         <div>
           <h2 className="text-3xl font-black text-white uppercase tracking-tighter italic">
             User Directory
@@ -64,7 +64,7 @@ export default function UserDirectory() {
           <input 
             type="text" 
             placeholder="FIND USER..." 
-            className="pl-10 pr-6 py-3 bg-white/[0.05] border border-white/10 rounded-full text-[10px] text-white outline-none focus:border-white/30 font-black tracking-widest uppercase w-64"
+            className="pl-10 pr-6 py-3 bg-white/[0.05] border border-white/10 rounded-full text-[10px] text-white outline-none focus:border-white/30 font-black tracking-widest uppercase w-full md:w-64"
           />
         </div>
       </div>
