@@ -49,7 +49,6 @@ export const metadata: Metadata = {
     description: "Discover exclusive events and secret parties in real-time.",
     images: ['https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=1200&h=630&fit=crop'],
   },
-  themeColor: '#000000',
   manifest: '/manifest.ts',
 };
 
@@ -58,6 +57,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   viewportFit: "cover",
+  themeColor: '#000000',
 };
 
 export default function RootLayout({
