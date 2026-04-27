@@ -5,7 +5,7 @@ import { NotificationProvider } from "@/components/NotificationContext";
 import { AuthProvider } from "@/components/AuthContext";
 import SmoothScroll from "@/components/SmoothScroll";
 import dynamic from "next/dynamic";
-const CookieConsent = dynamic(() => import("@/components/CookieConsent"), { ssr: false });
+const CookieConsent = dynamic(() => import("@/components/CookieConsent"));
 
 const lexend = Lexend({
   subsets: ["latin"],
