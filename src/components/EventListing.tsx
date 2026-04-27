@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
 import { Search, MapPin, Calendar, Clock, Filter, Star, ChevronRight, X, Music, Trophy, Layout, Search as SearchIcon, Heart, Share2, Ticket, Check, ArrowUpDown, Send, Loader2 } from "lucide-react";
 import clsx from "clsx";
 import { createClient } from "@/utils/supabase/client";
@@ -554,7 +555,7 @@ function FeaturedCarousel({ items, onExpand }: { items: EventData[], onExpand: (
             {item.video_url ? (
               <video src={item.video_url} autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
             ) : (
-              <img src={item.image} alt={item.title} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+              <Image src={item.image} alt={item.title} fill className="object-cover transition-transform duration-700 group-hover:scale-105" priority sizes="(max-width: 768px) 100vw, 85vw" />
             )}
             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
             <div className="absolute inset-x-0 bottom-0 p-8">
@@ -589,7 +590,7 @@ function EventGridCard({ event, onExpand }: { event: EventData, onExpand: (e: Ev
       {event.video_url ? (
         <video src={event.video_url} autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover grayscale transition-all duration-700 group-hover:grayscale-0 group-hover:scale-105" />
       ) : (
-        <img src={event.image} alt={event.title} className="absolute inset-0 w-full h-full object-cover grayscale transition-all duration-700 group-hover:grayscale-0 group-hover:scale-105" />
+        <Image src={event.image} alt={event.title} fill className="object-cover grayscale transition-all duration-700 group-hover:grayscale-0 group-hover:scale-105" sizes="(max-width: 768px) 100vw, 50vw" />
       )}
       <div className="absolute inset-0 bg-black/60 group-hover:bg-black/40 transition-colors" />
       <div className="absolute inset-x-0 bottom-0 p-8 z-10">
@@ -638,7 +639,7 @@ function EventDetailView({
         {event.video_url ? (
            <video src={event.video_url} autoPlay muted loop playsInline className="w-full h-full object-cover" />
         ) : (
-           <img src={event.image} alt={event.title} className="w-full h-full object-cover" />
+           <Image src={event.image} alt={event.title} fill priority className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
         )}
         <div className="absolute inset-0 bg-gradient-to-r from-black via-transparent to-transparent hidden md:block" />
         {isMobile && (
@@ -659,9 +660,9 @@ function EventDetailView({
         {/* Social FOMO Component */}
         <div className="flex items-center gap-4 bg-white/[0.02] border border-white/5 p-4 rounded-2xl w-fit mt-6 mb-6">
            <div className="flex -space-x-3 shrink-0">
-             <img src="https://i.pravatar.cc/100?img=12" className="w-8 h-8 rounded-full border-2 border-black object-cover" />
-             <img src="https://i.pravatar.cc/100?img=4" className="w-8 h-8 rounded-full border-2 border-black object-cover" />
-             <img src="https://i.pravatar.cc/100?img=9" className="w-8 h-8 rounded-full border-2 border-black object-cover" />
+             <Image src="https://i.pravatar.cc/100?img=12" width={32} height={32} alt="User" className="rounded-full border-2 border-black object-cover" />
+             <Image src="https://i.pravatar.cc/100?img=4" width={32} height={32} alt="User" className="rounded-full border-2 border-black object-cover" />
+             <Image src="https://i.pravatar.cc/100?img=9" width={32} height={32} alt="User" className="rounded-full border-2 border-black object-cover" />
              <FomoCounter />
            </div>
            <div className="flex-1">
@@ -743,7 +744,7 @@ function EventDetailView({
                 className="group relative aspect-video rounded-2xl overflow-hidden cursor-pointer border border-white/5" 
                 onClick={() => { onClose(); onSelectEvent(re); }}
               >
-                <img src={re.image} className="absolute inset-0 w-full h-full object-cover transition-transform group-hover:scale-105" />
+                <Image src={re.image} alt={re.title || "Related"} fill className="object-cover transition-transform group-hover:scale-105" sizes="(max-width: 768px) 50vw, 33vw" />
                 <div className="absolute inset-0 bg-black/60 group-hover:bg-black/40 transition-colors" />
                 <div className="absolute inset-0 p-4 flex flex-col justify-end">
                   <p className="text-white font-black text-[9px] uppercase tracking-tight leading-tight">{re.title}</p>

@@ -4,7 +4,8 @@ import "./globals.css";
 import { NotificationProvider } from "@/components/NotificationContext";
 import { AuthProvider } from "@/components/AuthContext";
 import SmoothScroll from "@/components/SmoothScroll";
-import CookieConsent from "@/components/CookieConsent";
+import dynamic from "next/dynamic";
+const CookieConsent = dynamic(() => import("@/components/CookieConsent"), { ssr: false });
 
 const lexend = Lexend({
   subsets: ["latin"],

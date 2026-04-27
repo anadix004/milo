@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Video, Image as ImageIcon, X, Loader2 } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import { useAuth } from "./AuthContext";
 import { useNotifications } from "./NotificationContext";
-import { useEffect } from "react";
+import Image from "next/image";
 import clsx from "clsx";
 
 interface VibeCheckProps {
@@ -132,7 +132,7 @@ export default function VibeCheck({ eventId }: VibeCheckProps) {
           <div key={story.id} className="flex flex-col items-center gap-2 shrink-0 cursor-pointer group" onClick={() => setActiveStory(story)}>
             <div className="relative w-16 h-16 rounded-full p-[2px] bg-gradient-to-tr from-purple-500 to-cyan-500 group-hover:scale-105 transition-transform">
               <div className="w-full h-full rounded-full border-2 border-black overflow-hidden relative">
-                <img src={story.user_avatar || story.userAvatar || "https://i.pravatar.cc/100"} alt={story.user_name || story.userName} className="w-full h-full object-cover" />
+                <Image src={story.user_avatar || story.userAvatar || "https://i.pravatar.cc/100"} alt={story.user_name || story.userName || "User"} fill className="object-cover" sizes="64px" />
                 {story.type === "video" && (
                    <div className="absolute bottom-0 right-0 w-4 h-4 bg-purple-500 rounded-full flex items-center justify-center border border-black">
                      <Video size={8} className="text-white" />
@@ -168,14 +168,16 @@ export default function VibeCheck({ eventId }: VibeCheckProps) {
               className="relative w-full max-w-sm aspect-[9/16] rounded-2xl overflow-hidden bg-black shadow-2xl shadow-purple-500/20"
             >
               <div className="absolute top-4 left-4 z-10 flex items-center gap-3">
-                <img src={activeStory.user_avatar || activeStory.userAvatar} className="w-10 h-10 rounded-full border border-white/20" />
+                <div className="relative w-10 h-10 rounded-full border border-white/20 overflow-hidden">
+                  <Image src={activeStory.user_avatar || activeStory.userAvatar || "https://i.pravatar.cc/100"} alt="User" fill className="object-cover" sizes="40px" />
+                </div>
                 <span className="font-black text-white text-sm tracking-widest uppercase drop-shadow-md">{activeStory.user_name || activeStory.userName}</span>
               </div>
               
               {activeStory.type === "video" ? (
                 <video src={activeStory.url} autoPlay loop playsInline className="w-full h-full object-cover" />
               ) : (
-                <img src={activeStory.url} className="w-full h-full object-cover" />
+                <Image src={activeStory.url} alt="Story" fill className="object-cover" priority sizes="(max-width: 768px) 100vw, 400px" />
               )}
             </motion.div>
           </motion.div>

@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Ticket, Bookmark, History, ExternalLink, QrCode, Loader2 } from "lucide-react";
+import Image from "next/image";
+import { Ticket, Bookmark, History, QrCode, Loader2 } from "lucide-react";
 import clsx from "clsx";
 import { EVENTS } from "@/constants/events";
 import { createClient } from "@/utils/supabase/client";
@@ -110,7 +111,7 @@ export default function MyRadar() {
                 <div key={event.id} className="w-full md:w-[400px] flex rounded-2xl overflow-hidden bg-white/5 border border-white/10 group cursor-pointer hover:border-purple-500/50 transition-colors relative">
                   {/* Event Image */}
                   <div className="w-1/3 relative">
-                    <img src={event.image || "https://images.unsplash.com/photo-1540039155732-684735035727?w=800"} alt={event.title} className="w-full h-full object-cover" />
+                    <Image src={event.image || "https://images.unsplash.com/photo-1540039155732-684735035727?w=800"} alt={event.title} fill className="object-cover" sizes="(max-width: 768px) 33vw, 133px" />
                     <div className="absolute inset-0 bg-black/40 mix-blend-multiply" />
                   </div>
                   {/* Pass Details */}
@@ -140,7 +141,7 @@ export default function MyRadar() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {saved.map(event => (
               <div key={event.id} className="group relative aspect-[4/5] rounded-2xl overflow-hidden cursor-pointer border border-white/5">
-                 <img src={event.image} alt={event.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                 <Image src={event.image} alt={event.title} fill className="object-cover group-hover:scale-105 transition-transform duration-700" sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw" />
                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-80" />
                  <div className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center">
                     <Bookmark size={14} className="text-cyan-400" fill="currentColor" />

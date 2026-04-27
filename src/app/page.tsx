@@ -15,10 +15,12 @@ const CITY_IMAGES = [
 ];
 
 import Header from "@/components/Header";
-import ProfileSidebar from "@/components/ProfileSidebar";
-import EventSubmission from "@/components/EventSubmission";
-import AuthModal from "@/components/AuthModal";
-import NotificationSidebar from "@/components/NotificationSidebar";
+import dynamic from "next/dynamic";
+
+const ProfileSidebar = dynamic(() => import("@/components/ProfileSidebar"), { ssr: false });
+const EventSubmission = dynamic(() => import("@/components/EventSubmission"), { ssr: false });
+const AuthModal = dynamic(() => import("@/components/AuthModal"), { ssr: false });
+const NotificationSidebar = dynamic(() => import("@/components/NotificationSidebar"), { ssr: false });
 
 import BottomNav from "@/components/mobile/BottomNav";
 
