@@ -8,11 +8,15 @@ import { isValidUrl, normalizeCategory, COMMON_URL_COLUMNS } from "@/utils/scrap
 const CONCURRENCY = 3;
 const SCRAPE_TIMEOUT_MS = 15_000;
 const IMAGE_TIMEOUT_MS = 10_000;
+
 const SCRAPE_HEADERS = {
-  "User-Agent":
-    "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)",
-  Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-  "Accept-Language": "en-US,en;q=0.5",
+  "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+  "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+  "Accept-Language": "en-US,en;q=0.9",
+  "Sec-Ch-Ua": '"Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"',
+  "Sec-Ch-Ua-Mobile": "?0",
+  "Sec-Ch-Ua-Platform": '"Windows"',
+  "Upgrade-Insecure-Requests": "1",
   "Cache-Control": "no-cache",
 };
 
@@ -31,12 +35,40 @@ interface ScrapedData {
   venue: string;
 }
 
+/**
+ * Detects if a URL points to the project's Supabase instance
+ */
+function isProjectSupabaseUrl(url: string): boolean {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  if (!supabaseUrl) return false;
+  try {
+    const projectHost = new URL(supabaseUrl).hostname;
+    return new URL(url).hostname === projectHost;
+  } catch {
+    return false;
+  }
+}
+
 async function scrapeUrl(url: string): Promise<ScrapedData> {
+  const headers: Record<string, string> = { ...SCRAPE_HEADERS };
+  
+  // If target is our own Supabase, we MUST include the API key
+  if (isProjectSupabaseUrl(url)) {
+    headers["apikey"] = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+    headers["Authorization"] = `Bearer ${headers["apikey"]}`;
+  }
+
   const res = await fetch(url, {
-    headers: SCRAPE_HEADERS,
+    headers,
     signal: AbortSignal.timeout(SCRAPE_TIMEOUT_MS),
   });
-  if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+  
+  if (!res.ok) {
+    if (res.status === 403) {
+      throw new Error(`HTTP 403: Forbidden. The site blocked our scraper. Try a different URL or manual entry.`);
+    }
+    throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+  }
 
   const html = await res.text();
   const $ = cheerio.load(html);
@@ -127,8 +159,14 @@ async function reHostImage(
 ): Promise<string> {
   if (!imageUrl) return "";
   try {
+    const headers: Record<string, string> = { ...SCRAPE_HEADERS };
+    if (isProjectSupabaseUrl(imageUrl)) {
+      headers["apikey"] = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+      headers["Authorization"] = `Bearer ${headers["apikey"]}`;
+    }
+
     const res = await fetch(imageUrl, {
-      headers: { "User-Agent": SCRAPE_HEADERS["User-Agent"] },
+      headers,
       signal: AbortSignal.timeout(IMAGE_TIMEOUT_MS),
     });
     if (!res.ok) return imageUrl;
@@ -216,6 +254,20 @@ export async function POST(req: NextRequest) {
         }
 
         const supabase = getSupabaseAdmin();
+        
+        // Quick connectivity check
+        const { error: healthCheck } = await supabase.from("events").select("id", { count: "exact", head: true }).limit(1);
+        if (healthCheck) {
+          console.error("Supabase health check failed:", healthCheck);
+          // If it's the "No API key" error, we want to give a clear message
+          const errorMsg = healthCheck.message === "No API key found in request" 
+            ? "Database authentication failed (No API key). Please check your SUPABASE_SERVICE_ROLE_KEY."
+            : `Database connection failed: ${healthCheck.message}`;
+          controller.enqueue(sse({ type: "error", message: errorMsg }));
+          controller.close();
+          return;
+        }
+
         let successCount = 0, failedCount = 0, skippedCount = 0;
 
         // Process in concurrent batches of CONCURRENCY

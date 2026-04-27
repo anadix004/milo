@@ -12,25 +12,23 @@ export function getSupabaseAdmin(): SupabaseClient {
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-    if (!url && !key) {
+    if (!url || !key || key === "undefined" || key === "null") {
+      const missing = [];
+      if (!url) missing.push("NEXT_PUBLIC_SUPABASE_URL");
+      if (!key || key === "undefined" || key === "null") missing.push("SUPABASE_SERVICE_ROLE_KEY");
+      
       throw new Error(
-        "Env vars missing: NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are both undefined."
-      );
-    }
-    if (!url) {
-      throw new Error(
-        "Env var missing: NEXT_PUBLIC_SUPABASE_URL is undefined."
-      );
-    }
-    if (!key) {
-      throw new Error(
-        "Env var missing: SUPABASE_SERVICE_ROLE_KEY is undefined."
+        `Critical: Supabase Admin configuration missing or invalid. Missing: ${missing.join(", ")}. Ensure these are set in your environment variables.`
       );
     }
 
-    _supabaseAdmin = createClient(url, key, {
-      auth: { autoRefreshToken: false, persistSession: false },
-    });
+    try {
+      _supabaseAdmin = createClient(url, key, {
+        auth: { autoRefreshToken: false, persistSession: false },
+      });
+    } catch (err) {
+      throw new Error(`Failed to initialize Supabase Admin client: ${err instanceof Error ? err.message : "Unknown error"}`);
+    }
   }
   return _supabaseAdmin;
 }
