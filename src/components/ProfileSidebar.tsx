@@ -2,6 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { User, Mail, Globe, Image as ImageIcon, QrCode, LogOut, X, ChevronRight, ShieldCheck, Camera, Loader2, Shield } from "lucide-react";
+import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import clsx from "clsx";
@@ -124,7 +125,7 @@ export default function ProfileSidebar({ isOpen, onClose, onAuthClick }: Profile
             isGhostMode ? "bg-emerald-500/10 shadow-[0_0_30px_rgba(16,185,129,0.3)] border-emerald-400" : "border-white/5 hover:border-white/20"
           )}>
             {user?.avatar_url ? (
-              <img src={user.avatar_url} alt="Profile" className="w-full h-full object-cover" />
+              <Image src={user.avatar_url} alt="Profile" fill className="object-cover" sizes="128px" />
             ) : (
               <User size={40} className={clsx("transition-colors", isGhostMode ? "text-emerald-400" : "text-white/20")} />
             )}
@@ -267,11 +268,12 @@ export default function ProfileSidebar({ isOpen, onClose, onAuthClick }: Profile
                     className="overflow-hidden"
                   >
                     <div className="p-8 bg-white rounded-[2rem] flex flex-col items-center space-y-6">
-                      <div className="p-2 bg-white rounded-xl border-4 border-black/5 shadow-2xl">
-                         <img 
+                      <div className="p-2 bg-white rounded-xl border-4 border-black/5 shadow-2xl relative w-48 h-48">
+                         <Image 
                             src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=milo:${user?.id || 'guest'}&bgcolor=ffffff&color=000000`} 
                             alt="Milo Pass QR"
-                            className="w-48 h-48"
+                            fill
+                            className="p-2"
                          />
                       </div>
                       <div className="flex flex-col items-center gap-2">
