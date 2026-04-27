@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthContext";
 import { Loader2 } from "lucide-react";
+import { createClient } from "@/utils/supabase/client";
 
 export default function AdminGuard({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth();

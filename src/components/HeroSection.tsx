@@ -45,7 +45,7 @@ export default function HeroSection() {
               Your City
             </h1>
             <p className="font-[family-name:var(--font-roboto-mono)] text-[8px] md:text-xs text-white/50 uppercase tracking-[0.5em] font-black">
-              Your city's live social radar.
+              Your city&apos;s live social radar.
             </p>
           </div>
         </div>
