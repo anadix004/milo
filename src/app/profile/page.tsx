@@ -5,9 +5,11 @@ import { Settings } from "lucide-react";
 import DigitalPassport from "@/components/profile/DigitalPassport";
 import MyRadar from "@/components/profile/MyRadar";
 import SettingsModal from "@/components/profile/SettingsModal";
+import ProfileEditModal from "@/components/profile/ProfileEditModal";
 
 export default function ProfilePage() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-black relative pb-24 md:pb-12 pt-20">
@@ -25,12 +27,21 @@ export default function ProfilePage() {
         </div>
 
         {/* Profile Content */}
-        <DigitalPassport />
+        <DigitalPassport onEditProfile={() => setIsEditOpen(true)} />
         <MyRadar />
 
       </div>
 
-      <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
+      <SettingsModal
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+        onEditProfile={() => setIsEditOpen(true)}
+      />
+      
+      <ProfileEditModal
+        isOpen={isEditOpen}
+        onClose={() => setIsEditOpen(false)}
+      />
     </div>
   );
 }

@@ -15,9 +15,11 @@ interface AuthUser extends User {
   is_ghost?: boolean;
   bio?: string;
   location?: string;
+  city?: string;
   instagram?: string;
   twitter?: string;
   spotify?: string;
+  cover_url?: string;
 }
 
 interface AuthContextType {
