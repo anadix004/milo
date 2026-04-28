@@ -2,7 +2,7 @@
 # 1. Technical
 
 - [ ] **Environment Audit:** Verify that all production environment variables in Vercel are correct. Check that you aren't accidentally hitting "Sandbox" or "Test" endpoints for payments or databases.  Double-check that all **Production** keys (Stripe, Firebase, APIs) are set in Vercel and differ from development keys. 
-- [ ] **Console Clean-up:** Open DevTools and ensure there are no `console.log` statements, warnings, or failed network requests in the production build.
+- [x] **Console Clean-up:** Open DevTools and ensure there are no `console.log` statements, warnings, or failed network requests in the production build.
 
 # 2. Quality Assurance
 
