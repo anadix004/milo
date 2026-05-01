@@ -3,26 +3,35 @@
 import { useState, useEffect } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { motion } from "framer-motion";
-import { Loader2, Check, X, Search, Filter } from "lucide-react";
+import { Loader2, Check, X, Search, Filter, Eye, Video } from "lucide-react";
 import clsx from "clsx";
+import { METRO_CITIES } from "@/constants/cities";
 
 export default function ApprovalsGrid() {
   const supabase = createClient();
   const [events, setEvents] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [viewMode, setViewMode] = useState<"pending" | "live">("pending");
+  const [selectedCity, setSelectedCity] = useState<string>("all");
+  const [selectedEvent, setSelectedEvent] = useState<any>(null);
 
   useEffect(() => {
     fetchEvents();
-  }, [viewMode]);
+  }, [viewMode, selectedCity]);
 
   const fetchEvents = async () => {
     setIsLoading(true);
-    const { data } = await supabase
+    let query = supabase
       .from("events")
       .select("*")
       .eq("is_verified", viewMode === "live")
       .order("created_at", { ascending: false });
+      
+    if (selectedCity !== "all") {
+      query = query.eq("cityId", selectedCity);
+    }
+
+    const { data } = await query;
     
     if (data) setEvents(data);
     setIsLoading(false);
@@ -75,6 +84,16 @@ export default function ApprovalsGrid() {
           </div>
         </div>
         <div className="flex gap-4">
+          <select
+            value={selectedCity}
+            onChange={(e) => setSelectedCity(e.target.value)}
+            className="px-6 py-3 bg-white/[0.05] border border-white/10 rounded-full text-[10px] text-white outline-none focus:border-white/30 font-black tracking-widest uppercase appearance-none"
+          >
+            <option value="all" className="bg-black text-white">All Cities</option>
+            {METRO_CITIES.map(c => (
+              <option key={c.id} value={c.id} className="bg-black text-white">{c.label}</option>
+            ))}
+          </select>
           <div className="relative">
             <Search size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40" />
             <input 
@@ -137,9 +156,25 @@ export default function ApprovalsGrid() {
                     </button>
                   </div>
                   <div className="flex gap-2">
-                    {event.image && <div className="w-8 h-8 bg-white/10 rounded overflow-hidden"><img src={event.image} className="w-full h-full object-cover" /></div>}
+                    {event.video_url ? (
+                      <div className="w-8 h-8 bg-white/10 rounded overflow-hidden relative group/video">
+                        <video src={event.video_url} autoPlay loop muted playsInline className="w-full h-full object-cover" />
+                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover/video:opacity-100 transition-opacity">
+                           <Video size={12} className="text-white" />
+                        </div>
+                      </div>
+                    ) : event.image ? (
+                      <div className="w-8 h-8 bg-white/10 rounded overflow-hidden"><img src={event.image} className="w-full h-full object-cover" /></div>
+                    ) : null}
                   </div>
                   <div className="flex items-center justify-end gap-2 opacity-50 group-hover:opacity-100 transition-opacity">
+                    <button 
+                      onClick={() => setSelectedEvent(event)}
+                      className="p-2 bg-white/5 text-white/60 rounded-full hover:bg-white/20 hover:text-white transition-all"
+                      title="View Details"
+                    >
+                      <Eye size={16} />
+                    </button>
                     {viewMode === "pending" ? (
                       <>
                         <button 
@@ -170,6 +205,65 @@ export default function ApprovalsGrid() {
           )}
         </div>
       </div>
+
+      {/* Event Details Modal */}
+      {selectedEvent && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[200] flex items-center justify-center p-4">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-neutral-950 border border-white/10 rounded-3xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+          >
+            <div className="flex justify-between items-start mb-6">
+              <h3 className="text-2xl font-black text-white uppercase tracking-tighter">Event Details</h3>
+              <button onClick={() => setSelectedEvent(null)} className="p-2 text-white/40 hover:text-white bg-white/5 rounded-full"><X size={20} /></button>
+            </div>
+            <div className="space-y-6">
+              {selectedEvent.video_url ? (
+                <video src={selectedEvent.video_url} autoPlay loop muted playsInline className="w-full h-48 object-cover rounded-2xl border border-white/10" />
+              ) : (
+                <img src={selectedEvent.image} className="w-full h-48 object-cover rounded-2xl border border-white/10" />
+              )}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-[10px] text-white/40 uppercase tracking-widest font-black mb-1">Title</p>
+                  <p className="text-white text-sm font-bold uppercase tracking-wide">{selectedEvent.title}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] text-white/40 uppercase tracking-widest font-black mb-1">Category</p>
+                  <p className="text-white text-sm font-bold uppercase tracking-wide">{selectedEvent.category || "N/A"}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] text-white/40 uppercase tracking-widest font-black mb-1">Date</p>
+                  <p className="text-white text-sm font-bold uppercase tracking-wide">{selectedEvent.date}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] text-white/40 uppercase tracking-widest font-black mb-1">Price</p>
+                  <p className="text-white text-sm font-bold uppercase tracking-wide">{selectedEvent.price}</p>
+                </div>
+              </div>
+              <div>
+                <p className="text-[10px] text-white/40 uppercase tracking-widest font-black mb-1">Location</p>
+                <p className="text-white text-sm font-bold tracking-wide">{selectedEvent.location}</p>
+              </div>
+              <div>
+                <p className="text-[10px] text-white/40 uppercase tracking-widest font-black mb-1">Description</p>
+                <p className="text-white/80 text-sm font-mono tracking-wide">{selectedEvent.description}</p>
+              </div>
+              <div className="flex justify-end gap-4 mt-8 pt-6 border-t border-white/10">
+                 {viewMode === "pending" && (
+                    <button 
+                      onClick={() => { handleAction(selectedEvent.id, "approve"); setSelectedEvent(null); }}
+                      className="px-6 py-3 bg-emerald-500 text-black font-black uppercase tracking-widest text-[10px] rounded-full"
+                    >
+                      Approve
+                    </button>
+                 )}
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 }

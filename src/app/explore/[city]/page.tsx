@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { Search, SlidersHorizontal, ArrowUpDown, Plus } from "lucide-react";
 import { useAuth } from "@/components/AuthContext";
 import { useLocation } from "@/components/LocationContext";
+import { createClient } from "@/utils/supabase/client";
 import Header from "@/components/Header";
 import BottomNav from "@/components/mobile/BottomNav";
 import FiltersPanel from "@/components/FiltersPanel";
@@ -70,14 +71,44 @@ export default function ExplorePage() {
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [isSortOpen, setIsSortOpen] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [spotlightEvents, setSpotlightEvents] = useState<any[]>(SPOTLIGHT_EVENTS);
 
   // Auto-slide effect
   useEffect(() => {
+    if (spotlightEvents.length <= 1) return;
     const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % SPOTLIGHT_EVENTS.length);
+      setCurrentSlide((prev) => (prev + 1) % spotlightEvents.length);
     }, 5000);
     return () => clearInterval(timer);
-  }, []);
+  }, [spotlightEvents.length]);
+
+  // Fetch Featured Events
+  useEffect(() => {
+    if (!cityUrl) return;
+    const fetchSpotlight = async () => {
+      const supabase = createClient();
+      let cityCode = cityUrl;
+      if (cityUrl === "delhi") cityCode = "del";
+      if (cityUrl === "mumbai") cityCode = "mum";
+      if (cityUrl === "bengaluru") cityCode = "blr";
+
+      const { data } = await supabase
+        .from("events")
+        .select("*")
+        .eq("featured", true)
+        .eq("cityId", cityCode)
+        .order("created_at", { ascending: false })
+        .limit(3);
+        
+      if (data && data.length > 0) {
+        setSpotlightEvents(data);
+        setCurrentSlide(0);
+      } else {
+        setSpotlightEvents(SPOTLIGHT_EVENTS); // Fallback
+      }
+    };
+    fetchSpotlight();
+  }, [cityUrl]);
 
   // Sync URL city with global context
   useEffect(() => {
@@ -131,13 +162,24 @@ export default function ExplorePage() {
             transition={{ duration: 0.8, ease: "easeInOut" }}
             className="absolute inset-0"
           >
-            <Image
-              src={SPOTLIGHT_EVENTS[currentSlide].image}
-              alt={SPOTLIGHT_EVENTS[currentSlide].title}
-              fill
-              className="object-cover"
-              priority
-            />
+            {spotlightEvents[currentSlide]?.video_url ? (
+              <video
+                src={spotlightEvents[currentSlide].video_url}
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+            ) : (
+              <Image
+                src={spotlightEvents[currentSlide]?.image}
+                alt={spotlightEvents[currentSlide]?.title || "Featured Event"}
+                fill
+                className="object-cover"
+                priority
+              />
+            )}
             {/* Gradients: dark on left to transparent right, dark bottom to transparent up */}
             <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/50 to-transparent" />
             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
@@ -148,28 +190,28 @@ export default function ExplorePage() {
                 Featured Event
               </span>
               <h1 className="text-4xl md:text-6xl font-black text-white uppercase tracking-tighter leading-[0.9] mb-4">
-                {SPOTLIGHT_EVENTS[currentSlide].title}
+                {spotlightEvents[currentSlide]?.title || spotlightEvents[currentSlide]?.name}
               </h1>
               <div className="flex items-center gap-3 text-xs md:text-sm font-mono text-white/70 uppercase tracking-widest mb-4">
-                <span>{SPOTLIGHT_EVENTS[currentSlide].date}</span>
+                <span>{spotlightEvents[currentSlide]?.date}</span>
                 <span className="w-1 h-1 bg-white/50 rounded-full" />
-                <span>{SPOTLIGHT_EVENTS[currentSlide].location}</span>
+                <span>{spotlightEvents[currentSlide]?.location || spotlightEvents[currentSlide]?.cityId}</span>
                 <span className="w-1 h-1 bg-white/50 rounded-full" />
-                <span style={{ color: cityThemeColor }}>{SPOTLIGHT_EVENTS[currentSlide].type}</span>
+                <span style={{ color: cityThemeColor }}>{spotlightEvents[currentSlide]?.category || spotlightEvents[currentSlide]?.type}</span>
               </div>
               <p className="text-sm text-white/60 line-clamp-2 max-w-lg mb-8 leading-relaxed">
-                {SPOTLIGHT_EVENTS[currentSlide].description}
+                {spotlightEvents[currentSlide]?.description}
               </p>
               <div className="flex items-center gap-4">
                 <button 
                   className="px-8 py-3 rounded-xl bg-white text-black font-black uppercase tracking-widest text-xs hover:bg-white/90 transition-transform hover:scale-105 active:scale-95"
-                  onClick={() => router.push(`/explore/${cityUrl}/${SPOTLIGHT_EVENTS[currentSlide].id}`)}
+                  onClick={() => router.push(`/explore/${cityUrl}/${spotlightEvents[currentSlide]?.id}`)}
                 >
                   Get Tickets
                 </button>
                 <button 
                   className="px-8 py-3 rounded-xl bg-white/10 border border-white/20 text-white font-black uppercase tracking-widest text-xs backdrop-blur-md hover:bg-white/20 transition-transform hover:scale-105 active:scale-95"
-                  onClick={() => router.push(`/explore/${cityUrl}/${SPOTLIGHT_EVENTS[currentSlide].id}`)}
+                  onClick={() => router.push(`/explore/${cityUrl}/${spotlightEvents[currentSlide]?.id}`)}
                 >
                   More Info
                 </button>
@@ -180,7 +222,7 @@ export default function ExplorePage() {
 
         {/* Slide Indicators */}
         <div className="absolute bottom-6 right-4 md:right-12 flex items-center gap-2 z-20">
-          {SPOTLIGHT_EVENTS.map((_, index) => (
+          {spotlightEvents.length > 1 && spotlightEvents.map((_, index) => (
             <button
               key={index}
               onClick={() => setCurrentSlide(index)}
