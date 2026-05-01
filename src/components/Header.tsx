@@ -46,7 +46,7 @@ export default function Header({ onProfileClick, onEventClick, onNotificationsCl
       "fixed top-0 inset-x-0 w-full z-[100] transition-all duration-700 ease-in-out pointer-events-none",
       isScrolled ? "bg-black/60 backdrop-blur-2xl border-b border-white/5 py-4" : "pt-4 md:pt-6 py-6"
     )}>
-      <div className="max-w-[1800px] mx-auto px-4 md:px-8 grid grid-cols-3 items-center">
+      <div className="max-w-[1800px] mx-auto px-4 md:px-8 flex items-center justify-between">
         
         {/* Left: Profile & Logo */}
         <div className="flex items-center gap-4 md:gap-6 pointer-events-auto justify-start">
@@ -94,20 +94,20 @@ export default function Header({ onProfileClick, onEventClick, onNotificationsCl
           </Link>
         </div>
 
-        {/* Center: Location Selector */}
-        <div className="flex justify-center pointer-events-auto relative">
-          <button 
-            onClick={() => setIsLocationOpen(!isLocationOpen)}
-            className="hidden md:flex items-center gap-2 px-6 py-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-white transition-colors"
-          >
-            <MapPin size={16} className="text-white/60" />
-            <span className="font-bold text-sm uppercase tracking-wide">{getCityName()}</span>
-          </button>
-          <LocationSelectorPopup isOpen={isLocationOpen} onClose={() => setIsLocationOpen(false)} />
-        </div>
-
         {/* Right: Actions */}
         <div className="flex items-center gap-2 md:gap-4 pointer-events-auto justify-end">
+          {/* Location Selector */}
+          <div className="relative">
+            <button 
+              onClick={() => setIsLocationOpen(!isLocationOpen)}
+              className="hidden md:flex items-center gap-2 px-4 py-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-white transition-colors"
+            >
+              <MapPin size={16} className="text-white/60" />
+              <span className="font-bold text-[11px] uppercase tracking-wider">{getCityName()}</span>
+            </button>
+            <LocationSelectorPopup isOpen={isLocationOpen} onClose={() => setIsLocationOpen(false)} />
+          </div>
+
           <button 
             onClick={onEventClick}
             className="hidden md:flex items-center justify-center w-10 h-10 rounded-xl bg-white/10 border border-white/20 text-white hover:bg-white/20 hover:scale-105 active:scale-95 transition-all duration-300"
