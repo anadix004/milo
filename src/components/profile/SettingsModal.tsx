@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Lock, Bell, EyeOff, LogOut, ChevronRight, UserCircle, ShieldAlert, Loader2, Eye, Check } from "lucide-react";
 import { useAuth } from "@/components/AuthContext";
@@ -32,6 +32,17 @@ export default function SettingsModal({ isOpen, onClose, onEditProfile }: Settin
   });
 
   const isGhostMode = !!(user as any)?.is_ghost;
+
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOpen]);
 
   const handleEditProfile = () => {
     onClose();
@@ -79,20 +90,20 @@ export default function SettingsModal({ isOpen, onClose, onEditProfile }: Settin
   return (
     <AnimatePresence>
       {isOpen && (
-        <>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto p-4 md:p-6">
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100]"
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm"
             onClick={onClose}
           />
           <motion.div 
-            initial={{ y: "100%" }}
-            animate={{ y: 0 }}
-            exit={{ y: "100%" }}
+            initial={{ y: "100%", opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: "100%", opacity: 0 }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="fixed bottom-0 left-0 right-0 md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:bottom-auto md:w-full md:max-w-lg bg-zinc-950 border border-white/10 rounded-t-3xl md:rounded-3xl z-[101] overflow-hidden flex flex-col max-h-[90vh]"
+            className="relative w-full max-w-lg bg-zinc-950 border border-white/10 rounded-3xl z-[101] overflow-hidden flex flex-col max-h-full"
           >
             {/* Header */}
             <div className="flex items-center justify-between p-6 border-b border-white/10 shrink-0 bg-zinc-950 sticky top-0 z-10">

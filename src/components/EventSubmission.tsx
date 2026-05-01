@@ -45,14 +45,6 @@ export default function EventSubmission({ isOpen, onClose, onAuthRedirect }: Eve
   const [ticketLinks, setTicketLinks] = useState([{ name: "", url: "" }]);
   const [media, setMedia] = useState<{ photo: File | null; video: File | null }>({ photo: null, video: null });
 
-  useEffect(() => {
-    if (!isMobile) {
-      if (isOpen) document.body.style.overflow = "hidden";
-      else document.body.style.overflow = "unset";
-    }
-    return () => { document.body.style.overflow = "unset"; };
-  }, [isOpen, isMobile]);
-
   const validateMedia = async (e: React.ChangeEvent<HTMLInputElement>, type: "photo" | "video") => {
     const file = e.target.files?.[0];
     if (!file) return;
