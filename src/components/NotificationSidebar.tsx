@@ -29,14 +29,23 @@ export default function NotificationSidebar({ isOpen, onClose }: NotificationSid
     <div className={clsx("flex flex-col h-full", !isMobile && "p-0")}>
       {/* Header - Desktop Only */}
       {!isMobile && (
-        <div className="p-8 border-b border-white/5 flex items-center justify-between">
-          <div>
-            <h2 className="font-lexend text-xl font-black text-white uppercase tracking-widest">Notification Hub</h2>
-            <p className="font-mono text-[10px] text-white/30 uppercase tracking-[0.4em]">Historical Telemetry</p>
+        <div className="p-8 border-b border-white/5 flex flex-col gap-4">
+          <div className="flex items-center justify-between">
+            <h2 className="font-lexend text-2xl font-black text-white uppercase tracking-tighter">Notifications</h2>
+            <button onClick={onClose} className="p-2 text-white/40 hover:text-white transition-all bg-white/5 rounded-full hover:bg-white/10">
+              <X size={20} />
+            </button>
           </div>
-          <button onClick={onClose} className="p-3 text-white/20 hover:text-white transition-all bg-white/5 rounded-full">
-            <X size={20} />
-          </button>
+          
+          {/* Tabs */}
+          <div className="flex gap-4">
+            <button className="text-white text-sm font-black uppercase tracking-widest pb-2 border-b-2 border-purple-500">
+              All
+            </button>
+            <button className="text-white/40 hover:text-white text-sm font-black uppercase tracking-widest pb-2 border-b-2 border-transparent transition-colors">
+              Unread
+            </button>
+          </div>
         </div>
       )}
 

@@ -3,6 +3,7 @@ import { Lexend, Roboto_Mono, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { NotificationProvider } from "@/components/NotificationContext";
 import { AuthProvider } from "@/components/AuthContext";
+import { LocationProvider } from "@/components/LocationContext";
 import SmoothScroll from "@/components/SmoothScroll";
 import dynamic from "next/dynamic";
 const CookieConsent = dynamic(() => import("@/components/CookieConsent"));
@@ -72,10 +73,12 @@ export default function RootLayout({
       >
         <NotificationProvider>
           <AuthProvider>
-            <SmoothScroll>
-              {children}
-              <CookieConsent />
-            </SmoothScroll>
+            <LocationProvider>
+              <SmoothScroll>
+                {children}
+                <CookieConsent />
+              </SmoothScroll>
+            </LocationProvider>
           </AuthProvider>
         </NotificationProvider>
       </body>

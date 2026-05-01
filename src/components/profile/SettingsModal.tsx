@@ -105,80 +105,28 @@ export default function SettingsModal({ isOpen, onClose, onEditProfile }: Settin
             {/* Content Area */}
             <div className="overflow-y-auto p-6 space-y-8 no-scrollbar">
               
-              {/* Account Security */}
+              {/* Account Details */}
               <section className="space-y-2">
-                <p className="text-[10px] font-mono text-white/40 uppercase tracking-widest px-2">Account & Security</p>
-                <div className="bg-white/[0.02] border border-white/5 rounded-2xl overflow-hidden">
+                <p className="text-[10px] font-mono text-white/40 uppercase tracking-widest px-2">Account Details</p>
+                <div className="bg-white/[0.02] border border-white/5 rounded-2xl overflow-hidden flex flex-col">
                   
-                  {/* Edit Profile */}
-                  <button
-                    onClick={handleEditProfile}
-                    className="w-full flex items-center justify-between p-4 hover:bg-white/5 transition-colors group text-left"
-                  >
-                    <div className="flex items-center gap-3">
-                      <UserCircle size={18} className="text-white/50 group-hover:text-white transition-colors" />
-                      <span className="text-sm font-black text-white/80 group-hover:text-white uppercase tracking-wider transition-colors">Edit Profile Details</span>
-                    </div>
-                    <ChevronRight size={16} className="text-white/20 group-hover:text-white/60 group-hover:translate-x-1 transition-all" />
-                  </button>
-
-                  <div className="h-px w-full bg-white/5" />
-                  
-                  {/* Change Password */}
-                  <div>
-                    <button
-                      onClick={() => setShowPasswordForm(!showPasswordForm)}
-                      className="w-full flex items-center justify-between p-4 hover:bg-white/5 transition-colors group text-left"
-                    >
-                      <div className="flex items-center gap-3">
-                        <Lock size={18} className="text-white/50 group-hover:text-white transition-colors" />
-                        <span className="text-sm font-black text-white/80 group-hover:text-white uppercase tracking-wider transition-colors">Change Password</span>
+                  {[
+                    { label: "Name", value: user?.display_name || user?.full_name || "Anonymous" },
+                    { label: "Phone Number", value: "+91 ••••• •••••" },
+                    { label: "Date of Birth", value: "DD/MM/YYYY" },
+                    { label: "Email Address", value: user?.email || "Not Provided" },
+                    { label: "City", value: (user as any)?.city || "Not Set" },
+                    { label: "Gender", value: "Not Specified" }
+                  ].map((field, idx) => (
+                    <div key={field.label} className={clsx("flex flex-col p-4", idx !== 5 && "border-b border-white/5")}>
+                      <div className="flex justify-between items-center mb-1">
+                        <span className="text-[10px] font-mono text-white/40 uppercase tracking-widest">{field.label}</span>
+                        <button onClick={handleEditProfile} className="text-[10px] font-black text-purple-400 uppercase tracking-widest hover:text-purple-300">Edit</button>
                       </div>
-                      <ChevronRight size={16} className={clsx("text-white/20 transition-all", showPasswordForm && "rotate-90")} />
-                    </button>
-
-                    <AnimatePresence>
-                      {showPasswordForm && (
-                        <motion.div
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: "auto", opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          className="overflow-hidden"
-                        >
-                          <div className="px-4 pb-4 flex gap-2">
-                            <input
-                              type="password"
-                              value={newPassword}
-                              onChange={(e) => setNewPassword(e.target.value)}
-                              placeholder="New password (min 6 chars)"
-                              className="flex-1 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 font-mono text-sm focus:outline-none focus:border-purple-500/50 transition-all"
-                            />
-                            <button
-                              onClick={handleChangePassword}
-                              disabled={isChangingPassword}
-                              className="px-4 py-3 rounded-xl bg-white text-black font-black text-xs uppercase tracking-wider hover:bg-white/90 transition-all disabled:opacity-50"
-                            >
-                              {isChangingPassword ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
-                            </button>
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-
-                  <div className="h-px w-full bg-white/5" />
-                  
-                  {/* 2FA */}
-                  <div className="w-full flex items-center justify-between p-4 text-left opacity-50">
-                    <div className="flex items-center gap-3">
-                      <ShieldAlert size={18} className="text-white/50" />
-                      <div>
-                        <span className="text-sm font-black text-white/80 uppercase tracking-wider">Two-Factor Auth (2FA)</span>
-                        <p className="text-[10px] font-mono text-white/40 mt-1">Coming soon</p>
-                      </div>
+                      <span className="text-sm font-black text-white">{field.value}</span>
                     </div>
-                    <span className="text-xs font-mono uppercase tracking-widest text-rose-400">Disabled</span>
-                  </div>
+                  ))}
+
                 </div>
               </section>
 

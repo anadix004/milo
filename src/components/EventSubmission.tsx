@@ -168,11 +168,12 @@ export default function EventSubmission({ isOpen, onClose, onAuthRedirect }: Eve
         <select 
           value={formData.category} 
           onChange={(e) => setFormData({...formData, category: e.target.value})}
-          className="w-full bg-white/[0.03] border border-white/10 rounded-2xl p-6 text-sm text-white outline-none focus:border-white/30 transition-all font-black tracking-widest appearance-none"
+          className="w-full bg-amber-500/10 border border-amber-500/50 rounded-2xl p-6 text-sm text-amber-500 outline-none focus:border-amber-400 transition-all font-black tracking-widest appearance-none"
           required
         >
+          <option value="" disabled className="bg-black text-white/50">Select a category</option>
           {["Music", "College", "Workshops", "Nightlife", "Networking"].map(cat => (
-            <option key={cat} value={cat} className="bg-black text-white">{cat}</option>
+            <option key={cat} value={cat} className="bg-black text-amber-500">{cat}</option>
           ))}
         </select>
       </div>
@@ -282,15 +283,16 @@ export default function EventSubmission({ isOpen, onClose, onAuthRedirect }: Eve
       {/* Header Hub */}
       <div className={clsx("p-8 border-b border-white/5 flex justify-between items-center", isMobile ? "px-0 pb-6" : "bg-white/[0.02]")}>
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 bg-purple-500/20 rounded-full flex items-center justify-center text-purple-400"><PlusCircle size={24} /></div>
+          <div className="px-3 py-1 bg-green-500/20 border border-green-500/50 rounded-full">
+            <span className="text-[10px] font-black uppercase tracking-widest text-green-400">Milo Origin</span>
+          </div>
           <div>
-            <h2 className="text-white text-xl font-black uppercase tracking-tight">Submit Event</h2>
-            <p className="text-[10px] text-purple-500 uppercase tracking-[0.4em] mt-1 font-black">Event Submission</p>
+            <h2 className="text-white text-xl font-black uppercase tracking-tight">Add Event</h2>
           </div>
         </div>
-        {!isMobile && (
-          <button onClick={resetAndClose} className="text-white/20 hover:text-white transition-colors"><X size={32} /></button>
-        )}
+        <button onClick={resetAndClose} className="text-white/40 hover:text-white transition-colors p-2 rounded-full hover:bg-white/10">
+          <X size={24} />
+        </button>
       </div>
 
       <div className={clsx("flex-1 overflow-y-auto no-scrollbar", isMobile ? "py-6" : "p-8 md:p-12")}>
@@ -344,8 +346,8 @@ export default function EventSubmission({ isOpen, onClose, onAuthRedirect }: Eve
                         Next Sequence <ArrowRight size={14} />
                      </button>
                    ) : (
-                     <button type="submit" disabled={isSubmitting} className="flex-[2] py-5 bg-emerald-500 text-black rounded-2xl font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-2">
-                        {isSubmitting ? <Loader2 className="animate-spin" size={16} /> : <>Authorize <CheckCircle2 size={14} /></>}
+                     <button type="submit" disabled={isSubmitting} className="flex-[2] py-5 bg-white text-black rounded-2xl font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-2">
+                        {isSubmitting ? <Loader2 className="animate-spin" size={16} /> : <>Add to Platform <CheckCircle2 size={14} /></>}
                      </button>
                    )}
                 </div>
@@ -361,7 +363,7 @@ export default function EventSubmission({ isOpen, onClose, onAuthRedirect }: Eve
                   {renderStep4()}
                 </div>
                 <button disabled={isSubmitting} className="w-full bg-white text-black py-8 rounded-full font-black uppercase tracking-widest text-xs hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50">
-                  {isSubmitting ? <Loader2 className="animate-spin mx-auto" /> : "Submit Event"}
+                  {isSubmitting ? <Loader2 className="animate-spin mx-auto" /> : "Add to Platform"}
                 </button>
               </div>
             )}

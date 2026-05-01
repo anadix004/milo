@@ -2,9 +2,29 @@
 
 import clsx from "clsx";
 import { useIsMobile } from "@/hooks/useMediaQuery";
+import { useLocation } from "./LocationContext";
+import { useRouter } from "next/navigation";
+import { useNotifications } from "./NotificationContext";
 
 export default function HeroSection() {
   const isMobile = useIsMobile();
+  const { selectedCity } = useLocation();
+  const router = useRouter();
+  const { addNotification } = useNotifications();
+
+  const handleExplore = () => {
+    if (!selectedCity) {
+      addNotification("system", "Please select your city from the location menu first.");
+      return;
+    }
+    
+    let cityUrl = selectedCity;
+    if (selectedCity === "del") cityUrl = "delhi";
+    if (selectedCity === "mum") cityUrl = "mumbai";
+    if (selectedCity === "blr") cityUrl = "bengaluru";
+    
+    router.push(`/explore/${cityUrl}`);
+  };
 
   return (
     <section className="relative w-full h-screen overflow-hidden">
@@ -35,22 +55,22 @@ export default function HeroSection() {
         <div className="absolute inset-0 flex flex-col items-center justify-center z-40 px-6 text-center pointer-events-none">
           <div className="space-y-6">
             <h1 className="font-[family-name:var(--font-lexend)] text-white text-4xl md:text-8xl font-black uppercase tracking-tighter leading-[0.9] italic">
-              Discover Everything <br />
-              <span className="text-white/40 not-italic tracking-normal">Happening In</span> <br />
-              Your City
+              THE HERO HEADLINE
             </h1>
             <p className="font-[family-name:var(--font-roboto-mono)] text-[8px] md:text-xs text-white/50 uppercase tracking-[0.5em] font-black">
-              Your city's live social radar.
+              &lt;SUBTEXT PLACEHOLDER&gt;
             </p>
           </div>
         </div>
 
-        {/* Bottom Annotations UI */}
-        <div className="absolute z-30 bottom-8 left-1/2 -translate-x-1/2 mix-blend-difference pointer-events-none">
-          <p className="font-[family-name:var(--font-roboto-mono)] text-[8px] md:text-xs text-white/70 tracking-widest uppercase flex flex-col items-center">
-            Scroll to explore
-            <span className="block w-[1px] bg-white/50 animate-pulse h-8 md:h-12 mt-3"></span>
-          </p>
+        {/* Explore Button */}
+        <div className="absolute z-50 bottom-16 left-1/2 -translate-x-1/2">
+          <button 
+            onClick={handleExplore}
+            className="px-12 py-4 bg-white hover:bg-white/90 text-black font-black uppercase tracking-widest text-sm rounded-2xl shadow-[0_0_40px_rgba(255,255,255,0.3)] transition-all hover:scale-105 active:scale-95"
+          >
+            Explore
+          </button>
         </div>
 
         {/* Bottom Fade-out transition */}

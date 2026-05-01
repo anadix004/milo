@@ -2,62 +2,35 @@
 
 import { useState, useEffect } from "react";
 import HeroSection from "@/components/HeroSection";
-import CitySelector from "@/components/CitySelector";
-import EventListing from "@/components/EventListing";
-import FinalCTA from "@/components/FinalCTA";
 import Preloader from "@/components/Preloader";
 import { useAuth } from "@/components/AuthContext";
-
-const CITY_IMAGES = [
-  "/city selection/delhi.png",
-  "/city selection/banglore.png",
-  "/city selection/mumbai.png"
-];
-
 import Header from "@/components/Header";
 import dynamic from "next/dynamic";
+import BottomNav from "@/components/mobile/BottomNav";
 
 const ProfileSidebar = dynamic(() => import("@/components/ProfileSidebar"), { ssr: false });
 const EventSubmission = dynamic(() => import("@/components/EventSubmission"), { ssr: false });
 const AuthModal = dynamic(() => import("@/components/AuthModal"), { ssr: false });
 const NotificationSidebar = dynamic(() => import("@/components/NotificationSidebar"), { ssr: false });
 
-import BottomNav from "@/components/mobile/BottomNav";
-
 export default function Home() {
   const { isAuthenticated } = useAuth();
-  const [selectedCity, setSelectedCity] = useState<string | null>(null);
   const [isReady, setIsReady] = useState(false);
   const [progress, setProgress] = useState(0);
   const [activeModal, setActiveModal] = useState<"profile" | "event" | "auth" | "notifications" | null>(null);
 
   useEffect(() => {
-    let loadedCount = 0;
-
-    const preload = async () => {
-      const promises = CITY_IMAGES.map((src) => {
-        return new Promise((resolve) => {
-          const img = new Image();
-          img.src = src;
-          img.onload = () => {
-            loadedCount++;
-            setProgress((loadedCount / CITY_IMAGES.length) * 100);
-            resolve(true);
-          };
-          img.onerror = () => {
-            loadedCount++;
-            setProgress((loadedCount / CITY_IMAGES.length) * 100);
-            resolve(true);
-          };
-        });
-      });
-
-      await Promise.all(promises);
-      const isMobile = window.innerWidth < 768;
-      setTimeout(() => setIsReady(true), isMobile ? 600 : 1200);
-    };
-
-    preload();
+    // Simulate short preload for video
+    let current = 0;
+    const interval = setInterval(() => {
+      current += 10;
+      setProgress(current);
+      if (current >= 100) {
+        clearInterval(interval);
+        setTimeout(() => setIsReady(true), 500);
+      }
+    }, 50);
+    return () => clearInterval(interval);
   }, []);
 
   const closeModals = () => setActiveModal(null);
@@ -71,7 +44,7 @@ export default function Home() {
   };
 
   return (
-    <main className="w-full bg-[#000000] pb-[80px] md:pb-0">
+    <main className="w-full h-screen bg-[#000000] overflow-hidden flex flex-col">
       <Preloader progress={progress} isReady={isReady} />
       
       <Header 
@@ -109,17 +82,8 @@ export default function Home() {
         onNotificationsClick={() => setActiveModal("notifications")}
       />
 
-      <div className={isReady ? "opacity-100" : "opacity-0 transition-opacity duration-1000"}>
+      <div className={isReady ? "opacity-100 flex-1" : "opacity-0 transition-opacity duration-1000 flex-1"}>
         <HeroSection />
-        <CitySelector 
-          selectedCity={selectedCity} 
-          onSelect={setSelectedCity} 
-        />
-        <EventListing 
-          selectedCity={selectedCity} 
-          onAuthRequired={() => setActiveModal("auth")}
-        />
-        <FinalCTA selectedCity={selectedCity} />
       </div>
     </main>
   );
