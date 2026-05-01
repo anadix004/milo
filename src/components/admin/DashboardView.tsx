@@ -10,7 +10,9 @@ interface Stats {
   totalUsers: number;
   totalEvents: number;
   pendingApprovals: number;
+  pendingApprovals: number;
   totalRSVPs: number;
+  cityDistribution: Record<string, number>;
 }
 
 export default function DashboardView() {
@@ -30,13 +32,19 @@ export default function DashboardView() {
         .from("profiles")
         .select("*", { count: "exact", head: true });
 
-      // Fetch Event Counts
+      // Fetch Event Counts and City info
       const { data: eventData } = await supabase
         .from("events")
-        .select("is_verified");
+        .select("is_verified, cityId");
       
       const totalEvents = eventData?.filter(e => e.is_verified).length || 0;
       const pendingApprovals = eventData?.filter(e => !e.is_verified).length || 0;
+      
+      const cityDistribution = eventData?.reduce((acc: Record<string, number>, event) => {
+         if (!event.cityId) return acc;
+         acc[event.cityId] = (acc[event.cityId] || 0) + 1;
+         return acc;
+      }, {}) || {};
 
       // Fetch RSVP Count
       const { count: rsvpCount } = await supabase
@@ -47,7 +55,8 @@ export default function DashboardView() {
         totalUsers: userCount || 0,
         totalEvents,
         pendingApprovals,
-        totalRSVPs: rsvpCount || 0
+        totalRSVPs: rsvpCount || 0,
+        cityDistribution
       });
     } catch (err) {
       console.error("Error fetching admin stats:", err);
@@ -103,13 +112,33 @@ export default function DashboardView() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Placeholder for Analytics Chart */}
-        <div className="p-6 md:p-8 bg-white/[0.03] border border-white/10 rounded-[2.5rem] h-[400px] flex flex-col items-center justify-center text-center">
-          <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mb-4 text-white/20">
-            <MapPin size={32} />
+        <div className="p-6 md:p-8 bg-white/[0.03] border border-white/10 rounded-[2.5rem] h-[400px] flex flex-col">
+          <div className="flex items-center gap-4 mb-8">
+            <div className="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center text-white/40">
+              <MapPin size={24} />
+            </div>
+            <div>
+              <h4 className="text-white font-black uppercase tracking-widest text-sm">City Distribution</h4>
+              <p className="text-white/40 font-mono text-[10px] uppercase tracking-widest">Events per region</p>
+            </div>
           </div>
-          <h4 className="text-white/20 font-black uppercase tracking-widest text-xs">City Distribution</h4>
-          <p className="text-white/10 font-mono text-[8px] uppercase tracking-widest mt-2">Chart module connecting...</p>
+          
+          <div className="flex-1 overflow-y-auto no-scrollbar space-y-4">
+            {stats?.cityDistribution && Object.keys(stats.cityDistribution).length > 0 ? (
+               Object.entries(stats.cityDistribution)
+                .sort(([,a], [,b]) => b - a)
+                .map(([city, count]) => (
+                 <div key={city} className="flex items-center justify-between p-4 bg-white/5 rounded-2xl">
+                   <span className="text-white font-bold uppercase tracking-widest text-xs">{city}</span>
+                   <span className="text-white/60 font-mono text-sm">{count} Events</span>
+                 </div>
+               ))
+            ) : (
+               <div className="h-full flex items-center justify-center">
+                 <p className="text-white/20 font-mono text-[10px] uppercase tracking-widest">No data available</p>
+               </div>
+            )}
+          </div>
         </div>
 
         <div className="p-6 md:p-8 bg-white/[0.03] border border-white/10 rounded-[2.5rem] h-[400px] flex flex-col items-center justify-center text-center">

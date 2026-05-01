@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { Search, SlidersHorizontal, ArrowUpDown, Plus } from "lucide-react";
 import { useAuth } from "@/components/AuthContext";
 import { useLocation } from "@/components/LocationContext";
+import { createClient } from "@/utils/supabase/client";
 import Header from "@/components/Header";
 import BottomNav from "@/components/mobile/BottomNav";
 import FiltersPanel from "@/components/FiltersPanel";
@@ -12,21 +13,42 @@ import SortByPanel from "@/components/SortByPanel";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import { TiltCard } from "@/components/TiltCard";
+import { motion, AnimatePresence } from "framer-motion";
 
 const ProfileSidebar = dynamic(() => import("@/components/ProfileSidebar"), { ssr: false });
 const EventSubmission = dynamic(() => import("@/components/EventSubmission"), { ssr: false });
 const NotificationSidebar = dynamic(() => import("@/components/NotificationSidebar"), { ssr: false });
 
-// Mock data for featured event (Spotlight)
-const SPOTLIGHT_EVENT = {
-  id: "featured-1",
-  title: "THE NEON WAREHOUSE WAVES",
-  date: "OCT 24",
-  location: "Secret Warehouse",
-  type: "Techno / Underground",
-  description: "An exclusive underground rave featuring top international DJs. Secret location revealed to ticket holders 2 hours before the event.",
-  image: "https://picsum.photos/seed/spotlight/1600/900",
-};
+// Mock data for featured events (Spotlight Slider)
+const SPOTLIGHT_EVENTS = [
+  {
+    id: "featured-1",
+    title: "THE NEON WAREHOUSE WAVES",
+    date: "OCT 24",
+    location: "Secret Warehouse",
+    type: "Techno / Underground",
+    description: "An exclusive underground rave featuring top international DJs. Secret location revealed to ticket holders 2 hours before the event.",
+    image: "https://picsum.photos/seed/spotlight1/1600/900",
+  },
+  {
+    id: "featured-2",
+    title: "ROOFTOP SYMPHONY",
+    date: "OCT 26",
+    location: "Skyline Terrace",
+    type: "Live Music / Chill",
+    description: "Experience classical instruments fused with modern electronic beats under the stars.",
+    image: "https://picsum.photos/seed/spotlight2/1600/900",
+  },
+  {
+    id: "featured-3",
+    title: "CYBERPUNK ALLEY",
+    date: "OCT 31",
+    location: "Downtown District 9",
+    type: "Festival / Immersive",
+    description: "A futuristic street festival with neon art installations, cyberpunk cosplay, and synthwave.",
+    image: "https://picsum.photos/seed/spotlight3/1600/900",
+  }
+];
 
 // Mock data for event grid
 const EVENTS = [
@@ -48,6 +70,45 @@ export default function ExplorePage() {
   const [activeModal, setActiveModal] = useState<"profile" | "event" | "auth" | "notifications" | null>(null);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [isSortOpen, setIsSortOpen] = useState(false);
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [spotlightEvents, setSpotlightEvents] = useState<any[]>(SPOTLIGHT_EVENTS);
+
+  // Auto-slide effect
+  useEffect(() => {
+    if (spotlightEvents.length <= 1) return;
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % spotlightEvents.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [spotlightEvents.length]);
+
+  // Fetch Featured Events
+  useEffect(() => {
+    if (!cityUrl) return;
+    const fetchSpotlight = async () => {
+      const supabase = createClient();
+      let cityCode = cityUrl;
+      if (cityUrl === "delhi") cityCode = "del";
+      if (cityUrl === "mumbai") cityCode = "mum";
+      if (cityUrl === "bengaluru") cityCode = "blr";
+
+      const { data } = await supabase
+        .from("events")
+        .select("*")
+        .eq("featured", true)
+        .eq("cityId", cityCode)
+        .order("created_at", { ascending: false })
+        .limit(3);
+        
+      if (data && data.length > 0) {
+        setSpotlightEvents(data);
+        setCurrentSlide(0);
+      } else {
+        setSpotlightEvents(SPOTLIGHT_EVENTS); // Fallback
+      }
+    };
+    fetchSpotlight();
+  }, [cityUrl]);
 
   // Sync URL city with global context
   useEffect(() => {
@@ -91,50 +152,93 @@ export default function ExplorePage() {
       />
 
       {/* SPOTLIGHT BANNER */}
-      <section className="relative w-full h-[70vh] min-h-[500px]">
-        <Image
-          src={SPOTLIGHT_EVENT.image}
-          alt={SPOTLIGHT_EVENT.title}
-          fill
-          className="object-cover"
-          priority
-        />
-        {/* Gradients: dark on left to transparent right, dark bottom to transparent up */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/50 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
+      <section className="relative w-full h-[70vh] min-h-[500px] overflow-hidden bg-black">
+        <AnimatePresence mode="popLayout">
+          <motion.div
+            key={currentSlide}
+            initial={{ opacity: 0, scale: 1.05 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.8, ease: "easeInOut" }}
+            className="absolute inset-0"
+          >
+            {spotlightEvents[currentSlide]?.video_url ? (
+              <video
+                src={spotlightEvents[currentSlide].video_url}
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+            ) : (
+              <Image
+                src={spotlightEvents[currentSlide]?.image}
+                alt={spotlightEvents[currentSlide]?.title || "Featured Event"}
+                fill
+                className="object-cover"
+                priority
+              />
+            )}
+            {/* Gradients: dark on left to transparent right, dark bottom to transparent up */}
+            <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/50 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
 
-        {/* Spotlight Content (Bottom Left) */}
-        <div className="absolute bottom-12 md:bottom-20 left-4 md:left-12 max-w-2xl z-10">
-          <span className="inline-block px-3 py-1 bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-[10px] font-black uppercase tracking-widest text-white mb-4">
-            Featured Event
-          </span>
-          <h1 className="text-4xl md:text-6xl font-black text-white uppercase tracking-tighter leading-[0.9] mb-4">
-            {SPOTLIGHT_EVENT.title}
-          </h1>
-          <div className="flex items-center gap-3 text-xs md:text-sm font-mono text-white/70 uppercase tracking-widest mb-4">
-            <span>{SPOTLIGHT_EVENT.date}</span>
-            <span className="w-1 h-1 bg-white/50 rounded-full" />
-            <span>{SPOTLIGHT_EVENT.location}</span>
-            <span className="w-1 h-1 bg-white/50 rounded-full" />
-            <span style={{ color: cityThemeColor }}>{SPOTLIGHT_EVENT.type}</span>
-          </div>
-          <p className="text-sm text-white/60 line-clamp-2 max-w-lg mb-8 leading-relaxed">
-            {SPOTLIGHT_EVENT.description}
-          </p>
-          <div className="flex items-center gap-4">
-            <button 
-              className="px-8 py-3 rounded-xl bg-white text-black font-black uppercase tracking-widest text-xs hover:bg-white/90 transition-transform hover:scale-105 active:scale-95"
-              onClick={() => router.push(`/explore/${cityUrl}/${SPOTLIGHT_EVENT.id}`)}
+            {/* Spotlight Content (Bottom Left) */}
+            <div className="absolute bottom-12 md:bottom-20 left-4 md:left-12 max-w-2xl z-10">
+              <span className="inline-block px-3 py-1 bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-[10px] font-black uppercase tracking-widest text-white mb-4">
+                Featured Event
+              </span>
+              <h1 className="text-4xl md:text-6xl font-black text-white uppercase tracking-tighter leading-[0.9] mb-4">
+                {spotlightEvents[currentSlide]?.title || spotlightEvents[currentSlide]?.name}
+              </h1>
+              <div className="flex items-center gap-3 text-xs md:text-sm font-mono text-white/70 uppercase tracking-widest mb-4">
+                <span>{spotlightEvents[currentSlide]?.date}</span>
+                <span className="w-1 h-1 bg-white/50 rounded-full" />
+                <span>{spotlightEvents[currentSlide]?.location || spotlightEvents[currentSlide]?.cityId}</span>
+                <span className="w-1 h-1 bg-white/50 rounded-full" />
+                <span style={{ color: cityThemeColor }}>{spotlightEvents[currentSlide]?.category || spotlightEvents[currentSlide]?.type}</span>
+              </div>
+              <p className="text-sm text-white/60 line-clamp-2 max-w-lg mb-8 leading-relaxed">
+                {spotlightEvents[currentSlide]?.description}
+              </p>
+              <div className="flex items-center gap-4">
+                <button 
+                  className="px-8 py-3 rounded-xl bg-white text-black font-black uppercase tracking-widest text-xs hover:bg-white/90 transition-transform hover:scale-105 active:scale-95"
+                  onClick={() => router.push(`/explore/${cityUrl}/${spotlightEvents[currentSlide]?.id}`)}
+                >
+                  Get Tickets
+                </button>
+                <button 
+                  className="px-8 py-3 rounded-xl bg-white/10 border border-white/20 text-white font-black uppercase tracking-widest text-xs backdrop-blur-md hover:bg-white/20 transition-transform hover:scale-105 active:scale-95"
+                  onClick={() => router.push(`/explore/${cityUrl}/${spotlightEvents[currentSlide]?.id}`)}
+                >
+                  More Info
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        </AnimatePresence>
+
+        {/* Slide Indicators */}
+        <div className="absolute bottom-6 right-4 md:right-12 flex items-center gap-2 z-20">
+          {spotlightEvents.length > 1 && spotlightEvents.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => setCurrentSlide(index)}
+              className="group relative h-1.5 rounded-full transition-all duration-300 overflow-hidden"
+              style={{ width: currentSlide === index ? '32px' : '16px' }}
             >
-              Get Tickets
+              <div className="absolute inset-0 bg-white/30 group-hover:bg-white/50 transition-colors" />
+              {currentSlide === index && (
+                <motion.div
+                  layoutId="activeIndicator"
+                  className="absolute inset-0"
+                  style={{ backgroundColor: cityThemeColor || 'white' }}
+                />
+              )}
             </button>
-            <button 
-              className="px-8 py-3 rounded-xl bg-white/10 border border-white/20 text-white font-black uppercase tracking-widest text-xs backdrop-blur-md hover:bg-white/20 transition-transform hover:scale-105 active:scale-95"
-              onClick={() => router.push(`/explore/${cityUrl}/${SPOTLIGHT_EVENT.id}`)}
-            >
-              More Info
-            </button>
-          </div>
+          ))}
         </div>
       </section>
 

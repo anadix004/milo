@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { motion } from "framer-motion";
-import { Users, Shield, ShieldAlert, ShieldCheck, Search, Loader2 } from "lucide-react";
+import { Users, Shield, ShieldAlert, ShieldCheck, Search, Loader2, EyeOff, MapPin } from "lucide-react";
 import clsx from "clsx";
 
 interface Profile {
@@ -12,6 +12,8 @@ interface Profile {
   role: string;
   created_at: string;
   username?: string;
+  is_ghost?: boolean;
+  city?: string;
 }
 
 export default function UserDirectory() {
@@ -70,11 +72,12 @@ export default function UserDirectory() {
       </div>
 
       <div className="flex-1 overflow-auto bg-neutral-950/50 rounded-3xl border border-white/5">
-        <div className="min-w-[800px]">
-          <div className="grid grid-cols-[2fr_2fr_1fr_1fr_1fr] gap-4 p-8 border-b border-white/10 text-[9px] font-mono uppercase tracking-[0.2em] text-white/40">
+        <div className="min-w-[1000px]">
+          <div className="grid grid-cols-[2fr_2fr_1fr_1.5fr_1fr_1fr] gap-4 p-8 border-b border-white/10 text-[9px] font-mono uppercase tracking-[0.2em] text-white/40">
             <div>Profile</div>
             <div>Email Address</div>
             <div>Role</div>
+            <div>Location</div>
             <div>Joined</div>
             <div className="text-right">Access</div>
           </div>
@@ -90,18 +93,25 @@ export default function UserDirectory() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   key={user.id} 
-                  className="grid grid-cols-[2fr_2fr_1fr_1fr_1fr] gap-4 p-8 items-center hover:bg-white/[0.02] transition-colors"
+                  className="grid grid-cols-[2fr_2fr_1fr_1.5fr_1fr_1fr] gap-4 p-8 items-center hover:bg-white/[0.02] transition-colors"
                 >
                   <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-white/10 to-white/5 flex items-center justify-center text-white font-black">
+                    <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-white/10 to-white/5 flex items-center justify-center text-white font-black relative">
                       {(user.username || user.email || "?")[0].toUpperCase()}
+                      {user.is_ghost && (
+                        <div className="absolute -bottom-1 -right-1 bg-black rounded-full p-1 border border-white/10" title="Ghost Mode Active">
+                          <EyeOff size={10} className="text-purple-400" />
+                        </div>
+                      )}
                     </div>
                     <div>
-                      <p className="text-white font-black uppercase tracking-tight">@{user.username || "anon"}</p>
+                      <div className="flex items-center gap-2">
+                        <p className="text-white font-black uppercase tracking-tight">@{user.username || "anon"}</p>
+                      </div>
                       <p className="text-white/20 text-[8px] font-mono uppercase truncate max-w-[150px]">{user.id}</p>
                     </div>
                   </div>
-                  <div className="text-white/60 font-mono text-xs">
+                  <div className="text-white/60 font-mono text-xs truncate pr-4">
                     {user.email}
                   </div>
                   <div>
@@ -113,6 +123,16 @@ export default function UserDirectory() {
                     )}>
                       {user.role}
                     </span>
+                  </div>
+                  <div className="text-white/50 font-mono text-[10px] flex items-center gap-2 uppercase tracking-widest">
+                    {user.city ? (
+                      <>
+                        <MapPin size={12} className="text-white/20" />
+                        {user.city}
+                      </>
+                    ) : (
+                      <span className="text-white/20">Unknown</span>
+                    )}
                   </div>
                   <div className="text-white/40 font-mono text-[10px]">
                     {new Date(user.created_at).toLocaleDateString()}
