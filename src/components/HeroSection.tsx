@@ -5,7 +5,7 @@ import { useLocation } from "./LocationContext";
 import { useRouter } from "next/navigation";
 import { useNotifications } from "./NotificationContext";
 import Image from "next/image";
-import { TypewriterEffect } from "./ui/typewriter-effect";
+import { TypingEffect } from "./ui/typing-effect";
 export default function HeroSection() {
   const isMobile = useIsMobile();
   const { selectedCity } = useLocation();
@@ -58,13 +58,9 @@ export default function HeroSection() {
         {/* Main Title Section */}
         <div className="absolute inset-0 flex flex-col items-center justify-center z-40 px-6 text-center pointer-events-none">
           <div className="space-y-6">
-            <TypewriterEffect
-              words={[
-                { text: "Discover", className: "text-white" },
-                { text: "Everything", className: "text-white" },
-              ]}
-              className="font-[family-name:var(--font-lexend)] text-4xl md:text-8xl font-black uppercase tracking-tighter leading-[0.9] italic"
-              cursorClassName="bg-white h-8 md:h-20"
+            <TypingEffect
+              texts={["Discover Everything"]}
+              className="font-[family-name:var(--font-lexend)] text-white text-4xl md:text-8xl font-black uppercase tracking-tighter leading-[0.9] italic"
             />
             <p className="font-[family-name:var(--font-roboto-mono)] text-[8px] md:text-xs text-white/50 uppercase tracking-[0.5em] font-black">
               Never miss anything happening near you.
