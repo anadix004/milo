@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, MapPin, User, AtSign, Sparkles, Save, Loader2, Instagram, Music, ChevronDown } from "lucide-react";
+import { X, MapPin, User, AtSign, Sparkles, Save, Loader2, Music, ChevronDown } from "lucide-react";
 import clsx from "clsx";
 import { useAuth } from "@/components/AuthContext";
 import { useNotifications } from "@/components/NotificationContext";
@@ -196,7 +196,7 @@ export default function ProfileEditModal({ isOpen, onClose }: ProfileEditModalPr
           <div className="space-y-3">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center shrink-0">
-                <Instagram size={18} className="text-white" />
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
               </div>
               <input
                 type="text"

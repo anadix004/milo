@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Edit3, Music, MapPin, Award, Loader2, Camera, Instagram } from "lucide-react";
+import { Edit3, Music, MapPin, Award, Loader2, Camera } from "lucide-react";
 import Image from "next/image";
 import { useAuth } from "@/components/AuthContext";
 import { useState, useRef } from "react";
