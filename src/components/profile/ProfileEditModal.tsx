@@ -256,7 +256,7 @@ export default function ProfileEditModal({ isOpen, onClose }: ProfileEditModalPr
 
   if (isMobile) {
     return (
-      <BottomSheet isOpen={isOpen} onClose={onClose} title="Edit Profile">
+      <BottomSheet isOpen={isOpen} onClose={onClose}>
         {content}
       </BottomSheet>
     );
