@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import { Calendar, Clock, MapPin, Tag, Users, AlertCircle, ArrowLeft } from "lucide-react";
@@ -186,6 +185,16 @@ export default function EventDetailPage() {
             )}
           </div>
 
+        </div>
+
+        {/* Back to top */}
+        <div className="flex justify-center mt-20">
+          <button 
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            className="w-12 h-12 rounded-full border border-white/20 text-white/50 hover:text-white hover:border-white/50 flex items-center justify-center transition-all"
+          >
+            <ArrowLeft size={16} className="rotate-90" />
+          </button>
         </div>
       </div>
     </main>

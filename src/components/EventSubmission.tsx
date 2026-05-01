@@ -151,8 +151,9 @@ export default function EventSubmission({ isOpen, onClose, onAuthRedirect }: Eve
 
       addNotification("radar", "Event submitted. Awaiting verification.");
       resetAndClose();
-    } catch (err: any) {
-      addNotification("system", `Identification Sync Failed: ${err.message}`);
+    } catch (err) {
+      const error = err as Error;
+      addNotification("system", `Identification Sync Failed: ${error.message}`);
     } finally {
       setIsSubmitting(false);
     }
@@ -282,8 +283,8 @@ export default function EventSubmission({ isOpen, onClose, onAuthRedirect }: Eve
     <div className="space-y-8 pb-8">
       <p className="text-[10px] font-mono text-white/20 uppercase tracking-[0.4em] font-black text-center">Media Gatekeeper Sync</p>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <MediaInput label="Visual (1MB)" icon={<ImageIcon size={20} />} onSelect={(e: any) => validateMedia(e, "photo")} accept="image/*" active={!!media.photo} />
-        <MediaInput label="Kinetic (10s/2MB)" icon={<Video size={20} />} onSelect={(e: any) => validateMedia(e, "video")} accept="video/*" active={!!media.video} />
+        <MediaInput label="Visual (1MB)" icon={<ImageIcon size={20} />} onSelect={(e) => validateMedia(e, "photo")} accept="image/*" active={!!media.photo} />
+        <MediaInput label="Kinetic (10s/2MB)" icon={<Video size={20} />} onSelect={(e) => validateMedia(e, "video")} accept="video/*" active={!!media.video} />
       </div>
     </div>
   );
@@ -305,7 +306,7 @@ export default function EventSubmission({ isOpen, onClose, onAuthRedirect }: Eve
         </button>
       </div>
 
-      <div className={clsx("flex-1 overflow-y-auto", isMobile ? "py-6" : "p-8 md:p-12")}>
+      <div className={clsx("flex-1 overflow-y-auto overscroll-contain", isMobile ? "py-6" : "p-8 md:p-12")}>
         {!isAuthenticated ? (
           <div className="py-20 flex flex-col items-center justify-center text-center space-y-8">
             <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center border border-white/10"><Lock size={40} className="text-white/20" /></div>
@@ -414,7 +415,7 @@ function InputGroup({ label, placeholder, value, onChange, type = "text" }: { la
   );
 }
 
-function MediaInput({ label, icon, onSelect, accept, active }: { label: string; icon: any; onSelect: (e: any) => void; accept: string; active: boolean }) {
+function MediaInput({ label, icon, onSelect, accept, active }: { label: string; icon: React.ReactNode; onSelect: (e: React.ChangeEvent<HTMLInputElement>) => void; accept: string; active: boolean }) {
   return (
     <label className={clsx("relative flex flex-col items-center justify-center p-10 bg-white/[0.03] border border-dashed rounded-[2rem] cursor-pointer transition-all hover:bg-white/[0.05]", active ? "border-emerald-500/50 bg-emerald-500/5" : "border-white/10 hover:border-white/20")}>
        <input type="file" className="hidden" onChange={onSelect} accept={accept} />
