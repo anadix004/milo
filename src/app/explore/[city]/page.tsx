@@ -17,7 +17,6 @@ const ProfileSidebar = dynamic(() => import("@/components/ProfileSidebar"), { ss
 const EventSubmission = dynamic(() => import("@/components/EventSubmission"), { ssr: false });
 const AuthModal = dynamic(() => import("@/components/AuthModal"), { ssr: false });
 const NotificationSidebar = dynamic(() => import("@/components/NotificationSidebar"), { ssr: false });
-const FinalCTA = dynamic(() => import("@/components/FinalCTA"), { ssr: false });
 
 // Mock data for featured event (Spotlight)
 const SPOTLIGHT_EVENT = {
@@ -262,7 +261,6 @@ export default function ExplorePage() {
 
       </section>
       
-      <FinalCTA selectedCity={selectedCity} />
     </main>
   );
 }
