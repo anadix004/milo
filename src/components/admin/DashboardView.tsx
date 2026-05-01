@@ -10,7 +10,6 @@ interface Stats {
   totalUsers: number;
   totalEvents: number;
   pendingApprovals: number;
-  pendingApprovals: number;
   totalRSVPs: number;
   cityDistribution: Record<string, number>;
 }
