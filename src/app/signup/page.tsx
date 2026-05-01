@@ -7,11 +7,12 @@ import { useRouter } from "next/navigation";
 import { Eye, EyeOff, ArrowLeft } from "lucide-react";
 import BrandLogo from "@/components/BrandLogo";
 import { useAuth } from "@/components/AuthContext";
-import { supabase } from "@/lib/supabaseClient";
+import { createClient } from "@/utils/supabase/client";
 
 export default function SignupPage() {
   const router = useRouter();
   const { isAuthenticated } = useAuth();
+  const supabase = createClient();
   
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
