@@ -45,6 +45,14 @@ export default function ProfileSidebar({ isOpen, onClose, onAuthClick }: Profile
   const { updateProfile } = useAuth();
   const isGhostMode = !!user?.is_ghost;
 
+  useEffect(() => {
+    if (!isMobile) {
+      if (isOpen) document.body.style.overflow = "hidden";
+      else document.body.style.overflow = "unset";
+    }
+    return () => { document.body.style.overflow = "unset"; };
+  }, [isOpen, isMobile]);
+
   const fetchRSVPs = async () => {
     if (!user) return;
     try {
@@ -387,7 +395,7 @@ export default function ProfileSidebar({ isOpen, onClose, onAuthClick }: Profile
     isGhostMode && "shadow-[inset_0_0_50px_rgba(16,185,129,0.1)] border-emerald-500/30"
   )}
 >
-  <div className="flex-1 overflow-y-auto p-8 no-scrollbar">
+  <div className="flex-1 overflow-y-auto p-8 no-scrollbar overscroll-contain">
     {renderContent()}
   </div></motion.div>
         </>

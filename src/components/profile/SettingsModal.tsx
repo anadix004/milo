@@ -80,7 +80,7 @@ export default function SettingsModal({ isOpen, onClose, onEditProfile }: Settin
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: "100%", opacity: 0 }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="relative w-full max-w-lg bg-zinc-950 border border-white/10 rounded-3xl z-[101] overflow-hidden flex flex-col max-h-full"
+            className="relative w-full max-w-lg bg-zinc-950 border border-white/10 rounded-3xl z-[101] overflow-hidden flex flex-col max-h-[90vh]"
           >
             {/* Header */}
             <div className="flex items-center justify-between p-6 border-b border-white/10 shrink-0 bg-zinc-950 sticky top-0 z-10">
@@ -91,7 +91,7 @@ export default function SettingsModal({ isOpen, onClose, onEditProfile }: Settin
             </div>
 
             {/* Content Area */}
-            <div className="overflow-y-auto p-6 space-y-8 no-scrollbar">
+            <div className="overflow-y-auto p-6 space-y-8 no-scrollbar overscroll-contain">
               
               {/* Account Details */}
               <section className="space-y-2">

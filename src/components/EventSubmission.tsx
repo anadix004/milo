@@ -45,6 +45,14 @@ export default function EventSubmission({ isOpen, onClose, onAuthRedirect }: Eve
   const [ticketLinks, setTicketLinks] = useState([{ name: "", url: "" }]);
   const [media, setMedia] = useState<{ photo: File | null; video: File | null }>({ photo: null, video: null });
 
+  useEffect(() => {
+    if (!isMobile) {
+      if (isOpen) document.body.style.overflow = "hidden";
+      else document.body.style.overflow = "unset";
+    }
+    return () => { document.body.style.overflow = "unset"; };
+  }, [isOpen, isMobile]);
+
   const validateMedia = async (e: React.ChangeEvent<HTMLInputElement>, type: "photo" | "video") => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -298,7 +306,7 @@ export default function EventSubmission({ isOpen, onClose, onAuthRedirect }: Eve
         </button>
       </div>
 
-      <div className={clsx("flex-1 overflow-y-auto no-scrollbar", isMobile ? "py-6" : "p-8 md:p-12")}>
+      <div className={clsx("flex-1 overflow-y-auto no-scrollbar overscroll-contain", isMobile ? "py-6" : "p-8 md:p-12")}>
         {!isAuthenticated ? (
           <div className="py-20 flex flex-col items-center justify-center text-center space-y-8">
             <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center border border-white/10"><Lock size={40} className="text-white/20" /></div>
