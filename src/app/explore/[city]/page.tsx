@@ -46,7 +46,7 @@ export default function ExplorePage() {
   const cityUrl = params?.city as string;
   
   const { isAuthenticated } = useAuth();
-  const { setSelectedCity, cityThemeColor } = useLocation();
+  const { setSelectedCity, selectedCity, cityThemeColor } = useLocation();
   const [activeModal, setActiveModal] = useState<"profile" | "event" | "auth" | "notifications" | null>(null);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [isSortOpen, setIsSortOpen] = useState(false);
