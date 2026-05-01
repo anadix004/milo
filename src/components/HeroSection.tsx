@@ -5,6 +5,7 @@ import { useIsMobile } from "@/hooks/useMediaQuery";
 import { useLocation } from "./LocationContext";
 import { useRouter } from "next/navigation";
 import { useNotifications } from "./NotificationContext";
+import Image from "next/image";
 
 export default function HeroSection() {
   const isMobile = useIsMobile();
@@ -31,8 +32,12 @@ export default function HeroSection() {
         {/* Background Visual Layer */}
         <div className="absolute inset-0 w-full h-full bg-black">
           {isMobile ? (
-            <div 
-              className="absolute inset-0 w-full h-full bg-[url('https://images.unsplash.com/photo-1540039155732-684735035727?w=800')] bg-cover bg-center opacity-70"
+            <Image 
+              src="https://images.unsplash.com/photo-1540039155732-684735035727?w=800"
+              alt="City Event"
+              fill
+              priority
+              className="object-cover opacity-70"
             />
           ) : (
             <video
@@ -40,7 +45,7 @@ export default function HeroSection() {
               muted
               loop
               playsInline
-              preload="none"
+              preload="metadata"
               poster="https://images.unsplash.com/photo-1540039155732-684735035727?w=1200"
               className="w-full h-full object-cover opacity-70"
             >
