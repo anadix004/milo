@@ -66,7 +66,7 @@ export default function SignupPage() {
       {/* Left Side: 3D Generic Image Split */}
       <div className="hidden lg:flex w-1/2 relative bg-zinc-900 overflow-hidden items-center justify-center">
         <Image
-          src="https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=1600&q=80" // A 3D/abstract vibe
+          src="https://picsum.photos/seed/signuppage/1600/2400"
           alt="Signup Abstract"
           fill
           className="object-cover opacity-60"

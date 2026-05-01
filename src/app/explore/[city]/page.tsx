@@ -27,17 +27,17 @@ const SPOTLIGHT_EVENT = {
   location: "Secret Warehouse",
   type: "Techno / Underground",
   description: "An exclusive underground rave featuring top international DJs. Secret location revealed to ticket holders 2 hours before the event.",
-  image: "https://images.unsplash.com/photo-1574391831460-1e5122ea36f7?w=1600&h=900&fit=crop",
+  image: "https://picsum.photos/seed/spotlight/1600/900",
 };
 
 // Mock data for event grid
 const EVENTS = [
-  { id: 1, name: "Sunset Techno Vibes", date: "24-10-2026", price: "₹999", image: "https://images.unsplash.com/photo-1540039155732-684735035727?w=800" },
-  { id: 2, name: "Underground Comedy Club", date: "25-10-2026", price: "₹499", image: "https://images.unsplash.com/photo-1585699324551-f6c309eedeca?w=800" },
-  { id: 3, name: "Midnight Art Exhibit", date: "26-10-2026", price: "FREE", image: "https://images.unsplash.com/photo-1536924940846-227afb31e2a5?w=800" },
-  { id: 4, name: "Rooftop Jazz & Wine", date: "27-10-2026", price: "₹1499", image: "https://images.unsplash.com/photo-1511192336575-5a79af67a629?w=800" },
-  { id: 5, name: "Cyberpunk Cosplay Meet", date: "28-10-2026", price: "₹299", image: "https://images.unsplash.com/photo-1618336753974-aae8e04506aa?w=800" },
-  { id: 6, name: "Secret Indie Gig", date: "29-10-2026", price: "₹799", image: "https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=800" },
+  { id: 1, name: "Sunset Techno Vibes", date: "24-10-2026", price: "₹999", image: "https://picsum.photos/seed/event1/800/1000" },
+  { id: 2, name: "Underground Comedy Club", date: "25-10-2026", price: "₹499", image: "https://picsum.photos/seed/event2/800/1000" },
+  { id: 3, name: "Midnight Art Exhibit", date: "26-10-2026", price: "FREE", image: "https://picsum.photos/seed/event3/800/1000" },
+  { id: 4, name: "Rooftop Jazz & Wine", date: "27-10-2026", price: "₹1499", image: "https://picsum.photos/seed/event4/800/1000" },
+  { id: 5, name: "Cyberpunk Cosplay Meet", date: "28-10-2026", price: "₹299", image: "https://picsum.photos/seed/event5/800/1000" },
+  { id: 6, name: "Secret Indie Gig", date: "29-10-2026", price: "₹799", image: "https://picsum.photos/seed/event6/800/1000" },
 ];
 
 export default function ExplorePage() {

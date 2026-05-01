@@ -44,7 +44,7 @@ export default function LoginPage() {
       {/* Left Side: 3D Generic Image Split */}
       <div className="hidden lg:flex w-1/2 relative bg-zinc-900 overflow-hidden items-center justify-center">
         <Image
-          src="https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=1600&q=80" // A 3D/abstract vibe
+          src="https://picsum.photos/seed/loginpage/1600/2400"
           alt="Login Abstract"
           fill
           className="object-cover opacity-60"

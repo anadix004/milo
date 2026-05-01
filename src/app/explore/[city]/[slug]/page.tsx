@@ -20,7 +20,7 @@ const EVENT = {
   type: "Techno / Underground",
   ageLimit: "21+",
   language: "English / Hindi",
-  image: "https://images.unsplash.com/photo-1574391831460-1e5122ea36f7?w=1600&h=900&fit=crop",
+  image: "https://picsum.photos/seed/detail/1600/900",
   ticketUrl: "https://example.com/tickets",
   isAvailable: true,
 };
