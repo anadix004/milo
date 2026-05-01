@@ -21,6 +21,17 @@ interface ProfileSidebarProps {
   onAuthClick: () => void;
 }
 
+interface RSVP {
+  id: string;
+  type: string;
+  event: {
+    title: string;
+    location: string;
+    date: string;
+    cityId: string;
+  } | null;
+}
+
 export default function ProfileSidebar({ isOpen, onClose, onAuthClick }: ProfileSidebarProps) {
   const isMobile = useIsMobile();
   const supabase = createClient();
@@ -30,7 +41,7 @@ export default function ProfileSidebar({ isOpen, onClose, onAuthClick }: Profile
   const [isUpdatingAvatar, setIsUpdatingAvatar] = useState(false);
   const [updateMode, setUpdateMode] = useState<"camera" | "upload" | null>(null);
   const [showPass, setShowPass] = useState(false);
-  const [rsvps, setRsvps] = useState<unknown[]>([]);
+  const [rsvps, setRsvps] = useState<RSVP[]>([]);
   const { updateProfile } = useAuth();
   const isGhostMode = !!user?.is_ghost;
 
@@ -54,7 +65,7 @@ export default function ProfileSidebar({ isOpen, onClose, onAuthClick }: Profile
         .limit(3);
 
       if (error) throw error;
-      setRsvps(data || []);
+      setRsvps((data as any) || []);
     } catch (err) {
       console.error("Error fetching RSVPs:", err);
     }
