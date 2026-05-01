@@ -60,10 +60,10 @@ export default function HeroSection() {
         <div className="absolute inset-0 flex flex-col items-center justify-center z-40 px-6 text-center pointer-events-none">
           <div className="space-y-6">
             <h1 className="font-[family-name:var(--font-lexend)] text-white text-4xl md:text-8xl font-black uppercase tracking-tighter leading-[0.9] italic">
-              THE HERO HEADLINE
+              Discover Everything
             </h1>
             <p className="font-[family-name:var(--font-roboto-mono)] text-[8px] md:text-xs text-white/50 uppercase tracking-[0.5em] font-black">
-              &lt;SUBTEXT PLACEHOLDER&gt;
+              Never miss anything happening near you.
             </p>
           </div>
         </div>
