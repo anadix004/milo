@@ -10,12 +10,10 @@ import BottomNav from "@/components/mobile/BottomNav";
 import FiltersPanel from "@/components/FiltersPanel";
 import SortByPanel from "@/components/SortByPanel";
 import dynamic from "next/dynamic";
-import clsx from "clsx";
 import Image from "next/image";
 
 const ProfileSidebar = dynamic(() => import("@/components/ProfileSidebar"), { ssr: false });
 const EventSubmission = dynamic(() => import("@/components/EventSubmission"), { ssr: false });
-const AuthModal = dynamic(() => import("@/components/AuthModal"), { ssr: false });
 const NotificationSidebar = dynamic(() => import("@/components/NotificationSidebar"), { ssr: false });
 
 // Mock data for featured event (Spotlight)
@@ -45,7 +43,7 @@ export default function ExplorePage() {
   const cityUrl = params?.city as string;
   
   const { isAuthenticated } = useAuth();
-  const { setSelectedCity, selectedCity, cityThemeColor } = useLocation();
+  const { setSelectedCity, cityThemeColor } = useLocation();
   const [activeModal, setActiveModal] = useState<"profile" | "event" | "auth" | "notifications" | null>(null);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [isSortOpen, setIsSortOpen] = useState(false);

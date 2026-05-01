@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import { Calendar, Clock, MapPin, Tag, Users, AlertCircle, ArrowLeft } from "lucide-react";

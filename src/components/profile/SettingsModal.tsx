@@ -2,10 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Lock, Bell, EyeOff, LogOut, ChevronRight, UserCircle, ShieldAlert, Loader2, Eye, Check } from "lucide-react";
+import { X, Bell, EyeOff, LogOut, ChevronRight, Eye } from "lucide-react";
 import { useAuth } from "@/components/AuthContext";
 import { useNotifications } from "@/components/NotificationContext";
-import { createClient } from "@/utils/supabase/client";
 import clsx from "clsx";
 
 interface SettingsModalProps {
@@ -17,11 +16,7 @@ interface SettingsModalProps {
 export default function SettingsModal({ isOpen, onClose, onEditProfile }: SettingsModalProps) {
   const { user, logout, updateProfile } = useAuth();
   const { addNotification } = useNotifications();
-  const supabase = createClient();
 
-  const [showPasswordForm, setShowPasswordForm] = useState(false);
-  const [newPassword, setNewPassword] = useState("");
-  const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [isTogglingGhost, setIsTogglingGhost] = useState(false);
 
   const [notificationsEnabled, setNotificationsEnabled] = useState(() => {
@@ -31,7 +26,7 @@ export default function SettingsModal({ isOpen, onClose, onEditProfile }: Settin
     return true;
   });
 
-  const isGhostMode = !!(user as any)?.is_ghost;
+  const isGhostMode = !!user?.is_ghost;
 
   useEffect(() => {
     if (isOpen) {
@@ -49,32 +44,14 @@ export default function SettingsModal({ isOpen, onClose, onEditProfile }: Settin
     setTimeout(() => onEditProfile(), 200);
   };
 
-  const handleChangePassword = async () => {
-    if (!newPassword || newPassword.length < 6) {
-      addNotification("system", "Password must be at least 6 characters.");
-      return;
-    }
-    setIsChangingPassword(true);
-    try {
-      const { error } = await supabase.auth.updateUser({ password: newPassword });
-      if (error) throw error;
-      addNotification("session", "Password updated successfully.");
-      setNewPassword("");
-      setShowPasswordForm(false);
-    } catch (err: any) {
-      addNotification("system", `Password change failed: ${err.message}`);
-    } finally {
-      setIsChangingPassword(false);
-    }
-  };
-
   const handleToggleGhost = async () => {
     setIsTogglingGhost(true);
     try {
-      await updateProfile({ is_ghost: !isGhostMode } as any);
+      await updateProfile({ is_ghost: !isGhostMode });
       addNotification("session", isGhostMode ? "Ghost Mode deactivated." : "Ghost Mode activated. You're invisible.");
-    } catch (err: any) {
-      addNotification("system", `Failed to toggle Ghost Mode: ${err.message}`);
+    } catch (err) {
+      const error = err as Error;
+      addNotification("system", `Failed to toggle Ghost Mode: ${error.message}`);
     } finally {
       setIsTogglingGhost(false);
     }
@@ -126,8 +103,8 @@ export default function SettingsModal({ isOpen, onClose, onEditProfile }: Settin
                     { label: "Phone Number", value: "+91 ••••• •••••" },
                     { label: "Date of Birth", value: "DD/MM/YYYY" },
                     { label: "Email Address", value: user?.email || "Not Provided" },
-                    { label: "City", value: (user as any)?.city || "Not Set" },
-                    { label: "Gender", value: "Not Specified" }
+                    { label: "City", value: user?.city || "Not Set" },
+                    { label: "Gender", value: "Not Specified" },
                   ].map((field, idx) => (
                     <div key={field.label} className={clsx("flex flex-col p-4", idx !== 5 && "border-b border-white/5")}>
                       <div className="flex justify-between items-center mb-1">
@@ -213,7 +190,7 @@ export default function SettingsModal({ isOpen, onClose, onEditProfile }: Settin
 
             </div>
           </motion.div>
-        </>
+        </div>
       )}
     </AnimatePresence>
   );

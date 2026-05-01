@@ -30,7 +30,7 @@ export default function ProfileSidebar({ isOpen, onClose, onAuthClick }: Profile
   const [isUpdatingAvatar, setIsUpdatingAvatar] = useState(false);
   const [updateMode, setUpdateMode] = useState<"camera" | "upload" | null>(null);
   const [showPass, setShowPass] = useState(false);
-  const [rsvps, setRsvps] = useState<any[]>([]);
+  const [rsvps, setRsvps] = useState<unknown[]>([]);
   const { updateProfile } = useAuth();
   const isGhostMode = !!user?.is_ghost;
 
@@ -316,7 +316,7 @@ export default function ProfileSidebar({ isOpen, onClose, onAuthClick }: Profile
                 <div key={i} className="p-5 bg-white/5 rounded-[1.5rem] border border-white/5 flex justify-between items-center group cursor-pointer hover:border-white/20 transition-all">
                   <div>
                     <p className="text-[10px] text-white font-black tracking-widest uppercase">{rsvp.event?.title}</p>
-                    <p className="text-[8px] text-white/20 uppercase font-mono">{rsvp.event?.location} // {rsvp.type}</p>
+                    <p className="text-[8px] text-white/20 uppercase font-mono">{rsvp.event?.location} • {rsvp.type}</p>
                   </div>
                   <div className={clsx(
                     "w-2 h-2 rounded-full transition-opacity",
@@ -366,21 +366,19 @@ export default function ProfileSidebar({ isOpen, onClose, onAuthClick }: Profile
             onClick={onClose}
             className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[110] transition-all duration-700"
           />
-
-          <motion.div
-            initial={{ x: "-100%", opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            exit={{ x: "-100%", opacity: 0 }}
-            transition={SPRING_CONFIG}
-            className={clsx(
-              "fixed inset-y-0 left-0 w-full max-w-sm bg-black/40 backdrop-blur-3xl border-r border-white/10 z-[120] flex flex-col font-[family-name:var(--font-lexend)] transition-shadow duration-500",
-              isGhostMode && "shadow-[inset_0_0_50px_rgba(16,185,129,0.1)] border-emerald-500/30"
-            )}
-          >
-            <div className="flex-1 overflow-y-auto p-8 no-scrollbar">
-              {renderContent()}
-            </div>
-          </motion.div>
+<motion.div
+  initial={{ x: "-100%", opacity: 0 }}
+  animate={{ x: 0, opacity: 1 }}
+  exit={{ x: "-100%", opacity: 0 }}
+  transition={SPRING_CONFIG}
+  className={clsx(
+    "fixed inset-y-0 left-0 w-full max-w-sm bg-black/40 backdrop-blur-3xl border-r border-white/10 z-[120] flex flex-col font-[family-name:var(--font-lexend)] transition-shadow duration-500",
+    isGhostMode && "shadow-[inset_0_0_50px_rgba(16,185,129,0.1)] border-emerald-500/30"
+  )}
+>
+  <div className="flex-1 overflow-y-auto p-8 no-scrollbar">
+    {renderContent()}
+  </div></motion.div>
         </>
       )}
     </AnimatePresence>
