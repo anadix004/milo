@@ -11,6 +11,7 @@ import FiltersPanel from "@/components/FiltersPanel";
 import SortByPanel from "@/components/SortByPanel";
 import dynamic from "next/dynamic";
 import Image from "next/image";
+import { TiltCard } from "@/components/TiltCard";
 
 const ProfileSidebar = dynamic(() => import("@/components/ProfileSidebar"), { ssr: false });
 const EventSubmission = dynamic(() => import("@/components/EventSubmission"), { ssr: false });
@@ -208,15 +209,15 @@ export default function ExplorePage() {
                 className="group cursor-pointer flex flex-col"
               >
                 {/* Image Box */}
-                <div className="relative w-full aspect-[4/5] bg-zinc-900 rounded-3xl overflow-hidden mb-4 border border-white/5">
+                <TiltCard className="relative w-full aspect-[4/5] bg-zinc-900 rounded-3xl overflow-hidden mb-4 border border-white/5">
                   <Image
                     src={event.image}
                     alt={event.name}
                     fill
-                    className="object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700 ease-out"
+                    className="object-cover transition-all duration-700 ease-out"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity" />
-                </div>
+                </TiltCard>
                 
                 {/* White Text Area Box below card as per prompt */}
                 <div className="bg-white rounded-2xl p-5 flex flex-col gap-2 transform group-hover:-translate-y-2 transition-transform duration-500 shadow-xl">

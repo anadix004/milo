@@ -15,6 +15,7 @@ import { EVENTS } from "@/constants/events";
 import { useIsMobile } from "@/hooks/useMediaQuery";
 import BottomSheet from "@/components/mobile/BottomSheet";
 import VibeCheck from "@/components/VibeCheck";
+import { TiltCard } from "@/components/TiltCard";
 
 // --- SPRING CONFIG SYNC ---
 const SPRING_CONFIG = { stiffness: 70, damping: 15 };
@@ -586,19 +587,21 @@ function FeaturedCarousel({ items, onExpand }: { items: EventData[], onExpand: (
 
 function EventGridCard({ event, onExpand }: { event: EventData, onExpand: (e: EventData) => void }) {
   return (
-    <motion.div onClick={() => onExpand(event)} whileHover={{ scale: 1.02 }} className="relative w-full aspect-[1.2/1] md:aspect-video rounded-3xl overflow-hidden cursor-pointer group bg-neutral-900 border border-white/5">
-      {event.video_url ? (
-        <video src={event.video_url} autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover grayscale transition-all duration-700 group-hover:grayscale-0 group-hover:scale-105" />
-      ) : (
-        <Image src={event.image} alt={event.title} fill className="object-cover grayscale transition-all duration-700 group-hover:grayscale-0 group-hover:scale-105" sizes="(max-width: 768px) 100vw, 50vw" />
-      )}
-      <div className="absolute inset-0 bg-black/60 group-hover:bg-black/40 transition-colors" />
-      <div className="absolute inset-x-0 bottom-0 p-8 z-10">
-        <span className="font-mono text-[10px] tracking-widest text-white/60 uppercase mb-2 block">{event.category}</span>
-        <h3 className="text-xl md:text-3xl font-black text-white uppercase tracking-tight leading-tight mb-2">{event.title}</h3>
-        <p className="text-white/80 text-[10px] md:text-sm font-black uppercase tracking-widest">{event.price} // {event.date}</p>
-      </div>
-    </motion.div>
+    <div onClick={() => onExpand(event)} className="cursor-pointer group w-full">
+      <TiltCard className="relative w-full aspect-[1.2/1] md:aspect-video rounded-3xl overflow-hidden bg-neutral-900 border border-white/5">
+        {event.video_url ? (
+          <video src={event.video_url} autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover transition-all duration-700" />
+        ) : (
+          <Image src={event.image} alt={event.title} fill className="object-cover transition-all duration-700" sizes="(max-width: 768px) 100vw, 50vw" />
+        )}
+        <div className="absolute inset-0 bg-black/60 group-hover:bg-black/40 transition-colors" />
+        <div className="absolute inset-x-0 bottom-0 p-8 z-10">
+          <span className="font-mono text-[10px] tracking-widest text-white/60 uppercase mb-2 block">{event.category}</span>
+          <h3 className="text-xl md:text-3xl font-black text-white uppercase tracking-tight leading-tight mb-2">{event.title}</h3>
+          <p className="text-white/80 text-[10px] md:text-sm font-black uppercase tracking-widest">{event.price} // {event.date}</p>
+        </div>
+      </TiltCard>
+    </div>
   );
 }
 
