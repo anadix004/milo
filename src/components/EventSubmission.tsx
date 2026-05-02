@@ -290,7 +290,7 @@ export default function EventSubmission({ isOpen, onClose, onAuthRedirect }: Eve
   );
 
   const renderContent = () => (
-    <div className={clsx("flex flex-col h-full", !isMobile && "max-h-[90vh]")}>
+    <div className={clsx("flex flex-col h-full")}>
       {/* Header Hub */}
       <div className={clsx("p-8 border-b border-white/5 flex justify-between items-center", isMobile ? "px-0 pb-6" : "bg-white/[0.02]")}>
         <div className="flex items-center gap-4">
