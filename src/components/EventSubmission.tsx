@@ -306,7 +306,7 @@ export default function EventSubmission({ isOpen, onClose, onAuthRedirect }: Eve
         </button>
       </div>
 
-      <div className={clsx("flex-1 overflow-y-auto overscroll-contain", isMobile ? "py-6" : "p-8 md:p-12")}>
+      <div className={clsx("flex-1 overflow-y-auto overscroll-contain touch-pan-y", isMobile ? "py-6" : "p-8 md:p-12")}>
         {!isAuthenticated ? (
           <div className="py-20 flex flex-col items-center justify-center text-center space-y-8">
             <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center border border-white/10"><Lock size={40} className="text-white/20" /></div>
@@ -397,7 +397,7 @@ export default function EventSubmission({ isOpen, onClose, onAuthRedirect }: Eve
       {isOpen && (
         <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 md:p-6 overflow-y-auto">
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} className="absolute inset-0 bg-black/90 backdrop-blur-3xl" />
-          <motion.div initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0, y: 20 }} transition={SPRING_CONFIG} className="relative w-full max-w-5xl bg-neutral-950 border border-white/10 rounded-[2.5rem] overflow-hidden shadow-2xl">
+          <motion.div initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0, y: 20 }} transition={SPRING_CONFIG} className="relative w-full max-w-5xl bg-neutral-950 border border-white/10 rounded-[2.5rem] overflow-y-auto max-h-[90vh] overscroll-contain shadow-2xl">
             {renderContent()}
           </motion.div>
         </div>

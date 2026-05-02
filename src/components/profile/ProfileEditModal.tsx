@@ -61,6 +61,15 @@ export default function ProfileEditModal({ isOpen, onClose }: ProfileEditModalPr
     }
   }, [isOpen, user]);
 
+  // Body scroll locking
+  useEffect(() => {
+    if (!isMobile) {
+      if (isOpen) document.body.style.overflow = "hidden";
+      else document.body.style.overflow = "unset";
+    }
+    return () => { document.body.style.overflow = "unset"; };
+  }, [isOpen, isMobile]);
+
   const handleSave = async () => {
     setIsSaving(true);
     try {
@@ -98,7 +107,7 @@ export default function ProfileEditModal({ isOpen, onClose }: ProfileEditModalPr
       </div>
 
       {/* Scrollable Content */}
-      <div className="overflow-y-auto flex-1 p-6 space-y-8 no-scrollbar">
+      <div className="overflow-y-auto flex-1 p-6 space-y-8 no-scrollbar touch-pan-y">
 
         {/* Display Name */}
         <section className="space-y-2">
@@ -278,7 +287,7 @@ export default function ProfileEditModal({ isOpen, onClose }: ProfileEditModalPr
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 40, opacity: 0 }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg max-h-[90vh] bg-zinc-950 border border-white/10 rounded-3xl z-[101] overflow-hidden flex flex-col"
+            className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg max-h-[90vh] bg-zinc-950 border border-white/10 rounded-3xl z-[101] overflow-y-auto overscroll-contain flex flex-col"
           >
             {content}
           </motion.div>

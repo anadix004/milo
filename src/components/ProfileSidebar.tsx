@@ -391,11 +391,11 @@ export default function ProfileSidebar({ isOpen, onClose, onAuthClick }: Profile
   exit={{ x: "-100%", opacity: 0 }}
   transition={SPRING_CONFIG}
   className={clsx(
-    "fixed inset-y-0 left-0 w-full max-w-sm bg-black/40 backdrop-blur-3xl border-r border-white/10 z-[120] flex flex-col font-[family-name:var(--font-lexend)] transition-shadow duration-500",
+    "fixed inset-y-0 left-0 w-full max-w-sm max-h-full bg-black/40 backdrop-blur-3xl border-r border-white/10 z-[120] flex flex-col font-[family-name:var(--font-lexend)] transition-shadow duration-500",
     isGhostMode && "shadow-[inset_0_0_50px_rgba(16,185,129,0.1)] border-emerald-500/30"
   )}
 >
-  <div className="flex-1 overflow-y-auto p-8 no-scrollbar overscroll-contain">
+  <div className="flex-1 overflow-y-auto p-8 no-scrollbar overscroll-contain touch-pan-y">
     {renderContent()}
   </div></motion.div>
         </>
