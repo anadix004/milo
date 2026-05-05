@@ -14,7 +14,7 @@ import dynamic from "next/dynamic";
 import Image from "next/image";
 import { TiltCard } from "@/components/TiltCard";
 import { motion, AnimatePresence } from "framer-motion";
-import { getCategoryColour, getCategoryHeroAura, getCategoryCardAura, getCategoryBorderGlow, CATEGORY_LABELS, EventCategory } from "@/lib/aura";
+import { getCategoryColour, getCategoryHeroAura, getCategoryCardAura, getCategoryButtonGlow, getCategoryBorderGlow, CATEGORY_LABELS, EventCategory } from "@/lib/aura";
 
 const ProfileSidebar = dynamic(() => import("@/components/ProfileSidebar"), { ssr: false });
 const EventSubmission = dynamic(() => import("@/components/EventSubmission"), { ssr: false });
@@ -249,10 +249,10 @@ export default function ExplorePage() {
               {currentSlide === index && (
                 <motion.div
                   layoutId="activeIndicator"
-                  className="absolute inset-0"
+                  className="absolute inset-0 backdrop-blur-md"
                   style={{ 
-                    backgroundColor: getCategoryColour(spotlightEvents[currentSlide]?.category || spotlightEvents[currentSlide]?.type || 'other'),
-                    boxShadow: `0 0 12px ${getCategoryColour(spotlightEvents[currentSlide]?.category || spotlightEvents[currentSlide]?.type || 'other')}`
+                    backgroundColor: getCategoryColour(spotlightEvents[currentSlide]?.category || spotlightEvents[currentSlide]?.type || 'other').replace(/1\)$/, '0.4)'),
+                    boxShadow: `0 0 16px ${getCategoryColour(spotlightEvents[currentSlide]?.category || spotlightEvents[currentSlide]?.type || 'other').replace(/1\)$/, '0.5)')}, inset 0 0 4px rgba(255,255,255,0.1)`
                   }}
                 />
               )}
