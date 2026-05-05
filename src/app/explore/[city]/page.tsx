@@ -50,15 +50,6 @@ const SPOTLIGHT_EVENTS = [
   }
 ];
 
-// Mock data for event grid
-const EVENTS = [
-  { id: 1, name: "Sunset Techno Vibes", date: "24-10-2026", price: "₹999", image: "https://picsum.photos/seed/event1/800/1000" },
-  { id: 2, name: "Underground Comedy Club", date: "25-10-2026", price: "₹499", image: "https://picsum.photos/seed/event2/800/1000" },
-  { id: 3, name: "Midnight Art Exhibit", date: "26-10-2026", price: "FREE", image: "https://picsum.photos/seed/event3/800/1000" },
-  { id: 4, name: "Rooftop Jazz & Wine", date: "27-10-2026", price: "₹1499", image: "https://picsum.photos/seed/event4/800/1000" },
-  { id: 5, name: "Cyberpunk Cosplay Meet", date: "28-10-2026", price: "₹299", image: "https://picsum.photos/seed/event5/800/1000" },
-  { id: 6, name: "Secret Indie Gig", date: "29-10-2026", price: "₹799", image: "https://picsum.photos/seed/event6/800/1000" },
-];
 
 export default function ExplorePage() {
   const params = useParams();
@@ -72,6 +63,8 @@ export default function ExplorePage() {
   const [isSortOpen, setIsSortOpen] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [spotlightEvents, setSpotlightEvents] = useState<any[]>(SPOTLIGHT_EVENTS);
+  const [events, setEvents] = useState<any[]>([]);
+  const [isLoadingEvents, setIsLoadingEvents] = useState(true);
 
   // Auto-slide effect
   useEffect(() => {
@@ -88,9 +81,6 @@ export default function ExplorePage() {
     const fetchSpotlight = async () => {
       const supabase = createClient();
       let cityCode = cityUrl;
-      if (cityUrl === "delhi") cityCode = "del";
-      if (cityUrl === "mumbai") cityCode = "mum";
-      if (cityUrl === "bengaluru") cityCode = "blr";
 
       const { data } = await supabase
         .from("events")
@@ -110,14 +100,31 @@ export default function ExplorePage() {
     fetchSpotlight();
   }, [cityUrl]);
 
+  // Fetch Event Grid Data
+  useEffect(() => {
+    if (!cityUrl) return;
+    const fetchEvents = async () => {
+      setIsLoadingEvents(true);
+      const supabase = createClient();
+      
+      const { data } = await supabase
+        .from("events")
+        .select("*")
+        .eq("cityId", cityUrl)
+        .order("created_at", { ascending: false });
+        
+      if (data) {
+        setEvents(data);
+      }
+      setIsLoadingEvents(false);
+    };
+    fetchEvents();
+  }, [cityUrl]);
+
   // Sync URL city with global context
   useEffect(() => {
     if (cityUrl) {
-      let cityCode = cityUrl;
-      if (cityUrl === "delhi") cityCode = "del";
-      if (cityUrl === "mumbai") cityCode = "mum";
-      if (cityUrl === "bengaluru") cityCode = "blr";
-      setSelectedCity(cityCode);
+      setSelectedCity(cityUrl);
     }
   }, [cityUrl, setSelectedCity]);
 
@@ -304,9 +311,13 @@ export default function ExplorePage() {
         </div>
 
         {/* 4-Column Grid */}
-        {EVENTS.length > 0 ? (
+        {isLoadingEvents ? (
+          <div className="flex justify-center items-center py-32">
+            <div className="w-10 h-10 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        ) : events.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
-            {EVENTS.map((event) => (
+            {events.map((event) => (
               <div 
                 key={event.id}
                 onClick={() => router.push(`/explore/${cityUrl}/${event.id}`)}
@@ -315,8 +326,8 @@ export default function ExplorePage() {
                 {/* Image Box */}
                 <TiltCard className="relative w-full aspect-[4/5] bg-zinc-900 rounded-3xl overflow-hidden mb-4 border border-white/5">
                   <Image
-                    src={event.image}
-                    alt={event.name}
+                    src={event.image || "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&q=80&w=1200"}
+                    alt={event.title || "Event Image"}
                     fill
                     className="object-cover transition-all duration-700 ease-out"
                   />
@@ -326,13 +337,13 @@ export default function ExplorePage() {
                 {/* White Text Area Box below card as per prompt */}
                 <div className="bg-white rounded-2xl p-5 flex flex-col gap-2 transform group-hover:-translate-y-2 transition-transform duration-500 shadow-xl">
                   <span className="font-mono text-[10px] text-black/50 uppercase tracking-widest">
-                    DATE - {event.date}
+                    DATE - {event.date || "TBA"}
                   </span>
                   <h3 className="font-black text-black text-xl uppercase tracking-tighter leading-none line-clamp-2">
-                    {event.name}
+                    {event.title}
                   </h3>
                   <span className="font-black text-lg mt-1" style={{ color: cityThemeColor }}>
-                    {event.price}
+                    {event.price || "TBA"}
                   </span>
                 </div>
               </div>
