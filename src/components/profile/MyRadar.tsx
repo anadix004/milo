@@ -26,7 +26,7 @@ export default function MyRadar() {
       try {
         // Fetch RSVPs
         const { data: rsvpData, error: rsvpError } = await supabase
-          .from("rsvps")
+          .from("vibe_checks")
           .select(`
             id,
             event:events (*)

@@ -57,7 +57,7 @@ export default function ProfileSidebar({ isOpen, onClose, onAuthClick }: Profile
     if (!user) return;
     try {
       const { data, error } = await supabase
-        .from("rsvps")
+        .from("vibe_checks")
         .select(`
           id,
           type,

@@ -130,17 +130,23 @@ export default function EventSubmission({ isOpen, onClose, onAuthRedirect }: Eve
 
       const hashedAadhaar = await hashAadhaar(formData.aadhaarId);
 
+      let finalDescription = formData.description;
+      if (formData.venueAddress) {
+        finalDescription += `\n\nVenue: ${formData.venueAddress}`;
+      }
+      const validLinks = ticketLinks.filter(l => l.url.trim() !== "");
+      if (validLinks.length > 0) {
+        finalDescription += `\n\nTickets:\n` + validLinks.map(l => `${l.name || 'Link'}: ${l.url}`).join('\n');
+      }
+
       const { error: dbError } = await supabase.from("events").insert({
         title: formData.title,
-        description: formData.description,
+        description: finalDescription,
         location: formData.zoneId ? `${formData.zoneId}, ${formData.cityId}` : formData.cityId,
         cityId: formData.cityId,
         date: formData.date,
         price: formData.price,
         category: formData.category,
-        venue_address: formData.venueAddress,
-        aadhaar_id: hashedAadhaar,
-        ticket_links: ticketLinks.filter(l => l.url.trim() !== ""),
         image: imageUrl || "https://images.unsplash.com/photo-1492684223066-81342ee5ff30",
         video_url: videoUrl,
         user_id: user.id,
