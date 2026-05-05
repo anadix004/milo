@@ -1,49 +1,36 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthContext";
 import { Loader2 } from "lucide-react";
-import { createClient } from "@/utils/supabase/client";
+
+const ADMIN_ROLES = ["admin", "owner", "team"];
 
 export default function AdminGuard({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth();
   const router = useRouter();
-  const [isAuthorized, setIsAuthorized] = useState(false);
+
+  const role = user?.role ?? "user";
+  const isAuthorized = ADMIN_ROLES.includes(role);
 
   useEffect(() => {
-    async function checkRole() {
-      if (isLoading) return;
-      if (!user) {
-        router.push("/login");
-        return;
-      }
+    // Wait until auth has fully resolved before making any routing decision
+    if (isLoading) return;
 
-      try {
-        const supabase = createClient();
-        const { data, error } = await supabase
-          .from("profiles")
-          .select("role")
-          .eq("id", user.id)
-          .single();
-
-        if (error || !data || !["admin", "owner", "team"].includes(data.role)) {
-          console.error("Unauthorized access attempt:", error);
-          router.push("/");
-          return;
-        }
-
-        setIsAuthorized(true);
-      } catch (err) {
-        console.error("AdminGuard check failed:", err);
-        router.push("/");
-      }
+    if (!user) {
+      router.push("/login");
+      return;
     }
 
-    checkRole();
-  }, [user, isLoading, router]);
+    if (!isAuthorized) {
+      console.warn("AdminGuard: insufficient role →", role);
+      router.push("/");
+    }
+  }, [user, isLoading, isAuthorized, role, router]);
 
-  if (isLoading || !isAuthorized) {
+  // Show spinner while auth is loading OR while we wait for the role check
+  if (isLoading || !user || !isAuthorized) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
         <Loader2 className="animate-spin text-purple-500" size={48} />
