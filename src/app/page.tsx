@@ -20,17 +20,9 @@ export default function Home() {
   const [activeModal, setActiveModal] = useState<"profile" | "event" | "auth" | "notifications" | null>(null);
 
   useEffect(() => {
-    // Simulate short preload for video
-    let current = 0;
-    const interval = setInterval(() => {
-      current += 10;
-      setProgress(current);
-      if (current >= 100) {
-        clearInterval(interval);
-        setTimeout(() => setIsReady(true), 500);
-      }
-    }, 50);
-    return () => clearInterval(interval);
+    setProgress(100);
+    const timer = setTimeout(() => setIsReady(true), 100);
+    return () => clearTimeout(timer);
   }, []);
 
   const closeModals = () => setActiveModal(null);
@@ -82,7 +74,7 @@ export default function Home() {
         onNotificationsClick={() => setActiveModal("notifications")}
       />
 
-      <div className={isReady ? "opacity-100 flex-1" : "opacity-0 transition-opacity duration-1000 flex-1"}>
+      <div className="flex-1">
         <HeroSection />
       </div>
     </main>

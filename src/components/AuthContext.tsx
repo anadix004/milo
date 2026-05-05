@@ -102,18 +102,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setSession(session);
       if (session?.user) {
-        fetchProfile(session.user.id, session.user).then(hasProfile => {
-          if (_event === "SIGNED_IN" && !hasProfile) {
-            addNotification("session", "Account initialized. Let's set up your profile.");
-          }
-        });
+        // IMPORTANT: await fetchProfile so isLoading is only set false AFTER
+        // the user object (including role) is fully resolved.
+        const hasProfile = await fetchProfile(session.user.id, session.user);
+        if (_event === "SIGNED_IN" && !hasProfile) {
+          addNotification("session", "Account initialized. Let's set up your profile.");
+        }
       } else {
         setUser(null);
       }
       setIsLoading(false);
-      
-      // Trigger router.refresh to sync with Server Components/Middleware
-      router.refresh();
+
+      // Only refresh server components on meaningful auth changes, not on
+      // TOKEN_REFRESHED / INITIAL_SESSION to avoid spurious re-renders.
+      if (_event === "SIGNED_IN" || _event === "SIGNED_OUT") {
+        router.refresh();
+      }
     });
 
     return () => subscription.unsubscribe();

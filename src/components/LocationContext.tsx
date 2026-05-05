@@ -6,13 +6,11 @@ import { usePathname, useRouter } from "next/navigation";
 interface LocationContextType {
   selectedCity: string | null;
   setSelectedCity: (city: string | null) => void;
-  cityThemeColor: string;
 }
 
 const LocationContext = createContext<LocationContextType>({
   selectedCity: null,
   setSelectedCity: () => {},
-  cityThemeColor: "#ffffff",
 });
 
 export const LocationProvider = ({ children }: { children: React.ReactNode }) => {
@@ -50,14 +48,8 @@ export const LocationProvider = ({ children }: { children: React.ReactNode }) =>
     }
   };
 
-  // Determine theme color
-  let cityThemeColor = "#ffffff"; // default white
-  if (selectedCity === "del") cityThemeColor = "#DC2626"; // Red for Delhi
-  if (selectedCity === "mum") cityThemeColor = "#3B82F6"; // Blue for Mumbai
-  if (selectedCity === "blr") cityThemeColor = "#10B981"; // Green for Bangalore
-
   return (
-    <LocationContext.Provider value={{ selectedCity, setSelectedCity, cityThemeColor }}>
+    <LocationContext.Provider value={{ selectedCity, setSelectedCity }}>
       {children}
     </LocationContext.Provider>
   );

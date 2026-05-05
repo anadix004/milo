@@ -14,6 +14,7 @@ import dynamic from "next/dynamic";
 import Image from "next/image";
 import { TiltCard } from "@/components/TiltCard";
 import { motion, AnimatePresence } from "framer-motion";
+import { getCategoryColour, getCategoryHeroAura, getCategoryCardAura, getCategoryBorderGlow, CATEGORY_LABELS, EventCategory } from "@/lib/aura";
 
 const ProfileSidebar = dynamic(() => import("@/components/ProfileSidebar"), { ssr: false });
 const EventSubmission = dynamic(() => import("@/components/EventSubmission"), { ssr: false });
@@ -26,7 +27,7 @@ const SPOTLIGHT_EVENTS = [
     title: "THE NEON WAREHOUSE WAVES",
     date: "OCT 24",
     location: "Secret Warehouse",
-    type: "Techno / Underground",
+    type: "dj_night",
     description: "An exclusive underground rave featuring top international DJs. Secret location revealed to ticket holders 2 hours before the event.",
     image: "https://picsum.photos/seed/spotlight1/1600/900",
   },
@@ -35,7 +36,7 @@ const SPOTLIGHT_EVENTS = [
     title: "ROOFTOP SYMPHONY",
     date: "OCT 26",
     location: "Skyline Terrace",
-    type: "Live Music / Chill",
+    type: "dj_night",
     description: "Experience classical instruments fused with modern electronic beats under the stars.",
     image: "https://picsum.photos/seed/spotlight2/1600/900",
   },
@@ -44,7 +45,7 @@ const SPOTLIGHT_EVENTS = [
     title: "CYBERPUNK ALLEY",
     date: "OCT 31",
     location: "Downtown District 9",
-    type: "Festival / Immersive",
+    type: "club",
     description: "A futuristic street festival with neon art installations, cyberpunk cosplay, and synthwave.",
     image: "https://picsum.photos/seed/spotlight3/1600/900",
   }
@@ -57,7 +58,7 @@ export default function ExplorePage() {
   const cityUrl = params?.city as string;
   
   const { isAuthenticated } = useAuth();
-  const { setSelectedCity, cityThemeColor } = useLocation();
+  const { setSelectedCity } = useLocation();
   const [activeModal, setActiveModal] = useState<"profile" | "event" | "auth" | "notifications" | null>(null);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [isSortOpen, setIsSortOpen] = useState(false);
@@ -188,8 +189,14 @@ export default function ExplorePage() {
               />
             )}
             {/* Gradients: dark on left to transparent right, dark bottom to transparent up */}
-            <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/50 to-transparent" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/50 to-transparent z-[1]" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent z-[1]" />
+            
+            {/* Spotlight Aura */}
+            <div 
+              className="absolute inset-0 z-[2] mix-blend-screen opacity-100" 
+              style={{ background: getCategoryHeroAura(spotlightEvents[currentSlide]?.category || spotlightEvents[currentSlide]?.type || 'other') }} 
+            />
 
             {/* Spotlight Content (Bottom Left) */}
             <div className="absolute bottom-12 md:bottom-20 left-4 md:left-12 max-w-2xl z-10">
@@ -204,7 +211,9 @@ export default function ExplorePage() {
                 <span className="w-1 h-1 bg-white/50 rounded-full" />
                 <span>{spotlightEvents[currentSlide]?.location || spotlightEvents[currentSlide]?.cityId}</span>
                 <span className="w-1 h-1 bg-white/50 rounded-full" />
-                <span style={{ color: cityThemeColor }}>{spotlightEvents[currentSlide]?.category || spotlightEvents[currentSlide]?.type}</span>
+                <span style={{ color: getCategoryColour(spotlightEvents[currentSlide]?.category || spotlightEvents[currentSlide]?.type || 'other') }}>
+                  {CATEGORY_LABELS[(spotlightEvents[currentSlide]?.category || spotlightEvents[currentSlide]?.type) as EventCategory] || (spotlightEvents[currentSlide]?.category || spotlightEvents[currentSlide]?.type)}
+                </span>
               </div>
               <p className="text-sm text-white/60 line-clamp-2 max-w-lg mb-8 leading-relaxed">
                 {spotlightEvents[currentSlide]?.description}
@@ -241,7 +250,10 @@ export default function ExplorePage() {
                 <motion.div
                   layoutId="activeIndicator"
                   className="absolute inset-0"
-                  style={{ backgroundColor: cityThemeColor || 'white' }}
+                  style={{ 
+                    backgroundColor: getCategoryColour(spotlightEvents[currentSlide]?.category || spotlightEvents[currentSlide]?.type || 'other'),
+                    boxShadow: `0 0 12px ${getCategoryColour(spotlightEvents[currentSlide]?.category || spotlightEvents[currentSlide]?.type || 'other')}`
+                  }}
                 />
               )}
             </button>
@@ -280,8 +292,7 @@ export default function ExplorePage() {
 
             <button 
               onClick={() => handleAuthGate(() => setActiveModal("event"))}
-              className="w-14 h-14 rounded-2xl border border-transparent text-white flex items-center justify-center transition-transform hover:scale-105 active:scale-95"
-              style={{ backgroundColor: cityThemeColor }}
+              className="w-14 h-14 rounded-2xl border border-transparent bg-white text-black flex items-center justify-center transition-transform hover:scale-105 active:scale-95"
             >
               <Plus size={24} strokeWidth={3} />
             </button>
@@ -324,25 +335,40 @@ export default function ExplorePage() {
                 className="group cursor-pointer flex flex-col"
               >
                 {/* Image Box */}
-                <TiltCard className="relative w-full aspect-[4/5] bg-zinc-900 rounded-3xl overflow-hidden mb-4 border border-white/5">
+                <TiltCard 
+                  className="relative w-full aspect-[4/5] rounded-3xl overflow-hidden mb-4 border border-white/5"
+                  style={{
+                    background: getCategoryCardAura(event.category || event.type || 'other'),
+                    boxShadow: getCategoryBorderGlow(event.category || event.type || 'other')
+                  }}
+                >
+                  <div className="absolute inset-0 bg-black/75 z-0" />
                   <Image
                     src={event.image || "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&q=80&w=1200"}
                     alt={event.title || "Event Image"}
                     fill
-                    className="object-cover transition-all duration-700 ease-out"
+                    className="object-cover transition-all duration-700 ease-out mix-blend-overlay z-10"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity z-20" />
                 </TiltCard>
                 
-                {/* White Text Area Box below card as per prompt */}
-                <div className="bg-white rounded-2xl p-5 flex flex-col gap-2 transform group-hover:-translate-y-2 transition-transform duration-500 shadow-xl">
-                  <span className="font-mono text-[10px] text-black/50 uppercase tracking-widest">
-                    DATE - {event.date || "TBA"}
-                  </span>
-                  <h3 className="font-black text-black text-xl uppercase tracking-tighter leading-none line-clamp-2">
+                {/* Ambient Text Area Box */}
+                <div 
+                  className="rounded-2xl p-5 flex flex-col gap-2 transform group-hover:-translate-y-2 transition-transform duration-500 border border-white/5 backdrop-blur-xl relative z-30"
+                  style={{ background: `linear-gradient(to bottom, rgba(0,0,0,0.6), rgba(0,0,0,0.9)), ${getCategoryCardAura(event.category || event.type || 'other')}` }}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono text-[10px] text-white/50 uppercase tracking-widest">
+                      DATE - {event.date || "TBA"}
+                    </span>
+                    <span className="font-black text-[9px] uppercase tracking-widest px-2 py-1 rounded-full border border-white/10" style={{ color: getCategoryColour(event.category || event.type || 'other'), backgroundColor: `${getCategoryColour(event.category || event.type || 'other')}15` }}>
+                      {CATEGORY_LABELS[(event.category || event.type) as EventCategory] || (event.category || event.type)}
+                    </span>
+                  </div>
+                  <h3 className="font-black text-white text-xl uppercase tracking-tighter leading-tight line-clamp-2 mt-1">
                     {event.title}
                   </h3>
-                  <span className="font-black text-lg mt-1" style={{ color: cityThemeColor }}>
+                  <span className="font-black text-lg mt-1" style={{ color: getCategoryColour(event.category || event.type || 'other') }}>
                     {event.price || "TBA"}
                   </span>
                 </div>
