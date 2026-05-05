@@ -6,6 +6,7 @@ import { Calendar, Clock, MapPin, Tag, Users, AlertCircle, ArrowLeft } from "luc
 import { useAuth } from "@/components/AuthContext";
 import { useLocation } from "@/components/LocationContext";
 import Header from "@/components/Header";
+import { getCategoryColour, getCategoryButtonGlow, getCategoryCardAura } from "@/lib/aura";
 
 // Mock Data
 const EVENT = {
@@ -29,7 +30,7 @@ export default function EventDetailPage() {
   const router = useRouter();
   const cityUrl = params?.city as string;
   const { isAuthenticated } = useAuth();
-  const { cityThemeColor } = useLocation();
+  const { selectedCity } = useLocation();
 
   const handleJoinPlan = () => {
     if (!isAuthenticated) {
@@ -110,7 +111,7 @@ export default function EventDetailPage() {
           {/* Details Block (Mid-Left) */}
           <div className="md:col-span-8 md:row-span-1 bg-white/5 border border-white/10 rounded-[2rem] p-6 md:p-8 flex flex-wrap gap-x-8 gap-y-6">
             <div className="flex items-center gap-3 min-w-[160px]">
-              <div className="p-2.5 rounded-xl bg-white/10" style={{ color: cityThemeColor }}><Calendar size={18} /></div>
+              <div className="p-2.5 rounded-xl bg-white/10" style={{ color: getCategoryColour(EVENT.type) }}><Calendar size={18} /></div>
               <div>
                 <p className="text-[10px] font-mono text-white/40 uppercase tracking-widest">Date</p>
                 <p className="text-sm font-bold text-white">{EVENT.date}</p>
@@ -118,7 +119,7 @@ export default function EventDetailPage() {
             </div>
             
             <div className="flex items-center gap-3 min-w-[160px]">
-              <div className="p-2.5 rounded-xl bg-white/10" style={{ color: cityThemeColor }}><Clock size={18} /></div>
+              <div className="p-2.5 rounded-xl bg-white/10" style={{ color: getCategoryColour(EVENT.type) }}><Clock size={18} /></div>
               <div>
                 <p className="text-[10px] font-mono text-white/40 uppercase tracking-widest">Time</p>
                 <p className="text-sm font-bold text-white">{EVENT.time}</p>
@@ -126,7 +127,7 @@ export default function EventDetailPage() {
             </div>
 
             <div className="flex items-center gap-3 min-w-[160px]">
-              <div className="p-2.5 rounded-xl bg-white/10" style={{ color: cityThemeColor }}><Tag size={18} /></div>
+              <div className="p-2.5 rounded-xl bg-white/10" style={{ color: getCategoryColour(EVENT.type) }}><Tag size={18} /></div>
               <div>
                 <p className="text-[10px] font-mono text-white/40 uppercase tracking-widest">Type</p>
                 <p className="text-sm font-bold text-white">{EVENT.type}</p>
@@ -134,7 +135,7 @@ export default function EventDetailPage() {
             </div>
 
             <div className="flex items-center gap-3 min-w-[160px]">
-              <div className="p-2.5 rounded-xl bg-white/10" style={{ color: cityThemeColor }}><AlertCircle size={18} /></div>
+              <div className="p-2.5 rounded-xl bg-white/10" style={{ color: getCategoryColour(EVENT.type) }}><AlertCircle size={18} /></div>
               <div>
                 <p className="text-[10px] font-mono text-white/40 uppercase tracking-widest">Age Limit</p>
                 <p className="text-sm font-bold text-white">{EVENT.ageLimit}</p>
@@ -142,7 +143,7 @@ export default function EventDetailPage() {
             </div>
 
             <div className="flex items-center gap-3 min-w-[160px] md:col-span-2">
-              <div className="p-2.5 rounded-xl bg-white/10" style={{ color: cityThemeColor }}><MapPin size={18} /></div>
+              <div className="p-2.5 rounded-xl bg-white/10" style={{ color: getCategoryColour(EVENT.type) }}><MapPin size={18} /></div>
               <div>
                 <p className="text-[10px] font-mono text-white/40 uppercase tracking-widest">Location</p>
                 <p className="text-sm font-bold text-white">{EVENT.location}</p>
@@ -162,13 +163,30 @@ export default function EventDetailPage() {
             <div className="absolute inset-0 bg-gradient-to-tr from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             
             {EVENT.isAvailable ? (
-              <button
-                onClick={handleJoinPlan}
-                className="w-full py-6 rounded-xl font-black uppercase tracking-widest text-sm transition-transform hover:scale-[1.02] active:scale-95 shadow-[0_0_30px_rgba(255,255,255,0.1)] hover:shadow-[0_0_40px_rgba(255,255,255,0.2)]"
-                style={{ backgroundColor: cityThemeColor, color: "white" }}
-              >
-                Join Plan
-              </button>
+              <div style={{ position: 'relative', width: '100%' }}>
+                <div style={{
+                  position: 'absolute',
+                  inset: -16,
+                  background: getCategoryCardAura(EVENT.type),
+                  filter: 'blur(20px)',
+                  pointerEvents: 'none',
+                  zIndex: 0,
+                }} />
+                <button
+                  onClick={handleJoinPlan}
+                  className="w-full py-6 rounded-xl font-black uppercase tracking-widest text-sm transition-transform hover:scale-[1.02] active:scale-95"
+                  style={{
+                    position: 'relative',
+                    zIndex: 1,
+                    background: 'rgba(255,255,255,0.97)',
+                    color: '#000',
+                    boxShadow: getCategoryButtonGlow(EVENT.type),
+                    border: 'none',
+                  }}
+                >
+                  Join Plan
+                </button>
+              </div>
             ) : (
               <button
                 disabled

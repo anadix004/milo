@@ -21,7 +21,7 @@ const MORE_FILTERS = [
 ];
 
 export default function FiltersPanel({ isOpen, onClose }: FiltersPanelProps) {
-  const { cityThemeColor } = useLocation();
+  const { selectedCity } = useLocation();
 
   return (
     <AnimatePresence>
@@ -98,7 +98,7 @@ export default function FiltersPanel({ isOpen, onClose }: FiltersPanelProps) {
                   {MORE_FILTERS.map(f => (
                     <label key={f} className="flex items-center gap-3 cursor-pointer group">
                       <div className="w-5 h-5 rounded border border-white/20 bg-white/5 flex items-center justify-center group-hover:border-white/40 transition-colors">
-                        <div className="w-3 h-3 rounded-sm opacity-0 transition-opacity" style={{ backgroundColor: cityThemeColor }} />
+                        <div className="w-3 h-3 rounded-sm opacity-0 transition-opacity bg-white" />
                       </div>
                       <span className="text-sm font-bold text-white/80 group-hover:text-white transition-colors">{f}</span>
                     </label>
@@ -113,7 +113,7 @@ export default function FiltersPanel({ isOpen, onClose }: FiltersPanelProps) {
               <button onClick={onClose} className="px-6 py-4 rounded-xl border border-white/20 text-white font-black uppercase tracking-widest text-xs hover:bg-white/10 transition-colors">
                 Clear All
               </button>
-              <button style={{ backgroundColor: cityThemeColor }} className="px-6 py-4 rounded-xl text-white font-black uppercase tracking-widest text-xs transition-colors hover:opacity-90">
+              <button className="px-6 py-4 rounded-xl bg-white text-black font-black uppercase tracking-widest text-xs transition-colors hover:bg-white/90">
                 Apply
               </button>
             </div>

@@ -14,6 +14,7 @@ import dynamic from "next/dynamic";
 import Image from "next/image";
 import { TiltCard } from "@/components/TiltCard";
 import { motion, AnimatePresence } from "framer-motion";
+import { getCategoryColour } from "@/lib/aura";
 
 const ProfileSidebar = dynamic(() => import("@/components/ProfileSidebar"), { ssr: false });
 const EventSubmission = dynamic(() => import("@/components/EventSubmission"), { ssr: false });
@@ -57,7 +58,7 @@ export default function ExplorePage() {
   const cityUrl = params?.city as string;
   
   const { isAuthenticated } = useAuth();
-  const { setSelectedCity, cityThemeColor } = useLocation();
+  const { setSelectedCity } = useLocation();
   const [activeModal, setActiveModal] = useState<"profile" | "event" | "auth" | "notifications" | null>(null);
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [isSortOpen, setIsSortOpen] = useState(false);
@@ -204,7 +205,7 @@ export default function ExplorePage() {
                 <span className="w-1 h-1 bg-white/50 rounded-full" />
                 <span>{spotlightEvents[currentSlide]?.location || spotlightEvents[currentSlide]?.cityId}</span>
                 <span className="w-1 h-1 bg-white/50 rounded-full" />
-                <span style={{ color: cityThemeColor }}>{spotlightEvents[currentSlide]?.category || spotlightEvents[currentSlide]?.type}</span>
+                <span style={{ color: getCategoryColour(spotlightEvents[currentSlide]?.category || spotlightEvents[currentSlide]?.type || 'other') }}>{spotlightEvents[currentSlide]?.category || spotlightEvents[currentSlide]?.type}</span>
               </div>
               <p className="text-sm text-white/60 line-clamp-2 max-w-lg mb-8 leading-relaxed">
                 {spotlightEvents[currentSlide]?.description}
@@ -241,7 +242,7 @@ export default function ExplorePage() {
                 <motion.div
                   layoutId="activeIndicator"
                   className="absolute inset-0"
-                  style={{ backgroundColor: cityThemeColor || 'white' }}
+                  style={{ backgroundColor: getCategoryColour(spotlightEvents[currentSlide]?.category || spotlightEvents[currentSlide]?.type || 'other') }}
                 />
               )}
             </button>
@@ -280,8 +281,7 @@ export default function ExplorePage() {
 
             <button 
               onClick={() => handleAuthGate(() => setActiveModal("event"))}
-              className="w-14 h-14 rounded-2xl border border-transparent text-white flex items-center justify-center transition-transform hover:scale-105 active:scale-95"
-              style={{ backgroundColor: cityThemeColor }}
+              className="w-14 h-14 rounded-2xl border border-transparent bg-white text-black flex items-center justify-center transition-transform hover:scale-105 active:scale-95"
             >
               <Plus size={24} strokeWidth={3} />
             </button>
@@ -342,7 +342,7 @@ export default function ExplorePage() {
                   <h3 className="font-black text-black text-xl uppercase tracking-tighter leading-none line-clamp-2">
                     {event.title}
                   </h3>
-                  <span className="font-black text-lg mt-1" style={{ color: cityThemeColor }}>
+                  <span className="font-black text-lg mt-1" style={{ color: getCategoryColour(event.category || event.type || 'other') }}>
                     {event.price || "TBA"}
                   </span>
                 </div>
