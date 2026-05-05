@@ -67,6 +67,7 @@ export default function Preloader({ progress, isReady }: PreloaderProps) {
              <motion.div 
                 initial={{ width: 0 }}
                 animate={{ width: `${progress}%` }}
+                transition={{ duration: 1.2, ease: "easeOut" }}
                 className="h-full bg-white shadow-[0_0_20px_white]"
              />
           </div>
