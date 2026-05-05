@@ -174,7 +174,7 @@ export default function EventListing({ selectedCity, onAuthRequired }: { selecte
     if (!user) return;
     try {
       const { data, error } = await supabase
-        .from("rsvps")
+        .from("vibe_checks")
         .select("event_id")
         .eq("profile_id", user.id)
         .eq("type", "join");
@@ -275,7 +275,7 @@ export default function EventListing({ selectedCity, onAuthRequired }: { selecte
 
     try {
       const { error } = await supabase
-        .from("rsvps")
+        .from("vibe_checks")
         .insert({
           event_id: id,
           profile_id: user.id,

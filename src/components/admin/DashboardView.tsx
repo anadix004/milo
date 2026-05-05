@@ -47,7 +47,7 @@ export default function DashboardView() {
 
       // Fetch RSVP Count
       const { count: rsvpCount } = await supabase
-        .from("rsvps")
+        .from("vibe_checks")
         .select("*", { count: "exact", head: true });
 
       setStats({
