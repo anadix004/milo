@@ -75,5 +75,5 @@ export function getCategoryButtonGlow(category: string): string {
 export function getCategoryBorderGlow(category: string): string {
   const cat = normalizeCategory(category);
   const c = CATEGORY_AURA[cat] ?? CATEGORY_AURA.other
-  return `0 0 0 1px ${c.glow.replace(/[\d.]+\)$/, '0.25)')}, 0 4px 24px ${c.glow.replace(/[\d.]+\)$/, '0.15)')}`
+  return `0 4px 32px ${c.glow.replace(/[\d.]+\)$/, '0.2)')}, 0 0 120px ${c.glow.replace(/[\d.]+\)$/, '0.1)')}`
 }

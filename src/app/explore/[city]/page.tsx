@@ -194,7 +194,7 @@ export default function ExplorePage() {
             
             {/* Spotlight Aura */}
             <div 
-              className="absolute inset-0 z-[2] mix-blend-overlay opacity-60" 
+              className="absolute inset-0 z-[2] mix-blend-screen opacity-100" 
               style={{ background: getCategoryHeroAura(spotlightEvents[currentSlide]?.category || spotlightEvents[currentSlide]?.type || 'other') }} 
             />
 
@@ -250,7 +250,10 @@ export default function ExplorePage() {
                 <motion.div
                   layoutId="activeIndicator"
                   className="absolute inset-0"
-                  style={{ backgroundColor: getCategoryColour(spotlightEvents[currentSlide]?.category || spotlightEvents[currentSlide]?.type || 'other') }}
+                  style={{ 
+                    backgroundColor: getCategoryColour(spotlightEvents[currentSlide]?.category || spotlightEvents[currentSlide]?.type || 'other'),
+                    boxShadow: `0 0 12px ${getCategoryColour(spotlightEvents[currentSlide]?.category || spotlightEvents[currentSlide]?.type || 'other')}`
+                  }}
                 />
               )}
             </button>
@@ -349,12 +352,20 @@ export default function ExplorePage() {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity z-20" />
                 </TiltCard>
                 
-                {/* White Text Area Box below card as per prompt */}
-                <div className="bg-white rounded-2xl p-5 flex flex-col gap-2 transform group-hover:-translate-y-2 transition-transform duration-500 shadow-xl">
-                  <span className="font-mono text-[10px] text-black/50 uppercase tracking-widest">
-                    DATE - {event.date || "TBA"}
-                  </span>
-                  <h3 className="font-black text-black text-xl uppercase tracking-tighter leading-none line-clamp-2">
+                {/* Ambient Text Area Box */}
+                <div 
+                  className="rounded-2xl p-5 flex flex-col gap-2 transform group-hover:-translate-y-2 transition-transform duration-500 border border-white/5 backdrop-blur-xl relative z-30"
+                  style={{ background: `linear-gradient(to bottom, rgba(0,0,0,0.6), rgba(0,0,0,0.9)), ${getCategoryCardAura(event.category || event.type || 'other')}` }}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono text-[10px] text-white/50 uppercase tracking-widest">
+                      DATE - {event.date || "TBA"}
+                    </span>
+                    <span className="font-black text-[9px] uppercase tracking-widest px-2 py-1 rounded-full border border-white/10" style={{ color: getCategoryColour(event.category || event.type || 'other'), backgroundColor: `${getCategoryColour(event.category || event.type || 'other')}15` }}>
+                      {CATEGORY_LABELS[(event.category || event.type) as EventCategory] || (event.category || event.type)}
+                    </span>
+                  </div>
+                  <h3 className="font-black text-white text-xl uppercase tracking-tighter leading-tight line-clamp-2 mt-1">
                     {event.title}
                   </h3>
                   <span className="font-black text-lg mt-1" style={{ color: getCategoryColour(event.category || event.type || 'other') }}>
