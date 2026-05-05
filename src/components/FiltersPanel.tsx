@@ -4,16 +4,14 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Calendar } from "lucide-react";
 import clsx from "clsx";
 import { useLocation } from "./LocationContext";
+import { OFFICIAL_CATEGORIES, CATEGORY_LABELS } from "@/lib/aura";
 
 interface FiltersPanelProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-const CATEGORIES = [
-  "Workshop", "Comedy Shows", "Music Shows", "Kids", "Performance",
-  "Meetups", "Conferences", "Exhibitions", "Screening"
-];
+
 
 const MORE_FILTERS = [
   "OUTDOOR EVENTS", "FAST FILLING", "KIDS ALLOWED", "MUST ATTEND",
@@ -83,9 +81,9 @@ export default function FiltersPanel({ isOpen, onClose }: FiltersPanelProps) {
               <section>
                 <p className="text-[10px] font-mono text-white/40 uppercase tracking-widest mb-4">CATEGORY-</p>
                 <div className="flex flex-wrap gap-2">
-                  {CATEGORIES.map(c => (
+                  {OFFICIAL_CATEGORIES.map(c => (
                     <button key={c} className="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-xs font-bold text-white hover:bg-white/10 transition-colors">
-                      {c}
+                      {CATEGORY_LABELS[c]}
                     </button>
                   ))}
                 </div>

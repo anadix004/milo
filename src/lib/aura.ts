@@ -1,62 +1,28 @@
-export type EventCategory =
-  | 'club' | 'dj_night' | 'house_party' | 'comedy'
-  | 'open_mic' | 'networking' | 'sports' | 'other'
+export const OFFICIAL_CATEGORIES = [
+  'club', 'dj_night', 'house_party', 'comedy', 
+  'open_mic', 'networking', 'sports', 'other'
+] as const
 
-const AURA_COLOURS: Record<EventCategory, [string, string]> = {
-  club:        ['#f9643c', '#e83ca0'],
-  dj_night:    ['#f9643c', '#b48cff'],
-  house_party: ['#e83ca0', '#b48cff'],
-  comedy:      ['#ffc83c', '#f9643c'],
-  open_mic:    ['#b48cff', '#f0b482'],
-  networking:  ['#b48cff', '#3ce6b4'],
-  sports:      ['#3ce6b4', '#50a0ff'],
-  other:       ['#50a0ff', '#3ce6b4'],
+export type EventCategory = typeof OFFICIAL_CATEGORIES[number]
+
+export const CATEGORY_LABELS: Record<EventCategory, string> = {
+  club: 'Club', dj_night: 'DJ Night', house_party: 'House Party',
+  comedy: 'Comedy', open_mic: 'Open Mic', networking: 'Networking',
+  sports: 'Sports', other: 'Other',
 }
 
-// Primary aura colour for the category
-export function getCategoryColour(category: EventCategory | string): string {
-  // Safe cast for runtime string matches
-  const cat = normalizeCategory(category);
-  return AURA_COLOURS[cat]?.[0] ?? '#b48cff'
+// All aura colors are radial gradients, never solid fills
+const CATEGORY_AURA: Record<EventCategory, { primary: string, secondary: string, glow: string }> = {
+  club:        { primary: 'rgba(249,100,60,0.18)',  secondary: 'rgba(232,60,160,0.12)',  glow: 'rgba(249,100,60,0.35)'  },
+  dj_night:    { primary: 'rgba(249,100,60,0.18)',  secondary: 'rgba(232,60,160,0.12)',  glow: 'rgba(249,100,60,0.35)'  },
+  house_party: { primary: 'rgba(232,60,160,0.18)',  secondary: 'rgba(180,140,255,0.12)', glow: 'rgba(232,60,160,0.35)'  },
+  comedy:      { primary: 'rgba(255,200,60,0.18)',  secondary: 'rgba(249,100,60,0.10)',  glow: 'rgba(255,200,60,0.35)'  },
+  open_mic:    { primary: 'rgba(180,140,255,0.18)', secondary: 'rgba(240,180,130,0.10)', glow: 'rgba(180,140,255,0.35)' },
+  networking:  { primary: 'rgba(180,140,255,0.18)', secondary: 'rgba(60,230,180,0.10)',  glow: 'rgba(180,140,255,0.35)' },
+  sports:      { primary: 'rgba(60,230,180,0.18)',  secondary: 'rgba(80,160,255,0.12)',  glow: 'rgba(60,230,180,0.35)'  },
+  other:       { primary: 'rgba(80,160,255,0.18)',  secondary: 'rgba(60,230,180,0.12)',  glow: 'rgba(80,160,255,0.35)'  },
 }
 
-// Radial glow for card backgrounds — subtle bloom from top-left corner
-// Use as: background: getCategoryCardAura('club')
-export function getCategoryCardAura(category: EventCategory | string): string {
-  const cat = normalizeCategory(category);
-  const [c1, c2] = AURA_COLOURS[cat] ?? ['#b48cff', '#3ce6b4']
-  return `radial-gradient(ellipse 70% 60% at 0% 0%, ${c1}2e 0%, transparent 70%), radial-gradient(ellipse 50% 50% at 100% 100%, ${c2}1a 0%, transparent 65%)`
-}
-
-// Radial glow for selected filter pill
-export function getCategoryPillAura(category: EventCategory | string): string {
-  const cat = normalizeCategory(category);
-  const [c1] = AURA_COLOURS[cat] ?? ['#b48cff', '#3ce6b4']
-  return `radial-gradient(ellipse 120% 100% at 50% 50%, ${c1}47 0%, transparent 70%)`
-}
-
-// Full-bleed aura for detail view / modal header
-export function getCategoryHeroAura(category: EventCategory | string): string {
-  const cat = normalizeCategory(category);
-  const [c1, c2] = AURA_COLOURS[cat] ?? ['#b48cff', '#3ce6b4']
-  return `radial-gradient(ellipse 80% 60% at 20% 20%, ${c1}40 0%, transparent 65%), radial-gradient(ellipse 60% 50% at 80% 80%, ${c2}30 0%, transparent 60%)`
-}
-
-// Glow box-shadow for CTA buttons
-export function getCategoryButtonGlow(category: EventCategory | string): string {
-  const cat = normalizeCategory(category);
-  const [c1] = AURA_COLOURS[cat] ?? ['#b48cff', '#3ce6b4']
-  return `0 0 24px ${c1}50, 0 4px 16px rgba(0,0,0,0.4)`
-}
-
-// Border glow for focused/hovered card
-export function getCategoryBorderGlow(category: EventCategory | string): string {
-  const cat = normalizeCategory(category);
-  const [c1] = AURA_COLOURS[cat] ?? ['#b48cff', '#3ce6b4']
-  return `0 0 0 0.5px ${c1}40, 0 8px 32px ${c1}20`
-}
-
-// Helper to normalize user-facing labels to internal keys
 export function normalizeCategory(label: string): EventCategory {
   const normalized = label.trim().toLowerCase();
   switch (normalized) {
@@ -67,8 +33,47 @@ export function normalizeCategory(label: string): EventCategory {
     case 'open mic': return 'open_mic';
     case 'networking': return 'networking';
     case 'sports': return 'sports';
-    case 'music': return 'dj_night'; // fallback for old labels
-    case 'nightlife': return 'club'; // fallback for old labels
+    case 'music': return 'dj_night';
+    case 'nightlife': return 'club';
     default: return 'other';
   }
+}
+
+export function getCategoryColour(category: string): string {
+  const cat = normalizeCategory(category);
+  const c = CATEGORY_AURA[cat] ?? CATEGORY_AURA.other;
+  return c.glow.replace(/[\d.]+\)$/, '1)');
+}
+
+// Hero banner — large radial from top-left + smaller from bottom-right
+export function getCategoryHeroAura(category: string): string {
+  const cat = normalizeCategory(category);
+  const c = CATEGORY_AURA[cat] ?? CATEGORY_AURA.other
+  return `radial-gradient(ellipse at 20% 20%, ${c.primary} 0%, transparent 55%), radial-gradient(ellipse at 80% 80%, ${c.secondary} 0%, transparent 50%)`
+}
+
+// Card background — subtle ambient, not distracting
+export function getCategoryCardAura(category: string): string {
+  const cat = normalizeCategory(category);
+  const c = CATEGORY_AURA[cat] ?? CATEGORY_AURA.other
+  return `radial-gradient(ellipse at 0% 0%, ${c.primary.replace(/[\d.]+\)$/, '0.12)')} 0%, transparent 60%), radial-gradient(ellipse at 100% 100%, ${c.secondary.replace(/[\d.]+\)$/, '0.08)')} 0%, transparent 50%)`
+}
+
+export function getCategoryPillAura(category: string): string {
+  const cat = normalizeCategory(category);
+  const c = CATEGORY_AURA[cat] ?? CATEGORY_AURA.other
+  return `radial-gradient(ellipse 120% 100% at 50% 50%, ${c.primary.replace(/[\d.]+\)$/, '0.3)')} 0%, transparent 70%)`
+}
+
+export function getCategoryButtonGlow(category: string): string {
+  const cat = normalizeCategory(category);
+  const c = CATEGORY_AURA[cat] ?? CATEGORY_AURA.other
+  return `0 0 24px ${c.glow.replace(/[\d.]+\)$/, '0.4)')}, 0 4px 16px rgba(0,0,0,0.4)`
+}
+
+// Border glow — box-shadow only, never a solid border color
+export function getCategoryBorderGlow(category: string): string {
+  const cat = normalizeCategory(category);
+  const c = CATEGORY_AURA[cat] ?? CATEGORY_AURA.other
+  return `0 0 0 1px ${c.glow.replace(/[\d.]+\)$/, '0.25)')}, 0 4px 24px ${c.glow.replace(/[\d.]+\)$/, '0.15)')}`
 }

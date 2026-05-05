@@ -16,7 +16,7 @@ import { useIsMobile } from "@/hooks/useMediaQuery";
 import BottomSheet from "@/components/mobile/BottomSheet";
 import VibeCheck from "@/components/VibeCheck";
 import { TiltCard } from "@/components/TiltCard";
-import { getCategoryCardAura, getCategoryPillAura, getCategoryHeroAura, getCategoryButtonGlow, getCategoryBorderGlow, getCategoryColour } from "@/lib/aura";
+import { getCategoryCardAura, getCategoryPillAura, getCategoryHeroAura, getCategoryButtonGlow, getCategoryBorderGlow, getCategoryColour, OFFICIAL_CATEGORIES, CATEGORY_LABELS, EventCategory } from "@/lib/aura";
 
 // --- SPRING CONFIG SYNC ---
 const SPRING_CONFIG = { stiffness: 70, damping: 15 };
@@ -228,7 +228,7 @@ export default function EventListing({ selectedCity, onAuthRequired }: { selecte
     return () => { supabase.removeChannel(channel); };
   }, []);
 
-  const FIXED_CATEGORIES = ["All", "Club", "DJ Night", "House Party", "Comedy", "Open Mic", "Networking", "Sports", "Other"];
+  const FIXED_CATEGORIES = ["All", ...OFFICIAL_CATEGORIES];
 
   const isJoined = (id: string) => joinedEvents.has(id);
   const isBookmarked = (id: string) => bookmarkedEvents.has(id);
@@ -398,12 +398,15 @@ export default function EventListing({ selectedCity, onAuthRequired }: { selecte
                   key={cat}
                   onClick={() => setSelectedCat(cat)}
                   style={{
-                    background: selectedCat === cat
+                    background: selectedCat === cat && cat !== "All"
                       ? getCategoryPillAura(cat)
-                      : 'rgba(255,255,255,0.04)',
-                    border: `0.5px solid ${selectedCat === cat
-                      ? getCategoryColour(cat) + '60'
-                      : 'rgba(255,255,255,0.07)'}`,
+                      : selectedCat === cat ? "rgba(255,255,255,0.15)" : 'rgba(255,255,255,0.04)',
+                    boxShadow: selectedCat === cat && cat !== "All"
+                      ? getCategoryBorderGlow(cat)
+                      : undefined,
+                    border: `0.5px solid ${selectedCat === cat && cat !== "All"
+                      ? 'transparent'
+                      : selectedCat === cat ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.07)'}`,
                     color: selectedCat === cat ? '#fff' : 'rgba(255,255,255,0.35)',
                     borderRadius: 99,
                     padding: '7px 16px',
@@ -413,12 +416,15 @@ export default function EventListing({ selectedCity, onAuthRequired }: { selecte
                   }}
                   className="flex-shrink-0 uppercase tracking-widest"
                 >
-                  {cat}
+                  {cat === "All" ? "All" : CATEGORY_LABELS[cat as EventCategory]}
                 </button>
               ))
             ) : (
               <>
-                <Dropdown label="Categories" value={selectedCat} options={FIXED_CATEGORIES} onChange={setSelectedCat} icon={<Filter size={14} />} />
+                <Dropdown label="Categories" value={selectedCat === "All" ? "All" : CATEGORY_LABELS[selectedCat as EventCategory]} options={FIXED_CATEGORIES.map(c => c === "All" ? "All" : CATEGORY_LABELS[c as EventCategory])} onChange={(label) => {
+                  const cat = FIXED_CATEGORIES.find(c => (c === "All" ? "All" : CATEGORY_LABELS[c as EventCategory]) === label);
+                  if (cat) setSelectedCat(cat);
+                }} icon={<Filter size={14} />} />
                 <Dropdown label="Timeframe" value={timeFilter} options={["All", "Today", "Tomorrow", "Week", "Month"]} onChange={setTimeFilter} icon={<Calendar size={14} />} />
                 <Dropdown label="Access" value={priceFilter} options={["All", "Free", "Paid"]} onChange={setPriceFilter} icon={<Star size={14} />} />
                 <Dropdown label="Budget" value={budgetFilter} options={["All", "< 500", "< 2000", "2000+"]} onChange={setBudgetFilter} icon={<ArrowUpDown size={14} />} />

@@ -11,6 +11,7 @@ import clsx from "clsx";
 import { Trash2, Link as LinkIcon } from "lucide-react";
 import { useIsMobile } from "@/hooks/useMediaQuery";
 import BottomSheet from "@/components/mobile/BottomSheet";
+import { OFFICIAL_CATEGORIES, CATEGORY_LABELS } from "@/lib/aura";
 
 interface EventSubmissionProps {
   isOpen: boolean;
@@ -183,8 +184,8 @@ export default function EventSubmission({ isOpen, onClose, onAuthRedirect }: Eve
           required
         >
           <option value="" disabled className="bg-black text-white/50">Select a category</option>
-          {["Music", "College", "Workshops", "Nightlife", "Networking"].map(cat => (
-            <option key={cat} value={cat} className="bg-black text-amber-500">{cat}</option>
+          {OFFICIAL_CATEGORIES.map(cat => (
+            <option key={cat} value={cat} className="bg-black text-amber-500">{CATEGORY_LABELS[cat]}</option>
           ))}
         </select>
       </div>

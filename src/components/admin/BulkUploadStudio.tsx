@@ -28,6 +28,7 @@ import {
   COMMON_URL_COLUMNS,
 } from "@/utils/scrapeSync";
 import clsx from "clsx";
+import { OFFICIAL_CATEGORIES, CATEGORY_LABELS } from "@/lib/aura";
 
 // ── Manual mode types ─────────────────────────────────────────────────────────
 interface BulkEvent {
@@ -86,7 +87,7 @@ export default function BulkUploadStudio() {
         id: Math.random().toString(36).substr(2, 9),
         title: "",
         date: new Date().toISOString().split("T")[0],
-        category: "Music",
+        category: "dj_night",
         price: "Free",
         file: null,
         videoFile: null,
@@ -416,10 +417,10 @@ export default function BulkUploadStudio() {
                       onChange={(e) => updateRow(event.id, "category", e.target.value)}
                       className="w-full bg-black/50 border border-white/10 rounded-lg px-3 py-3 text-[10px] text-white font-black uppercase tracking-widest outline-none"
                     >
-                      {["Music", "College", "Workshops", "Nightlife", "Networking"].map(
+                      {OFFICIAL_CATEGORIES.map(
                         (cat) => (
                           <option key={cat} value={cat}>
-                            {cat}
+                            {CATEGORY_LABELS[cat]}
                           </option>
                         )
                       )}

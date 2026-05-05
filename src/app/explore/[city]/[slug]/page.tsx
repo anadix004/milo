@@ -17,7 +17,7 @@ const EVENT = {
   date: "OCT 24, 2026",
   time: "22:00 - 05:00",
   location: "Secret Warehouse",
-  type: "Techno / Underground",
+  type: "dj_night",
   ageLimit: "21+",
   language: "English / Hindi",
   image: "https://picsum.photos/seed/detail/1600/900",
