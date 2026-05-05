@@ -11,6 +11,7 @@ import ProfileEditModal from "@/components/profile/ProfileEditModal";
 export default function ProfilePage() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
+  const [activeEditField, setActiveEditField] = useState<string | null>(null);
   const router = useRouter();
 
   return (
@@ -44,12 +45,16 @@ export default function ProfilePage() {
       <SettingsModal
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
-        onEditProfile={() => setIsEditOpen(true)}
+        onEditProfile={(fieldId) => {
+          setActiveEditField(fieldId ?? null);
+          setIsEditOpen(true);
+        }}
       />
       
       <ProfileEditModal
         isOpen={isEditOpen}
-        onClose={() => setIsEditOpen(false)}
+        onClose={() => { setIsEditOpen(false); setActiveEditField(null); }}
+        activeField={activeEditField}
       />
     </div>
   );

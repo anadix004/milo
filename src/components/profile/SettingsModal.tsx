@@ -10,7 +10,7 @@ import clsx from "clsx";
 interface SettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onEditProfile: () => void;
+  onEditProfile: (fieldId?: string) => void;
 }
 
 export default function SettingsModal({ isOpen, onClose, onEditProfile }: SettingsModalProps) {
@@ -39,9 +39,9 @@ export default function SettingsModal({ isOpen, onClose, onEditProfile }: Settin
     };
   }, [isOpen]);
 
-  const handleEditProfile = () => {
+  const handleEditProfile = (fieldId?: string) => {
     onClose();
-    setTimeout(() => onEditProfile(), 200);
+    setTimeout(() => onEditProfile(fieldId), 200);
   };
 
   const handleToggleGhost = async () => {
@@ -99,17 +99,17 @@ export default function SettingsModal({ isOpen, onClose, onEditProfile }: Settin
                 <div className="bg-white/[0.02] border border-white/5 rounded-2xl overflow-hidden flex flex-col">
                   
                   {[
-                    { label: "Name", value: user?.display_name || user?.full_name || "Anonymous" },
-                    { label: "Phone Number", value: "+91 ••••• •••••" },
-                    { label: "Date of Birth", value: "DD/MM/YYYY" },
-                    { label: "Email Address", value: user?.email || "Not Provided" },
-                    { label: "City", value: user?.city || "Not Set" },
-                    { label: "Gender", value: "Not Specified" },
+                    { label: "Name", value: user?.display_name || user?.full_name || "Anonymous", id: "name" },
+                    { label: "Phone Number", value: (user as any)?.phone || "+91 ••••• •••••", id: "phone" },
+                    { label: "Date of Birth", value: (user as any)?.date_of_birth || "DD/MM/YYYY", id: "dob" },
+                    { label: "Email Address", value: user?.email || "Not Provided", id: "email" },
+                    { label: "City", value: user?.city || "Not Set", id: "city" },
+                    { label: "Gender", value: (user as any)?.gender || "Not Specified", id: "gender" },
                   ].map((field, idx) => (
                     <div key={field.label} className={clsx("flex flex-col p-4", idx !== 5 && "border-b border-white/5")}>
                       <div className="flex justify-between items-center mb-1">
                         <span className="text-[10px] font-mono text-white/40 uppercase tracking-widest">{field.label}</span>
-                        <button onClick={handleEditProfile} className="text-[10px] font-black text-purple-400 uppercase tracking-widest hover:text-purple-300">Edit</button>
+                        <button onClick={() => handleEditProfile(field.id)} className="text-[10px] font-black text-purple-400 uppercase tracking-widest hover:text-purple-300">Edit</button>
                       </div>
                       <span className="text-sm font-black text-white">{field.value}</span>
                     </div>

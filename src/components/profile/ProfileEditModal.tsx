@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, MapPin, User, AtSign, Sparkles, Save, Loader2, Music, ChevronDown } from "lucide-react";
+import { X, MapPin, User, AtSign, Sparkles, Save, Loader2, Music, ChevronDown, Phone, Calendar, Mail, UserCircle2 } from "lucide-react";
 import clsx from "clsx";
 import { useAuth } from "@/components/AuthContext";
 import { useNotifications } from "@/components/NotificationContext";
@@ -12,6 +12,7 @@ import BottomSheet from "@/components/mobile/BottomSheet";
 interface ProfileEditModalProps {
   isOpen: boolean;
   onClose: () => void;
+  activeField?: string | null;
 }
 
 const PRESET_BIOS = [
@@ -33,7 +34,14 @@ const CITIES = [
   { value: "mum", label: "Mumbai" },
 ];
 
-export default function ProfileEditModal({ isOpen, onClose }: ProfileEditModalProps) {
+const GENDERS = [
+  { value: "male", label: "Male" },
+  { value: "female", label: "Female" },
+  { value: "nonbinary", label: "Non-binary" },
+  { value: "prefer_not", label: "Prefer not to say" },
+];
+
+export default function ProfileEditModal({ isOpen, onClose, activeField }: ProfileEditModalProps) {
   const { user, updateProfile } = useAuth();
   const { addNotification } = useNotifications();
   const isMobile = useIsMobile();
@@ -47,6 +55,23 @@ export default function ProfileEditModal({ isOpen, onClose }: ProfileEditModalPr
   const [instagram, setInstagram] = useState("");
   const [twitter, setTwitter] = useState("");
   const [spotify, setSpotify] = useState("");
+  const [phone, setPhone] = useState("");
+  const [dob, setDob] = useState("");
+  const [email, setEmail] = useState("");
+  const [gender, setGender] = useState("");
+
+  // Refs for each focusable field
+  const nameRef = useRef<HTMLInputElement>(null);
+  const usernameRef = useRef<HTMLInputElement>(null);
+  const bioRef = useRef<HTMLTextAreaElement>(null);
+  const cityRef = useRef<HTMLSelectElement>(null);
+  const phoneRef = useRef<HTMLInputElement>(null);
+  const dobRef = useRef<HTMLInputElement>(null);
+  const emailRef = useRef<HTMLInputElement>(null);
+  const genderRef = useRef<HTMLSelectElement>(null);
+
+  // Scroll container ref
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   // Sync form with user data when modal opens
   useEffect(() => {
@@ -58,8 +83,42 @@ export default function ProfileEditModal({ isOpen, onClose }: ProfileEditModalPr
       setInstagram((user as any).instagram || "");
       setTwitter((user as any).twitter || "");
       setSpotify((user as any).spotify || "");
+      setPhone((user as any).phone || "");
+      setDob((user as any).date_of_birth || "");
+      setEmail(user.email || "");
+      setGender((user as any).gender || "");
     }
   }, [isOpen, user]);
+
+  // Focus and scroll to the activeField when the modal opens
+  useEffect(() => {
+    if (!isOpen || !activeField) return;
+
+    const refMap: Record<string, React.RefObject<HTMLElement | null>> = {
+      name: nameRef,
+      username: usernameRef,
+      bio: bioRef,
+      city: cityRef,
+      phone: phoneRef,
+      dob: dobRef,
+      email: emailRef,
+      gender: genderRef,
+    };
+
+    const targetRef = refMap[activeField];
+    if (!targetRef) return;
+
+    // Delay to allow the modal animation to settle
+    const timer = setTimeout(() => {
+      const el = targetRef.current;
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+        el.focus();
+      }
+    }, 350);
+
+    return () => clearTimeout(timer);
+  }, [isOpen, activeField]);
 
   // Body scroll locking
   useEffect(() => {
@@ -78,10 +137,11 @@ export default function ProfileEditModal({ isOpen, onClose }: ProfileEditModalPr
         username: username.trim().replace("@", ""),
         bio: bio.trim(),
         city: city,
+        gender: gender,
       };
 
-      // Only include social fields if the DB supports them
-      // These will silently fail if columns don't exist yet
+      if (phone.trim()) updates.phone = phone.trim();
+      if (dob.trim()) updates.date_of_birth = dob.trim();
       if (instagram.trim()) updates.instagram = instagram.trim();
       if (twitter.trim()) updates.twitter = twitter.trim();
       if (spotify.trim()) updates.spotify = spotify.trim();
@@ -96,6 +156,13 @@ export default function ProfileEditModal({ isOpen, onClose }: ProfileEditModalPr
     }
   };
 
+  const inputClass = (isFocused?: boolean) => clsx(
+    "w-full px-4 py-3 rounded-xl bg-white/5 border text-white placeholder-white/20 font-mono text-sm focus:outline-none transition-all",
+    isFocused
+      ? "border-purple-500/80 ring-1 ring-purple-500/40"
+      : "border-white/10 focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/30"
+  );
+
   const content = (
     <div className="flex flex-col h-full">
       {/* Header */}
@@ -107,7 +174,7 @@ export default function ProfileEditModal({ isOpen, onClose }: ProfileEditModalPr
       </div>
 
       {/* Scrollable Content */}
-      <div className="overflow-y-auto flex-1 p-6 space-y-8 no-scrollbar touch-pan-y">
+      <div ref={scrollContainerRef} className="overflow-y-auto flex-1 p-6 space-y-8 no-scrollbar touch-pan-y">
 
         {/* Display Name */}
         <section className="space-y-2">
@@ -115,11 +182,12 @@ export default function ProfileEditModal({ isOpen, onClose }: ProfileEditModalPr
             <User size={12} /> Display Name
           </label>
           <input
+            ref={nameRef}
             type="text"
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
             placeholder="Your name"
-            className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 font-mono text-sm focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/30 transition-all"
+            className={inputClass(activeField === "name")}
           />
         </section>
 
@@ -131,12 +199,100 @@ export default function ProfileEditModal({ isOpen, onClose }: ProfileEditModalPr
           <div className="relative">
             <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30 font-mono text-sm">@</span>
             <input
+              ref={usernameRef}
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value.replace(/[^a-zA-Z0-9._]/g, ""))}
               placeholder="username"
-              className="w-full pl-8 pr-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 font-mono text-sm focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/30 transition-all"
+              className={clsx(inputClass(activeField === "username"), "pl-8")}
             />
+          </div>
+        </section>
+
+        {/* Phone Number */}
+        <section className="space-y-2">
+          <label className="text-[10px] font-mono text-white/40 uppercase tracking-widest flex items-center gap-2">
+            <Phone size={12} /> Phone Number
+          </label>
+          <input
+            ref={phoneRef}
+            type="tel"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            placeholder="+91 00000 00000"
+            className={inputClass(activeField === "phone")}
+          />
+        </section>
+
+        {/* Date of Birth */}
+        <section className="space-y-2">
+          <label className="text-[10px] font-mono text-white/40 uppercase tracking-widest flex items-center gap-2">
+            <Calendar size={12} /> Date of Birth
+          </label>
+          <input
+            ref={dobRef}
+            type="date"
+            value={dob}
+            onChange={(e) => setDob(e.target.value)}
+            className={clsx(inputClass(activeField === "dob"), "appearance-none [color-scheme:dark]")}
+          />
+        </section>
+
+        {/* Email Address */}
+        <section className="space-y-2">
+          <label className="text-[10px] font-mono text-white/40 uppercase tracking-widest flex items-center gap-2">
+            <Mail size={12} /> Email Address
+          </label>
+          <input
+            ref={emailRef}
+            type="email"
+            value={email}
+            readOnly
+            placeholder="your@email.com"
+            className={clsx(inputClass(activeField === "email"), "cursor-not-allowed opacity-60")}
+          />
+          <p className="text-[9px] font-mono text-white/20 pl-1">Email cannot be changed here. Use account settings.</p>
+        </section>
+
+        {/* City / Location */}
+        <section className="space-y-2">
+          <label className="text-[10px] font-mono text-white/40 uppercase tracking-widest flex items-center gap-2">
+            <MapPin size={12} /> City
+          </label>
+          <div className="relative">
+            <select
+              ref={cityRef}
+              value={city}
+              onChange={(e) => setCity(e.target.value)}
+              className={clsx(inputClass(activeField === "city"), "appearance-none cursor-pointer")}
+            >
+              <option value="" className="bg-zinc-900">Select your city</option>
+              {CITIES.map((c) => (
+                <option key={c.value} value={c.value} className="bg-zinc-900">{c.label}</option>
+              ))}
+            </select>
+            <ChevronDown size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 pointer-events-none" />
+          </div>
+        </section>
+
+        {/* Gender */}
+        <section className="space-y-2">
+          <label className="text-[10px] font-mono text-white/40 uppercase tracking-widest flex items-center gap-2">
+            <UserCircle2 size={12} /> Gender
+          </label>
+          <div className="relative">
+            <select
+              ref={genderRef}
+              value={gender}
+              onChange={(e) => setGender(e.target.value)}
+              className={clsx(inputClass(activeField === "gender"), "appearance-none cursor-pointer")}
+            >
+              <option value="" className="bg-zinc-900">Select gender</option>
+              {GENDERS.map((g) => (
+                <option key={g.value} value={g.value} className="bg-zinc-900">{g.label}</option>
+              ))}
+            </select>
+            <ChevronDown size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 pointer-events-none" />
           </div>
         </section>
 
@@ -146,11 +302,12 @@ export default function ProfileEditModal({ isOpen, onClose }: ProfileEditModalPr
             <Sparkles size={12} /> Vibe / Bio
           </label>
           <textarea
+            ref={bioRef}
             value={bio}
             onChange={(e) => setBio(e.target.value.slice(0, 150))}
             placeholder="Tell people what you're about..."
             rows={3}
-            className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 font-mono text-sm focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/30 transition-all resize-none"
+            className={clsx(inputClass(activeField === "bio"), "resize-none")}
           />
           <div className="flex items-center justify-between">
             <span className="text-[9px] font-mono text-white/20">{bio.length}/150</span>
@@ -175,26 +332,6 @@ export default function ProfileEditModal({ isOpen, onClose }: ProfileEditModalPr
                 </button>
               ))}
             </div>
-          </div>
-        </section>
-
-        {/* City / Location */}
-        <section className="space-y-2">
-          <label className="text-[10px] font-mono text-white/40 uppercase tracking-widest flex items-center gap-2">
-            <MapPin size={12} /> City
-          </label>
-          <div className="relative">
-            <select
-              value={city}
-              onChange={(e) => setCity(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white font-mono text-sm focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/30 transition-all appearance-none cursor-pointer"
-            >
-              <option value="" className="bg-zinc-900">Select your city</option>
-              {CITIES.map((c) => (
-                <option key={c.value} value={c.value} className="bg-zinc-900">{c.label}</option>
-              ))}
-            </select>
-            <ChevronDown size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 pointer-events-none" />
           </div>
         </section>
 
