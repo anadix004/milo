@@ -80,20 +80,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
-    if (isInitialized.current) return;
-    isInitialized.current = true;
+    let isMounted = true;
 
     const initAuth = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
-        setSession(session);
-        if (session?.user) {
+        if (isMounted) setSession(session);
+        if (session?.user && isMounted) {
           await fetchProfile(session.user.id, session.user);
         }
       } catch (err) {
         console.error("Critical Auth Initializer Error:", err);
       } finally {
-        setIsLoading(false);
+        if (isMounted) setIsLoading(false);
       }
     };
 
@@ -120,7 +119,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
   }, [addNotification, router, supabase]);
 
   const login = async (email: string, pass: string) => {
