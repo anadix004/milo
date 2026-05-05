@@ -14,7 +14,7 @@ import dynamic from "next/dynamic";
 import Image from "next/image";
 import { TiltCard } from "@/components/TiltCard";
 import { motion, AnimatePresence } from "framer-motion";
-import { getCategoryColour, getCategoryHeroAura, getCategoryCardAura, getCategoryBorderGlow, CATEGORY_LABELS, EventCategory } from "@/lib/aura";
+import { getCategoryColour, getCategoryHeroAura, getCategoryCardAura, getCategoryPillAura, getCategoryBorderGlow, CATEGORY_LABELS, EventCategory } from "@/lib/aura";
 
 const ProfileSidebar = dynamic(() => import("@/components/ProfileSidebar"), { ssr: false });
 const EventSubmission = dynamic(() => import("@/components/EventSubmission"), { ssr: false });
@@ -251,8 +251,8 @@ export default function ExplorePage() {
                   layoutId="activeIndicator"
                   className="absolute inset-0"
                   style={{ 
-                    backgroundColor: getCategoryColour(spotlightEvents[currentSlide]?.category || spotlightEvents[currentSlide]?.type || 'other'),
-                    boxShadow: `0 0 12px ${getCategoryColour(spotlightEvents[currentSlide]?.category || spotlightEvents[currentSlide]?.type || 'other')}`
+                    background: getCategoryPillAura(spotlightEvents[currentSlide]?.category || spotlightEvents[currentSlide]?.type || 'other'),
+                    boxShadow: getCategoryBorderGlow(spotlightEvents[currentSlide]?.category || spotlightEvents[currentSlide]?.type || 'other')
                   }}
                 />
               )}
