@@ -249,10 +249,10 @@ export default function ExplorePage() {
               {currentSlide === index && (
                 <motion.div
                   layoutId="activeIndicator"
-                  className="absolute inset-0"
+                  className="absolute inset-0 backdrop-blur-md"
                   style={{ 
-                    backgroundColor: getCategoryColour(spotlightEvents[currentSlide]?.category || spotlightEvents[currentSlide]?.type || 'other'),
-                    boxShadow: getCategoryButtonGlow(spotlightEvents[currentSlide]?.category || spotlightEvents[currentSlide]?.type || 'other')
+                    backgroundColor: getCategoryColour(spotlightEvents[currentSlide]?.category || spotlightEvents[currentSlide]?.type || 'other').replace(/1\)$/, '0.4)'),
+                    boxShadow: `0 0 16px ${getCategoryColour(spotlightEvents[currentSlide]?.category || spotlightEvents[currentSlide]?.type || 'other').replace(/1\)$/, '0.5)')}, inset 0 0 4px rgba(255,255,255,0.1)`
                   }}
                 />
               )}
