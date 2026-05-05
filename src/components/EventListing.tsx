@@ -16,6 +16,7 @@ import { useIsMobile } from "@/hooks/useMediaQuery";
 import BottomSheet from "@/components/mobile/BottomSheet";
 import VibeCheck from "@/components/VibeCheck";
 import { TiltCard } from "@/components/TiltCard";
+import { getCategoryCardAura, getCategoryPillAura, getCategoryHeroAura, getCategoryButtonGlow, getCategoryBorderGlow, getCategoryColour } from "@/lib/aura";
 
 // --- SPRING CONFIG SYNC ---
 const SPRING_CONFIG = { stiffness: 70, damping: 15 };
@@ -227,7 +228,7 @@ export default function EventListing({ selectedCity, onAuthRequired }: { selecte
     return () => { supabase.removeChannel(channel); };
   }, []);
 
-  const FIXED_CATEGORIES = ["All", "Music", "College", "Workshops", "Nightlife", "Networking"];
+  const FIXED_CATEGORIES = ["All", "Club", "DJ Night", "House Party", "Comedy", "Open Mic", "Networking", "Sports", "Other"];
 
   const isJoined = (id: string) => joinedEvents.has(id);
   const isBookmarked = (id: string) => bookmarkedEvents.has(id);
@@ -396,12 +397,21 @@ export default function EventListing({ selectedCity, onAuthRequired }: { selecte
                 <button
                   key={cat}
                   onClick={() => setSelectedCat(cat)}
-                  className={clsx(
-                    "flex-shrink-0 px-6 py-3 rounded-full border text-[11px] font-black uppercase tracking-widest transition-all",
-                    selectedCat === cat 
-                      ? "bg-white text-black border-white" 
-                      : "bg-white/5 text-white/40 border-white/10"
-                  )}
+                  style={{
+                    background: selectedCat === cat
+                      ? getCategoryPillAura(cat)
+                      : 'rgba(255,255,255,0.04)',
+                    border: `0.5px solid ${selectedCat === cat
+                      ? getCategoryColour(cat) + '60'
+                      : 'rgba(255,255,255,0.07)'}`,
+                    color: selectedCat === cat ? '#fff' : 'rgba(255,255,255,0.35)',
+                    borderRadius: 99,
+                    padding: '7px 16px',
+                    fontSize: 12,
+                    fontWeight: 600,
+                    transition: 'all 0.2s ease',
+                  }}
+                  className="flex-shrink-0 uppercase tracking-widest"
                 >
                   {cat}
                 </button>
@@ -588,15 +598,29 @@ function FeaturedCarousel({ items, onExpand }: { items: EventData[], onExpand: (
 function EventGridCard({ event, onExpand }: { event: EventData, onExpand: (e: EventData) => void }) {
   return (
     <div onClick={() => onExpand(event)} className="cursor-pointer group w-full">
-      <TiltCard className="relative w-full aspect-[1.2/1] md:aspect-video rounded-3xl overflow-hidden bg-neutral-900 border border-white/5">
+      <TiltCard 
+        className="relative w-full aspect-[1.2/1] md:aspect-video overflow-hidden group/card"
+        style={{
+          background: `${getCategoryCardAura(event.category)}, var(--bg-surface)`,
+          boxShadow: getCategoryBorderGlow(event.category),
+          border: '0.5px solid rgba(255,255,255,0.07)',
+          borderRadius: 20,
+          transition: 'box-shadow 0.3s ease',
+        }}
+      >
         {event.video_url ? (
-          <video src={event.video_url} autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover transition-all duration-700" />
+          <video src={event.video_url} autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover transition-all duration-700 opacity-60 mix-blend-screen" />
         ) : (
-          <Image src={event.image} alt={event.title} fill className="object-cover transition-all duration-700" sizes="(max-width: 768px) 100vw, 50vw" />
+          <Image src={event.image} alt={event.title} fill className="object-cover transition-all duration-700 opacity-60 mix-blend-screen" sizes="(max-width: 768px) 100vw, 50vw" />
         )}
         <div className="absolute inset-0 bg-black/60 group-hover:bg-black/40 transition-colors" />
         <div className="absolute inset-x-0 bottom-0 p-8 z-10">
-          <span className="font-mono text-[10px] tracking-widest text-white/60 uppercase mb-2 block">{event.category}</span>
+          <span 
+            className="font-mono text-[10px] tracking-widest uppercase mb-2 block" 
+            style={{ color: getCategoryColour(event.category) }}
+          >
+            {event.category}
+          </span>
           <h3 className="text-xl md:text-3xl font-black text-white uppercase tracking-tight leading-tight mb-2">{event.title}</h3>
           <p className="text-white/80 text-[10px] md:text-sm font-black uppercase tracking-widest">{event.price} // {event.date}</p>
         </div>
@@ -638,11 +662,17 @@ function EventDetailView({
 
   const renderContent = () => (
     <div className={clsx("flex flex-col h-full", !isMobile && "md:flex-row")}>
-      <div className={clsx("relative shrink-0", isMobile ? "w-full aspect-video" : "w-1/2 h-full")}>
+      <div 
+        className={clsx("relative shrink-0", isMobile ? "w-full aspect-video" : "w-1/2 h-full")}
+        style={{
+          background: `${getCategoryHeroAura(event.category)}, #000`,
+          minHeight: 200,
+        }}
+      >
         {event.video_url ? (
-           <video src={event.video_url} autoPlay muted loop playsInline className="w-full h-full object-cover" />
+           <video src={event.video_url} autoPlay muted loop playsInline className="w-full h-full object-cover opacity-80 mix-blend-screen" />
         ) : (
-           <Image src={event.image} alt={event.title} fill priority className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
+           <Image src={event.image} alt={event.title} fill priority className="object-cover opacity-80 mix-blend-screen" sizes="(max-width: 768px) 100vw, 50vw" />
         )}
         <div className="absolute inset-0 bg-gradient-to-r from-black via-transparent to-transparent hidden md:block" />
         {isMobile && (
@@ -720,14 +750,39 @@ function EventDetailView({
                <Heart size={20} fill={isBookmarked ? "currentColor" : "none"} />
              </button>
              {event.ticket_links?.[0]?.url && (
-               <a 
-                 href={event.ticket_links[0].url} 
-                 target="_blank" 
-                 rel="noopener noreferrer"
-                 className="px-6 md:px-10 py-5 rounded-full font-black uppercase tracking-widest text-[9px] transition-all bg-purple-600 text-white hover:bg-purple-500 shadow-xl shadow-purple-500/20"
-               >
-                 Book Tickets
-               </a>
+               <div style={{ position: 'relative', display: 'inline-block' }}>
+                 <div style={{
+                   position: 'absolute',
+                   inset: -16,
+                   background: getCategoryCardAura(event.category),
+                   filter: 'blur(20px)',
+                   pointerEvents: 'none',
+                   zIndex: 0,
+                 }} />
+                 <a 
+                   href={event.ticket_links[0].url} 
+                   target="_blank" 
+                   rel="noopener noreferrer"
+                   style={{
+                     position: 'relative',
+                     zIndex: 1,
+                     background: 'rgba(255,255,255,0.97)',
+                     color: '#000',
+                     fontWeight: 800,
+                     boxShadow: getCategoryButtonGlow(event.category),
+                     borderRadius: 14,
+                     padding: '14px 28px',
+                     border: 'none',
+                     cursor: 'pointer',
+                     display: 'inline-block',
+                     textTransform: 'uppercase',
+                     letterSpacing: '0.1em',
+                     fontSize: '9px',
+                   }}
+                 >
+                   Book Tickets
+                 </a>
+               </div>
              )}
              <button onClick={onJoin} disabled={isJoined} className={clsx("px-8 md:px-12 py-5 rounded-full font-black uppercase tracking-widest text-[9px] transition-all", isJoined ? "bg-emerald-500 text-black" : "bg-white text-black")}>{isJoined ? "JOINED" : "JOIN PLAN"}</button>
           </div>

@@ -5,6 +5,31 @@
   --foreground: #ffffff;
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
+
+  /* Base */
+  --bg-primary: #000000;
+  --bg-surface: rgba(255,255,255,0.04);
+  --border-default: rgba(255,255,255,0.07);
+  --border-emphasis: rgba(255,255,255,0.14);
+  --text-primary: rgba(255,255,255,0.97);
+  --text-secondary: rgba(255,255,255,0.5);
+  --text-ghost: rgba(255,255,255,0.25);
+
+  /* Category aura colours — raw hex, used in gradients only */
+  --aura-club:        #f9643c;
+  --aura-dj:          #f9643c;
+  --aura-party:       #e83ca0;
+  --aura-comedy:      #ffc83c;
+  --aura-open-mic:    #b48cff;
+  --aura-networking:  #b48cff;
+  --aura-sports:      #3ce6b4;
+  --aura-other:       #50a0ff;
+
+  /* Aura gradient rules — always radial, always dissolve to transparent */
+  --aura-opacity-card:     0.18;   /* subtle — for card backgrounds */
+  --aura-opacity-selected: 0.28;   /* stronger — for selected filter pills */
+  --aura-opacity-glow:     0.45;   /* strongest — for focused elements like book button */
+  --aura-blur-radius:      80px;   /* how far the light spreads */
 }
 
 html {
