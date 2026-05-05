@@ -1,42 +1,62 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthContext";
 import { Loader2 } from "lucide-react";
 
 const ADMIN_ROLES = ["admin", "owner", "team"];
+const ADMIN_EMAIL = "milo.anadi@gmail.com";
 
 export default function AdminGuard({ children }: { children: React.ReactNode }) {
-  const { user, isLoading } = useAuth();
+  const { user, isLoading, session } = useAuth();
   const router = useRouter();
 
-  const role = user?.role ?? "user";
-  const isAuthorized = ADMIN_ROLES.includes(role);
+  // Once we've confirmed admin access, lock it in for this mount so a
+  // transient re-render (TOKEN_REFRESHED, etc.) can't kick us out.
+  const wasAuthorized = useRef(false);
+
+  // Local gate: stays true until we've made a definitive auth decision.
+  const [isChecking, setIsChecking] = useState(true);
+
+  const role = user?.role ?? "";
+  const email = user?.email ?? session?.user?.email ?? "";
+
+  // Admin if role matches OR email matches the hardcoded admin email.
+  const isAuthorized = ADMIN_ROLES.includes(role) || email === ADMIN_EMAIL;
 
   useEffect(() => {
-    // Wait until auth has fully resolved before making any routing decision
+    // Wait for AuthContext to finish resolving the user + profile.
     if (isLoading) return;
 
-    if (!user) {
-      router.push("/login");
+    if (isAuthorized) {
+      wasAuthorized.current = true;
+      setIsChecking(false);
       return;
     }
 
-    if (!isAuthorized) {
-      console.warn("AdminGuard: insufficient role →", role);
+    // If we've already been authorized once this mount, ignore transient
+    // un-authorized states (e.g., role briefly missing during token refresh).
+    if (wasAuthorized.current) return;
+
+    // Auth settled and user is definitively not allowed — redirect.
+    setIsChecking(false);
+    if (!user && !session) {
+      router.push("/login");
+    } else {
       router.push("/");
     }
-  }, [user, isLoading, isAuthorized, role, router]);
+  }, [isLoading, isAuthorized, user, session, router]);
 
-  // Show spinner while auth is loading OR while we wait for the role check
-  if (isLoading || !user || !isAuthorized) {
+  if (isLoading || isChecking) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
         <Loader2 className="animate-spin text-purple-500" size={48} />
       </div>
     );
   }
+
+  if (!isAuthorized && !wasAuthorized.current) return null;
 
   return <>{children}</>;
 }
