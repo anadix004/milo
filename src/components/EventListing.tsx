@@ -616,6 +616,15 @@ const AVATAR_COLORS = [
   "#F97316", "#EC4899", "#14B8A6",
 ];
 
+// Stable deterministic "hash" from a string — avoids Math.random() in render
+function stableCount(seed: string, min: number, range: number): number {
+  let h = 0;
+  for (let i = 0; i < seed.length; i++) {
+    h = (Math.imul(31, h) + seed.charCodeAt(i)) | 0;
+  }
+  return min + (Math.abs(h) % range);
+}
+
 function EventGridCard({ event, onExpand }: { event: EventData, onExpand: (e: EventData) => void }) {
   // Derive a friendly time slot tag from category or a fallback
   const tagLabel = event.featured ? "● Live now" : event.category || "Tonight";
@@ -628,10 +637,11 @@ function EventGridCard({ event, onExpand }: { event: EventData, onExpand: (e: Ev
     color: AVATAR_COLORS[i % AVATAR_COLORS.length],
   }));
 
-  // Format attendee count
-  const goText = event.featured
-    ? `${Math.floor(Math.random() * 60) + 20} people going`
-    : `${Math.floor(Math.random() * 30) + 8} people going`;
+  // Stable attendee count derived from event id — no Math.random() during render
+  const goCount = event.featured
+    ? stableCount(event.id, 20, 60)
+    : stableCount(event.id, 8, 30);
+  const goText = `${goCount} people going`;
 
   return (
     <motion.div
