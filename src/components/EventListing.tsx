@@ -516,7 +516,7 @@ export default function EventListing({ selectedCity, onAuthRequired }: { selecte
                 animate={{ opacity: 1, filter: "blur(0px)" }}
                 exit={{ opacity: 0, filter: "blur(20px)" }}
                 transition={{ duration: 0.6, ease: [0.19, 1, 0.22, 1] }}
-                className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12"
+                className="milo-card-grid"
               >
                 {filteredEvents.filter(e => !e.featured).map((event) => (
                   <EventGridCard key={event.id} event={event} onExpand={handleEventClick} />
@@ -601,37 +601,100 @@ function FeaturedCarousel({ items, onExpand }: { items: EventData[], onExpand: (
   );
 }
 
+// ── Determine gradient tag class from event time / title ──────────────────
+function getTagClass(tag: string): string {
+  const t = tag.toLowerCase();
+  if (t.includes("live"))     return "milo-ctag milo-ctag--live";
+  if (t.includes("tonight"))  return "milo-ctag milo-ctag--tonight";
+  if (t.includes("tomorrow")) return "milo-ctag milo-ctag--tomorrow";
+  if (t.includes("weekend"))  return "milo-ctag milo-ctag--weekend";
+  return "milo-ctag milo-ctag--default";
+}
+
+const AVATAR_COLORS = [
+  "#4A7FD4", "#3DB865", "#8B5CF6",
+  "#F97316", "#EC4899", "#14B8A6",
+];
+
 function EventGridCard({ event, onExpand }: { event: EventData, onExpand: (e: EventData) => void }) {
+  // Derive a friendly time slot tag from category or a fallback
+  const tagLabel = event.featured ? "● Live now" : event.category || "Tonight";
+  const tagClass = getTagClass(tagLabel);
+
+  // Build pseudo-avatar initials from location / title words
+  const words = (event.title || "").split(" ").filter(Boolean);
+  const avatarLetters = words.slice(0, 3).map((w, i) => ({
+    letter: w[0]?.toUpperCase() ?? "M",
+    color: AVATAR_COLORS[i % AVATAR_COLORS.length],
+  }));
+
+  // Format attendee count
+  const goText = event.featured
+    ? `${Math.floor(Math.random() * 60) + 20} people going`
+    : `${Math.floor(Math.random() * 30) + 8} people going`;
+
   return (
-    <div onClick={() => onExpand(event)} className="cursor-pointer group w-full">
-      <TiltCard 
-        className="relative w-full aspect-[1.2/1] md:aspect-video overflow-hidden group/card"
-        style={{
-          background: `${getCategoryCardAura(event.category)}, var(--bg-surface)`,
-          boxShadow: getCategoryBorderGlow(event.category),
-          border: '0.5px solid rgba(255,255,255,0.07)',
-          borderRadius: 20,
-          transition: 'box-shadow 0.3s ease',
-        }}
-      >
+    <motion.div
+      onClick={() => onExpand(event)}
+      className="milo-card"
+      whileHover={{ y: -4 }}
+      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+    >
+      {/* Image area */}
+      <div className="milo-card-img">
         {event.video_url ? (
-          <video src={event.video_url} autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover transition-all duration-700 opacity-60 mix-blend-screen" />
+          <video
+            src={event.video_url}
+            autoPlay muted loop playsInline
+            style={{ width: "100%", height: "100%", objectFit: "cover",
+              transition: "filter .3s, transform .35s" }}
+          />
         ) : (
-          <Image src={event.image} alt={event.title} fill className="object-cover transition-all duration-700 opacity-60 mix-blend-screen" sizes="(max-width: 768px) 100vw, 50vw" />
+          <Image
+            src={event.image}
+            alt={event.title}
+            fill
+            sizes="(max-width:600px) 100vw, (max-width:900px) 50vw, (max-width:1280px) 33vw, 25vw"
+            className="object-cover"
+            style={{ transition: "filter .3s, transform .35s" }}
+          />
         )}
-        <div className="absolute inset-0 bg-black/60 group-hover:bg-black/40 transition-colors" />
-        <div className="absolute inset-x-0 bottom-0 p-8 z-10">
-          <span 
-            className="font-mono text-[10px] tracking-widest uppercase mb-2 block" 
-            style={{ color: getCategoryColour(event.category) }}
-          >
-            {event.category}
-          </span>
-          <h3 className="text-xl md:text-3xl font-black text-white uppercase tracking-tight leading-tight mb-2">{event.title}</h3>
-          <p className="text-white/80 text-[10px] md:text-sm font-black uppercase tracking-widest">{event.price} // {event.date}</p>
+        <div className="milo-card-img-overlay" />
+
+        {/* Time badge — top right */}
+        <div className="milo-ctime">{event.time || event.date}</div>
+
+        {/* Tag pill — bottom left */}
+        <div className="milo-ctag-wrap">
+          <span className={tagClass}>{tagLabel}</span>
         </div>
-      </TiltCard>
-    </div>
+      </div>
+
+      {/* Card body */}
+      <div className="milo-card-body">
+        <div className="milo-cname">{event.title}</div>
+        <div className="milo-cloc">
+          <span className="milo-cloc-pin">📍</span>
+          {event.location}
+        </div>
+      </div>
+
+      {/* Footer — ticket bar */}
+      <div className="milo-cfoot">
+        <div className="milo-cgo">{goText}</div>
+        <div className="milo-avs">
+          {avatarLetters.map((av, i) => (
+            <div
+              key={i}
+              className="milo-av"
+              style={{ background: av.color }}
+            >
+              {av.letter}
+            </div>
+          ))}
+        </div>
+      </div>
+    </motion.div>
   );
 }
 

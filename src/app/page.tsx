@@ -7,6 +7,7 @@ import { useAuth } from "@/components/AuthContext";
 import Header from "@/components/Header";
 import dynamic from "next/dynamic";
 import BottomNav from "@/components/mobile/BottomNav";
+import MarqueeBar from "@/components/MarqueeBar";
 
 const ProfileSidebar = dynamic(() => import("@/components/ProfileSidebar"), { ssr: false });
 const EventSubmission = dynamic(() => import("@/components/EventSubmission"), { ssr: false });
@@ -74,8 +75,9 @@ export default function Home() {
         onNotificationsClick={() => setActiveModal("notifications")}
       />
 
-      <div className="flex-1">
+      <div className="flex-1 flex flex-col">
         <HeroSection />
+        <MarqueeBar />
       </div>
     </main>
   );

@@ -1,12 +1,17 @@
 @import "tailwindcss";
 
+/* ============================================================
+   CITY ACCENT SYSTEM
+   Background & text are always static dark-navy.
+   Only --ac, --acg, --acd, --br change per city.
+   ============================================================ */
 :root {
   --background: #000000;
   --foreground: #ffffff;
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
 
-  /* Base */
+  /* Base dark surfaces */
   --bg-primary: #000000;
   --bg-surface: rgba(255,255,255,0.04);
   --border-default: rgba(255,255,255,0.07);
@@ -25,13 +30,47 @@
   --aura-sports:      #3ce6b4;
   --aura-other:       #50a0ff;
 
-  /* Aura gradient rules — always radial, always dissolve to transparent */
-  --aura-opacity-card:     0.18;   /* subtle — for card backgrounds */
-  --aura-opacity-selected: 0.28;   /* stronger — for selected filter pills */
-  --aura-opacity-glow:     0.45;   /* strongest — for focused elements like book button */
-  --aura-blur-radius:      80px;   /* how far the light spreads */
+  /* Aura gradient rules */
+  --aura-opacity-card:     0.18;
+  --aura-opacity-selected: 0.28;
+  --aura-opacity-glow:     0.45;
+  --aura-blur-radius:      80px;
+
+  /* ── City accent defaults (Delhi) ── */
+  --ac:  #4A7FD4;
+  --acg: rgba(74,127,212,.15);
+  --acd: rgba(74,127,212,.28);
+  --br:  rgba(74,127,212,.14);
+
+  /* ── Static text colours — NEVER change per city ── */
+  --tx:  #E8EEF8;
+  --txm: rgba(232,238,248,.42);
+  --txu: rgba(232,238,248,.07);
 }
 
+/* ── Per-city accent overrides — background/text are untouched ── */
+body.city-delhi {
+  --ac:  #4A7FD4;
+  --acg: rgba(74,127,212,.15);
+  --acd: rgba(74,127,212,.28);
+  --br:  rgba(74,127,212,.14);
+}
+body.city-blr {
+  --ac:  #3DB865;
+  --acg: rgba(61,184,101,.15);
+  --acd: rgba(61,184,101,.28);
+  --br:  rgba(61,184,101,.14);
+}
+body.city-mum {
+  --ac:  #8B5CF6;
+  --acg: rgba(139,92,246,.15);
+  --acd: rgba(139,92,246,.28);
+  --br:  rgba(139,92,246,.14);
+}
+
+/* ============================================================
+   BASE RESET
+   ============================================================ */
 html {
   -webkit-overflow-scrolling: touch;
   scroll-behavior: auto;
@@ -42,6 +81,14 @@ body {
   color: var(--foreground);
   overflow-x: hidden;
   touch-action: manipulation;
+  /* Custom cursor hidden on desktop; shown on mobile */
+  cursor: auto;
+}
+
+/* Hide default cursor on desktop only */
+@media (pointer: fine) {
+  body { cursor: none !important; }
+  button, a, [role="button"] { cursor: none !important; }
 }
 
 button:not(.no-min-size), a:not(.no-min-size), [role="button"]:not(.no-min-size) {
@@ -52,12 +99,261 @@ button:not(.no-min-size), a:not(.no-min-size), [role="button"]:not(.no-min-size)
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-@layer utilities {
-  .writing-vertical-rl {
-    writing-mode: vertical-rl;
-  }
+/* ============================================================
+   CURSOR BLOB — hide on touch devices
+   ============================================================ */
+#cur, #ring, #blob {
+  display: none;
+}
+@media (pointer: fine) {
+  #cur  { display: block !important; }
+  #ring { display: block !important; }
+  #blob { display: block !important; }
 }
 
+/* ============================================================
+   MARQUEE BAR
+   ============================================================ */
+.milo-mqbar {
+  border-top: 0.5px solid var(--br);
+  border-bottom: 0.5px solid var(--br);
+  height: 38px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  transition: border-color .5s;
+}
+
+.milo-mqtrack {
+  display: flex;
+  animation: milo-mq 28s linear infinite;
+  white-space: nowrap;
+  will-change: transform;
+}
+
+.milo-mqi {
+  font-family: var(--font-roboto-mono, monospace);
+  font-size: 8.5px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--txm);
+  padding: 0 2.2rem;
+  display: flex;
+  align-items: center;
+  gap: .55rem;
+}
+
+.milo-mdot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--ac);
+  transition: background .5s;
+  flex-shrink: 0;
+}
+
+@keyframes milo-mq {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* ============================================================
+   PREMIUM EVENT CARDS
+   ============================================================ */
+
+/* Card container — glass/frosted */
+.milo-card {
+  border: 1px solid var(--br);
+  border-radius: 18px;
+  background: rgba(255,255,255,0.03);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  cursor: pointer;
+  transition: border-color .3s, transform .25s cubic-bezier(.34,1.56,.64,1), box-shadow .3s, background .5s;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.milo-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--acd);
+  box-shadow: 0 8px 32px var(--acg), 0 0 0 1px var(--acd);
+  background: rgba(255,255,255,0.055);
+}
+
+/* Image area */
+.milo-card-img {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16/9;
+  overflow: hidden;
+  border-radius: 14px 14px 0 0;
+}
+
+.milo-card-img img,
+.milo-card-img video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: filter .3s, transform .35s;
+}
+
+.milo-card:hover .milo-card-img img,
+.milo-card:hover .milo-card-img video {
+  filter: brightness(1.12);
+  transform: scale(1.03);
+}
+
+.milo-card-img-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,.65) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+/* Tag gradient pills — time-slot based */
+.milo-ctag {
+  display: inline-flex;
+  align-items: center;
+  font-size: 7.5px;
+  font-family: var(--font-roboto-mono, monospace);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 100px;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0,0,0,.4);
+}
+
+.milo-ctag--live     { background: linear-gradient(90deg, #ff6b6b, #feca57); }
+.milo-ctag--tonight  { background: linear-gradient(90deg, #4a7fd4, #8b5cf6); }
+.milo-ctag--tomorrow { background: linear-gradient(90deg, #3db865, #4a7fd4); }
+.milo-ctag--weekend  { background: linear-gradient(90deg, #8b5cf6, #ff6b6b); }
+.milo-ctag--default  { background: var(--acg); color: var(--ac); }
+
+/* Time badge — top-right corner of image */
+.milo-ctime {
+  position: absolute;
+  top: 10px;
+  right: 11px;
+  font-family: var(--font-roboto-mono, monospace);
+  font-size: 8px;
+  letter-spacing: .1em;
+  color: rgba(255,255,255,.85);
+  background: rgba(0,0,0,.45);
+  backdrop-filter: blur(6px);
+  padding: 3px 8px;
+  border-radius: 100px;
+  border: 0.5px solid rgba(255,255,255,.12);
+}
+
+/* Tag badge — absolute on image (bottom-left) */
+.milo-ctag-wrap {
+  position: absolute;
+  bottom: 10px;
+  left: 11px;
+}
+
+/* Card body */
+.milo-card-body {
+  padding: 13px 14px 10px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.milo-cname {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--tx);
+  line-height: 1.3;
+  letter-spacing: -.01em;
+}
+
+.milo-cloc {
+  font-size: 10.5px;
+  color: var(--txm);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+.milo-cloc-pin {
+  font-size: 11px;
+  line-height: 1;
+  opacity: .8;
+}
+
+/* Footer — ticket bar */
+.milo-cfoot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 0.5px solid rgba(255,255,255,.07);
+  padding: 9px 14px 12px;
+  margin-top: auto;
+}
+
+.milo-cgo {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--ac);
+  transition: color .5s;
+  letter-spacing: .02em;
+}
+
+/* Avatars */
+.milo-avs {
+  display: flex;
+}
+
+.milo-av {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  margin-left: -8px;
+  font-size: 8px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--ac);
+  box-shadow: 0 0 0 1px rgba(0,0,0,.4);
+  transition: border-color .5s;
+  color: #fff;
+}
+
+.milo-av:first-child { margin-left: 0; }
+
+/* ============================================================
+   CARD GRID
+   ============================================================ */
+.milo-card-grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+@media (max-width: 1280px) {
+  .milo-card-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 900px) {
+  .milo-card-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 600px) {
+  .milo-card-grid { grid-template-columns: 1fr; }
+}
+
+/* ============================================================
+   NEON PULSE ANIMATION
+   ============================================================ */
 @keyframes neon-pulse {
   0%, 100% {
     opacity: 0.7;
@@ -74,26 +370,44 @@ button:not(.no-min-size), a:not(.no-min-size), [role="button"]:not(.no-min-size)
 }
 
 @layer utilities {
-  .perspective-1000 {
-    perspective: 1000px;
-  }
+  .writing-vertical-rl { writing-mode: vertical-rl; }
+  .perspective-1000    { perspective: 1000px; }
 }
 
 @keyframes marquee-left {
   from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
+  to   { transform: translateX(-50%); }
 }
 
 @keyframes marquee-right {
   from { transform: translateX(-50%); }
-  to { transform: translateX(0); }
+  to   { transform: translateX(0); }
 }
 
-.animate-marquee-left {
-  animation: marquee-left 40s linear infinite;
+.animate-marquee-left  { animation: marquee-left  40s linear infinite; }
+.animate-marquee-right { animation: marquee-right 40s linear infinite; }
+
+/* ============================================================
+   LIVE DOT BLINK
+   ============================================================ */
+@keyframes milo-blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: .25; }
 }
 
-.animate-marquee-right {
-  animation: marquee-right 40s linear infinite;
+.milo-live-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ac);
+  animation: milo-blink 1.4s ease-in-out infinite;
+  transition: background .5s;
 }
 
+/* ============================================================
+   SMOOTH ACCENT TRANSITIONS on nav/header elements
+   ============================================================ */
+nav, header {
+  transition: border-color .5s;
+}

@@ -7,6 +7,7 @@ import { LocationProvider } from "@/components/LocationContext";
 import SmoothScroll from "@/components/SmoothScroll";
 import dynamic from "next/dynamic";
 const CookieConsent = dynamic(() => import("@/components/CookieConsent"));
+const CursorBlob = dynamic(() => import("@/components/CursorBlob"), { ssr: false });
 
 const lexend = Lexend({
   subsets: ["latin"],
@@ -71,6 +72,8 @@ export default function RootLayout({
       <body
         className={`${lexend.variable} ${plusJakarta.variable} ${robotoMono.variable} antialiased bg-black text-white selection:bg-white selection:text-black overflow-x-hidden`}
       >
+        {/* Ambient cursor blob — desktop only, hidden on touch via CSS */}
+        <CursorBlob />
         <NotificationProvider>
           <AuthProvider>
             <LocationProvider>

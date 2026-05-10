@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 interface LocationContextType {
   selectedCity: string | null;
@@ -13,31 +13,51 @@ const LocationContext = createContext<LocationContextType>({
   setSelectedCity: () => {},
 });
 
+// Maps short city code → body CSS class
+const CITY_CLASS: Record<string, string> = {
+  del: "city-delhi",
+  blr: "city-blr",
+  mum: "city-mum",
+};
+
+function applyCityClass(city: string | null) {
+  // Remove all existing city classes
+  document.body.classList.remove("city-delhi", "city-blr", "city-mum");
+  if (city && CITY_CLASS[city]) {
+    document.body.classList.add(CITY_CLASS[city]);
+  }
+}
+
 export const LocationProvider = ({ children }: { children: React.ReactNode }) => {
   const [selectedCity, setCity] = useState<string | null>(null);
   const pathname = usePathname();
-  const router = useRouter();
 
   // Initialize from local storage or URL
   useEffect(() => {
     const savedCity = localStorage.getItem("milo_city");
-    
+
     // Check if we are on a city-specific route
     const match = pathname?.match(/^\/explore\/(delhi|mumbai|bengaluru)/);
     if (match) {
       const cityFromUrl = match[1];
       let cityCode = cityFromUrl;
-      // Map full names to short codes used internally
       if (cityFromUrl === "delhi") cityCode = "del";
       if (cityFromUrl === "mumbai") cityCode = "mum";
       if (cityFromUrl === "bengaluru") cityCode = "blr";
-      
+
       setCity(cityCode);
       localStorage.setItem("milo_city", cityCode);
+      applyCityClass(cityCode);
     } else if (savedCity) {
       setCity(savedCity);
+      applyCityClass(savedCity);
     }
   }, [pathname]);
+
+  // Apply city class whenever selectedCity changes
+  useEffect(() => {
+    applyCityClass(selectedCity);
+  }, [selectedCity]);
 
   const setSelectedCity = (city: string | null) => {
     setCity(city);
