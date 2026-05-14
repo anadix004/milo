@@ -7,7 +7,7 @@ import { LocationProvider } from "@/components/LocationContext";
 import SmoothScroll from "@/components/SmoothScroll";
 import dynamic from "next/dynamic";
 const CookieConsent = dynamic(() => import("@/components/CookieConsent"));
-const CursorBlob = dynamic(() => import("@/components/CursorBlob"), { ssr: false });
+import CursorBlob from "@/components/CursorBlob";
 
 const lexend = Lexend({
   subsets: ["latin"],
