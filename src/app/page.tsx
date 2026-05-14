@@ -37,7 +37,7 @@ export default function Home() {
   };
 
   return (
-    <main className="w-full h-screen bg-[#000000] overflow-hidden flex flex-col">
+    <main className="w-full h-[100dvh] bg-[#000000] overflow-hidden flex flex-col">
       <Preloader progress={progress} isReady={isReady} />
       
       <Header 

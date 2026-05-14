@@ -27,7 +27,7 @@ export default function HeroSection() {
   };
 
   return (
-    <section className="relative w-full h-screen overflow-hidden">
+    <section className="relative w-full h-[100dvh] overflow-hidden">
         {/* Background Visual Layer */}
         <div className="absolute inset-0 w-full h-full bg-black">
           {isMobile ? (
@@ -69,7 +69,7 @@ export default function HeroSection() {
         </div>
 
         {/* Explore Button */}
-        <div className="absolute z-50 bottom-16 left-1/2 -translate-x-1/2">
+        <div className="absolute z-50 bottom-28 md:bottom-16 left-1/2 -translate-x-1/2">
           <button 
             onClick={handleExplore}
             className="px-12 py-4 bg-white hover:bg-white/90 text-black font-black uppercase tracking-widest text-sm rounded-2xl shadow-[0_0_40px_rgba(255,255,255,0.3)] transition-all hover:scale-105 active:scale-95"

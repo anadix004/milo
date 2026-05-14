@@ -52,10 +52,21 @@ const SPOTLIGHT_EVENTS = [
 ];
 
 
+// Map URL city names to internal short codes used in the database
+function getCityCode(urlCity: string): string {
+  const map: Record<string, string> = {
+    delhi: "del",
+    mumbai: "mum",
+    bengaluru: "blr",
+  };
+  return map[urlCity] || urlCity;
+}
+
 export default function ExplorePage() {
   const params = useParams();
   const router = useRouter();
   const cityUrl = params?.city as string;
+  const cityCode = getCityCode(cityUrl);
   
   const { isAuthenticated } = useAuth();
   const { setSelectedCity } = useLocation();
@@ -78,10 +89,9 @@ export default function ExplorePage() {
 
   // Fetch Featured Events
   useEffect(() => {
-    if (!cityUrl) return;
+    if (!cityCode) return;
     const fetchSpotlight = async () => {
       const supabase = createClient();
-      let cityCode = cityUrl;
 
       const { data } = await supabase
         .from("events")
@@ -99,11 +109,11 @@ export default function ExplorePage() {
       }
     };
     fetchSpotlight();
-  }, [cityUrl]);
+  }, [cityCode]);
 
   // Fetch Event Grid Data
   useEffect(() => {
-    if (!cityUrl) return;
+    if (!cityCode) return;
     const fetchEvents = async () => {
       setIsLoadingEvents(true);
       const supabase = createClient();
@@ -111,7 +121,7 @@ export default function ExplorePage() {
       const { data } = await supabase
         .from("events")
         .select("*")
-        .eq("cityId", cityUrl)
+        .eq("cityId", cityCode)
         .order("created_at", { ascending: false });
         
       if (data) {
@@ -120,14 +130,14 @@ export default function ExplorePage() {
       setIsLoadingEvents(false);
     };
     fetchEvents();
-  }, [cityUrl]);
+  }, [cityCode]);
 
   // Sync URL city with global context
   useEffect(() => {
-    if (cityUrl) {
-      setSelectedCity(cityUrl);
+    if (cityCode) {
+      setSelectedCity(cityCode);
     }
-  }, [cityUrl, setSelectedCity]);
+  }, [cityCode, setSelectedCity]);
 
   const closeModals = () => setActiveModal(null);
 

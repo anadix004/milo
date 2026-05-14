@@ -1,17 +1,10 @@
 "use client";
 import { ReactLenis } from "lenis/react";
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode } from "react";
+import { useIsMobile } from "@/hooks/useMediaQuery";
 
 export default function SmoothScroll({ children }: { children: ReactNode }) {
-  const [isMobile, setIsMobile] = useState(false);
-  
-  useEffect(() => {
-    // Disable Lenis on mobile to permit native momentum scroll
-    const checkMobile = () => setIsMobile(window.innerWidth < 768);
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
-  }, []);
+  const isMobile = useIsMobile();
 
   if (isMobile) return <>{children}</>;
   

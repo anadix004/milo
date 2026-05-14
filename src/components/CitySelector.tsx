@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { CheckCircle2 } from "lucide-react";
 import clsx from "clsx";
 
 const CITIES = [
@@ -174,4 +175,4 @@ export default function CitySelector({ selectedCity, onSelect }: CitySelectorPro
   );
 }
 
-import { CheckCircle2 } from "lucide-react";
+

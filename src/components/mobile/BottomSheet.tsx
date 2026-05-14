@@ -13,6 +13,11 @@ interface BottomSheetProps {
 export default function BottomSheet({ isOpen, onClose, children, snapHeight = "90vh", className = "" }: BottomSheetProps) {
   const y = useMotionValue(0);
   
+  // Reset drag position when sheet opens
+  useEffect(() => {
+    if (isOpen) y.set(0);
+  }, [isOpen, y]);
+
   // Prevent body scroll when sheet is open
   useEffect(() => {
     if (isOpen) document.body.style.overflow = "hidden";

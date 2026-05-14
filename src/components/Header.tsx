@@ -98,6 +98,22 @@ export default function Header({ onProfileClick, onEventClick, onNotificationsCl
         <div className="flex items-center gap-2 md:gap-4 pointer-events-auto justify-end">
           {/* Location Selector */}
           <div className="relative">
+            {/* Mobile Location Button */}
+            <button 
+              onClick={() => setIsLocationOpen(!isLocationOpen)}
+              className={clsx(
+                "flex md:hidden items-center gap-1.5 px-3 py-2 rounded-full border backdrop-blur-md transition-all",
+                selectedCity 
+                  ? "border-white/20 bg-white/10 text-white" 
+                  : "border-white/30 bg-white/15 text-white animate-pulse"
+              )}
+            >
+              <MapPin size={14} className={selectedCity ? "text-white/60" : "text-white"} />
+              <span className="font-black text-[9px] uppercase tracking-widest">
+                {getCityName()}
+              </span>
+            </button>
+            {/* Desktop Location Button */}
             <button 
               onClick={() => setIsLocationOpen(!isLocationOpen)}
               className="hidden md:flex items-center gap-2 px-4 py-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-white transition-colors"

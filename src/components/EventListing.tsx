@@ -584,10 +584,10 @@ function FeaturedCarousel({ items, onExpand }: { items: EventData[], onExpand: (
       </div>
       {items.length > 1 && (
         <>
-          <button onClick={goPrev} className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-black/60 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/60 hover:text-white hover:bg-black/80 transition-all opacity-0 group-hover/carousel:opacity-100">
+          <button onClick={goPrev} className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-black/60 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/60 hover:text-white hover:bg-black/80 transition-all opacity-100 md:opacity-0 md:group-hover/carousel:opacity-100">
             <ChevronRight size={20} className="rotate-180" />
           </button>
-          <button onClick={goNext} className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-black/60 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/60 hover:text-white hover:bg-black/80 transition-all opacity-0 group-hover/carousel:opacity-100">
+          <button onClick={goNext} className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-black/60 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/60 hover:text-white hover:bg-black/80 transition-all opacity-100 md:opacity-0 md:group-hover/carousel:opacity-100">
             <ChevronRight size={20} />
           </button>
           <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex gap-2">
@@ -731,13 +731,9 @@ function EventDetailView({
   const [isLiked, setIsLiked] = useState(false);
   
   useEffect(() => {
-    if (!isMobile) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "unset";
-    }
+    document.body.style.overflow = "hidden";
     return () => { document.body.style.overflow = "unset"; };
-  }, [isMobile]);
+  }, []);
 
   const renderContent = () => (
     <div className={clsx("flex flex-col h-full", !isMobile && "md:flex-row")}>
