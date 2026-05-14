@@ -30,27 +30,17 @@ export default function HeroSection() {
     <section className="relative w-full h-[100dvh] overflow-hidden">
         {/* Background Visual Layer */}
         <div className="absolute inset-0 w-full h-full bg-black">
-          {isMobile ? (
-            <Image 
-              src="https://images.unsplash.com/photo-1540039155732-684735035727?w=800"
-              alt="City Event"
-              fill
-              priority
-              className="object-cover opacity-70"
-            />
-          ) : (
-            <video
-              autoPlay
-              muted
-              loop
-              playsInline
-              preload="metadata"
-              poster="https://images.unsplash.com/photo-1540039155732-684735035727?w=1200"
-              className="w-full h-full object-cover opacity-70"
-            >
-              <source src="/city event/long event.mp4" type="video/mp4" />
-            </video>
-          )}
+          <video
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            poster="https://images.unsplash.com/photo-1540039155732-684735035727?w=1200"
+            className="w-full h-full object-cover opacity-70"
+          >
+            <source src="/city event/long event.mp4" type="video/mp4" />
+          </video>
           {/* Subtle dark overlay */}
           <div className="absolute inset-0 bg-black/50 w-full h-full pointer-events-none" />
         </div>
