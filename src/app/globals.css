@@ -411,3 +411,543 @@ button:not(.no-min-size), a:not(.no-min-size), [role="button"]:not(.no-min-size)
 nav, header {
   transition: border-color .5s;
 }
+
+/* ============================================================
+   HOME SPOTLIGHT — funky premium motion layers
+   ============================================================ */
+
+@keyframes milo-float {
+  0%   { transform: translate3d(-8px, 10px, 0) scale(1); opacity: .85; }
+  50%  { transform: translate3d(12px, -8px, 0) scale(1.06); opacity: 1; }
+  100% { transform: translate3d(-8px, 10px, 0) scale(1); opacity: .85; }
+}
+
+@keyframes milo-scan {
+  0%   { transform: translateY(-120%); opacity: 0; }
+  20%  { opacity: .28; }
+  60%  { opacity: .18; }
+  100% { transform: translateY(120%); opacity: 0; }
+}
+
+.milo-spotlight-grain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.05) 0 1px, rgba(0,0,0,0) 1px 3px),
+    repeating-linear-gradient(0deg, rgba(255,255,255,0.03) 0 1px, rgba(0,0,0,0) 1px 4px);
+  mix-blend-mode: overlay;
+  opacity: .06;
+}
+
+.milo-spotlight-orb {
+  position: absolute;
+  width: 520px;
+  height: 520px;
+  border-radius: 999px;
+  background: radial-gradient(circle, var(--acg) 0%, transparent 62%);
+  filter: blur(2px);
+  animation: milo-float 8.5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.milo-spotlight-orb--2 {
+  width: 420px;
+  height: 420px;
+  background: radial-gradient(circle, rgba(255,255,255,0.06) 0%, transparent 60%);
+  animation-duration: 11.5s;
+}
+
+.milo-spotlight-scanline {
+  position: absolute;
+  inset: -40% 0;
+  background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.12), transparent);
+  opacity: 0;
+  animation: milo-scan 5.8s ease-in-out infinite;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+
+/* ============================================================
+   LIVE PULSE STRIP
+   ============================================================ */
+.milo-pulse {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 14px;
+  border: 0.5px solid rgba(255,255,255,0.08);
+  border-radius: 18px;
+  background: rgba(255,255,255,0.03);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.milo-pulse-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 220px;
+}
+
+.milo-pulse-title {
+  font-family: "Syne", var(--font-lexend, system-ui);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--tx);
+}
+
+.milo-pulse-sub {
+  font-family: "Syne Mono", var(--font-roboto-mono, monospace);
+  font-size: 10px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--txm);
+}
+
+.milo-pulse-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+}
+
+.milo-pulse-stat {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 14px;
+  border: 0.5px solid rgba(255,255,255,0.07);
+  background: rgba(0,0,0,0.18);
+}
+
+.milo-pulse-k {
+  font-family: "Syne Mono", var(--font-roboto-mono, monospace);
+  font-size: 9px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--txm);
+}
+
+.milo-pulse-v {
+  font-family: "Syne", var(--font-lexend, system-ui);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  color: var(--ac);
+}
+
+@media (max-width: 740px) {
+  .milo-pulse { border-radius: 16px; }
+  .milo-pulse-left { min-width: 0; }
+  .milo-pulse-right { gap: 10px; }
+}
+
+/* ============================================================
+   LANDING (baharmilo_full_redesign.html) CLASSNAMES
+   Keep these classnames stable so the cursor hover bindings work.
+   ============================================================ */
+
+.milo-nav {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  padding: 1.4rem 2.8rem;
+  border-bottom: 0.5px solid var(--br);
+  background: rgba(0,0,0,0.15);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.logo {
+  font-family: "Syne", var(--font-lexend, system-ui);
+  font-size: 19px;
+  font-weight: 800;
+  color: var(--tx);
+  letter-spacing: -0.02em;
+  user-select: none;
+}
+
+.logo em {
+  color: var(--ac);
+  font-style: normal;
+  transition: color .5s;
+}
+
+.cities {
+  display: flex;
+  gap: 5px;
+  justify-self: center;
+}
+
+.cbtn {
+  font-family: "Syne Mono", var(--font-roboto-mono, monospace);
+  font-size: 9px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  padding: 6px 14px;
+  border-radius: 100px;
+  border: 1px solid var(--br);
+  color: var(--txm);
+  background: transparent;
+  transition: all .22s;
+}
+
+.cbtn.on {
+  background: var(--ac);
+  color: #fff;
+  border-color: var(--ac);
+}
+
+.nlinks {
+  display: flex;
+  align-items: center;
+  gap: 1.4rem;
+  justify-self: end;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+}
+
+.nl {
+  display: inline-flex;
+  align-items: center;
+  height: 28px;
+  line-height: 1;
+  font-family: "Syne Mono", var(--font-roboto-mono, monospace);
+  font-size: 10px;
+  color: var(--txm);
+  background: transparent;
+  border: 0;
+  padding: 0;
+}
+
+.nl:hover { color: var(--tx); }
+
+.nget {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--ac);
+  border: 1px solid var(--acd);
+  padding: 6px 15px;
+  border-radius: 100px;
+  transition: color .5s, border-color .5s, background .22s;
+  background: transparent;
+}
+
+.nget:hover { background: rgba(255,255,255,0.04); }
+
+/* HERO (landing) */
+.milo-hero {
+  padding: 3.2rem 2.8rem 2.4rem;
+  position: relative;
+  overflow: hidden;
+  min-height: 340px;
+}
+
+.livepill {
+  position: absolute;
+  top: 1.5rem;
+  right: 2.8rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--br);
+  border-radius: 100px;
+  padding: 5px 12px;
+  font-family: "Syne Mono", var(--font-roboto-mono, monospace);
+  font-size: 9px;
+  color: var(--txm);
+}
+
+.ldot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--ac);
+  animation: milo-blink 1.4s ease-in-out infinite;
+  transition: background .5s;
+}
+
+.bgn {
+  position: absolute;
+  right: -1.5rem;
+  bottom: -3rem;
+  font-size: 240px;
+  font-weight: 800;
+  color: var(--txu);
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+  letter-spacing: -0.05em;
+  transition: color .5s;
+}
+
+.brow {
+  font-family: "Syne Mono", var(--font-roboto-mono, monospace);
+  font-size: 9.5px;
+  letter-spacing: .2em;
+  color: var(--ac);
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 1.6rem;
+  transition: color .5s;
+}
+
+.brow::before {
+  content: '';
+  width: 22px;
+  height: 1px;
+  background: var(--ac);
+  transition: background .5s;
+}
+
+.hl {
+  font-family: "Syne", var(--font-lexend, system-ui);
+  font-size: clamp(44px, 6.2vw, 78px);
+  font-weight: 800;
+  line-height: .92;
+  letter-spacing: -0.03em;
+  color: var(--tx);
+  margin-bottom: 1.5rem;
+}
+
+.hl .city { color: var(--ac); transition: color .5s; }
+
+.hl .ghost {
+  color: transparent;
+  -webkit-text-stroke: 1.2px var(--txu);
+  transition: -webkit-text-stroke-color .5s;
+}
+
+.sub {
+  font-size: 13px;
+  color: var(--txm);
+  line-height: 1.8;
+  max-width: 420px;
+  margin-bottom: 2rem;
+}
+
+.ctarow { display: flex; align-items: center; gap: 1.6rem; }
+
+.btnp {
+  background: var(--ac);
+  color: #fff;
+  font-family: "Syne", var(--font-lexend, system-ui);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  padding: 13px 26px;
+  border-radius: 100px;
+  border: none;
+  transition: opacity .18s, transform .25s cubic-bezier(.34,1.56,.64,1);
+}
+
+.btnp:hover { transform: translateY(-1px); opacity: .95; }
+
+.btng {
+  font-family: "Syne Mono", var(--font-roboto-mono, monospace);
+  font-size: 10px;
+  color: var(--txm);
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}
+
+/* MARQUEE — exact classnames used in redesign HTML */
+.mqbar {
+  border-top: 0.5px solid var(--br);
+  border-bottom: 0.5px solid var(--br);
+  height: 38px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  transition: border-color .5s;
+}
+
+.mqtrack {
+  display: flex;
+  animation: milo-mq 28s linear infinite;
+  white-space: nowrap;
+  will-change: transform;
+}
+
+.mqi {
+  font-family: "Syne Mono", var(--font-roboto-mono, monospace);
+  font-size: 8.5px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--txm);
+  padding: 0 2.2rem;
+  display: flex;
+  align-items: center;
+  gap: .55rem;
+}
+
+.mdot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--ac);
+  transition: background .5s;
+  flex-shrink: 0;
+}
+
+/* 3-lane marquee stack */
+.milo-mqstack {
+  display: grid;
+  gap: 0;
+}
+
+.mqbar--b { opacity: .82; }
+.mqbar--c { opacity: .68; }
+
+@keyframes milo-mq-rev {
+  0%   { transform: translateX(-50%); }
+  100% { transform: translateX(0); }
+}
+
+.mqtrack--a { animation-duration: 26s; }
+.mqtrack--b { animation: milo-mq-rev 34s linear infinite; }
+.mqtrack--c { animation-duration: 44s; }
+
+@media (max-width: 740px) {
+  .milo-nav { padding: 1.1rem 1.1rem; }
+  .nlinks { gap: .9rem; }
+  .sub { max-width: 100%; }
+  .milo-hero { padding: 2.6rem 1.1rem 1.8rem; min-height: 300px; }
+  .livepill { right: 1.1rem; }
+}
+
+/* ============================================================
+   MARKETING PAGES — DESIGN TOKEN EXTENSIONS
+   Additive only. Existing tokens are untouched.
+   ============================================================ */
+
+/* Tailwind v4 theme extension — generates text-gold, bg-gold,
+   text-tx, text-tx2, text-tx3, border-bdr, border-bdr2, etc. */
+@theme {
+  --color-gold:    #C9A84C;
+  --color-goldDim: rgba(201,168,76,.08);
+  --color-goldBdr: rgba(201,168,76,.20);
+  --color-tx:      #E8EEF8;
+  --color-tx2:     rgba(232,238,248,.52);
+  --color-tx3:     rgba(232,238,248,.26);
+  --color-bdr:     rgba(255,255,255,.05);
+  --color-bdr2:    rgba(255,255,255,.10);
+  --color-sf:      #050505;
+  --color-teal-a:  #3ce6b4;
+}
+
+/* Font display/body shortcuts mapping to existing Next.js font vars */
+.font-d { font-family: var(--font-lexend, 'Syne', system-ui); }
+.font-b { font-family: var(--font-jakarta, 'Plus Jakarta Sans', system-ui); }
+.font-mono { font-family: var(--font-roboto-mono, 'Roboto Mono', monospace); }
+
+/* Glass card — used by new marketing pages */
+.glass {
+  background: rgba(255,255,255,.018);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: .5px solid rgba(255,255,255,.055);
+  transition: background .45s cubic-bezier(.175,.885,.32,1.275),
+              border-color .45s cubic-bezier(.175,.885,.32,1.275),
+              transform .45s cubic-bezier(.175,.885,.32,1.275),
+              box-shadow .45s cubic-bezier(.175,.885,.32,1.275);
+  position: relative;
+}
+
+.glass:hover {
+  background: rgba(255,255,255,.035);
+  border-color: rgba(201,168,76,.18);
+  transform: translateY(-3px);
+  box-shadow: 0 24px 60px -15px rgba(0,0,0,.65), 0 0 40px rgba(201,168,76,.04);
+}
+
+/* Noise texture pseudo-element */
+.noise::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  opacity: .022;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 128 128' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.5' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Shimmer sweep on hover */
+.shim { position: relative; overflow: hidden; }
+.shim::after {
+  content: '';
+  position: absolute;
+  top: -50%; left: -50%;
+  width: 200%; height: 200%;
+  background: linear-gradient(to bottom right, rgba(255,255,255,0), rgba(255,255,255,.07) 50%, rgba(255,255,255,0));
+  transform: rotate(45deg) translateY(100%);
+  transition: transform .65s cubic-bezier(.19,1,.22,1);
+}
+.shim:hover::after { transform: rotate(45deg) translateY(-100%); }
+
+/* Scroll-reveal initial state (JS animates to opacity:1 translateY:0) */
+.sr { opacity: 0; transform: translateY(32px); }
+
+/* Image hover zoom */
+.img-h { overflow: hidden; }
+.img-h img { transition: transform .8s cubic-bezier(.25,1,.5,1); }
+.img-h:hover img { transform: scale(1.05); }
+
+/* Site nav underline link */
+.site-nav-link { position: relative; }
+.site-nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -3px; left: 0;
+  width: 0; height: 1.5px;
+  background: #C9A84C;
+  transition: width .35s cubic-bezier(.175,.885,.32,1.275);
+}
+.site-nav-link:hover::after,
+.site-nav-link.active::after { width: 100%; }
+
+/* Film grain — fixed overlay for new pages */
+.film-grain {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9989;
+  opacity: .03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
+}
+
+/* Gold live-dot pulse */
+.gold-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: #C9A84C;
+  animation: gold-pulse 1.4s ease-in-out infinite;
+  flex-shrink: 0;
+}
+@keyframes gold-pulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 8px rgba(201,168,76,.5); }
+  50%       { opacity: .25; box-shadow: none; }
+}
+
+/* City accent dot (uses --ac) */
+.accent-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--ac);
+  animation: milo-blink 1.4s ease-in-out infinite;
+}
+
+/* Page hero fade-in */
+@keyframes page-in {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.page-in { animation: page-in .7s cubic-bezier(.25,1,.5,1) forwards; }

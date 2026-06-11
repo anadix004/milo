@@ -6,6 +6,12 @@
       "sourceType": "github",
       "skillPath": "caveman/SKILL.md",
       "computedHash": "a818cdc41dcfaa50dd891c5cb5e5705968338de02e7e37949ca56e8c30ad4176"
+    },
+    "hallmark": {
+      "source": "nutlope/hallmark",
+      "sourceType": "github",
+      "skillPath": "SKILL.md",
+      "computedHash": "5c0fa3fe0dd99fd3016ac120a1b5f425c6f93ce1d2f1c531b19e34361e532d6f"
     }
   }
 }

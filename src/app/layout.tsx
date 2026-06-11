@@ -27,16 +27,17 @@ const robotoMono = Roboto_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://baharmilo.com'),
   title: "MILO | Your City's Social Radar",
   description: "Discover exclusive events, secret parties, and connect with friends in real-time. The ultimate Gen-Z social radar app.",
   openGraph: {
     title: "MILO | Your City's Social Radar",
     description: "Discover exclusive events, secret parties, and connect with friends in real-time.",
-    url: 'https://milo-web-page.vercel.app',
+    url: 'https://baharmilo.com',
     siteName: 'MILO',
     images: [
       {
-        url: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=1200&h=630&fit=crop',
+        url: '/images/og-image.jpg', // referencing local/relative path now supported by metadataBase
         width: 1200,
         height: 630,
         alt: 'MILO Social Radar',
@@ -49,7 +50,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: "MILO | Your City's Social Radar",
     description: "Discover exclusive events and secret parties in real-time.",
-    images: ['https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=1200&h=630&fit=crop'],
+    images: ['/images/og-image.jpg'],
   },
 };
 

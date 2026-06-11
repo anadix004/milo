@@ -1,0 +1,181 @@
+
+<!DOCTYPE html>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Syne+Mono&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{width:100%;font-family:'Syne',sans-serif;cursor:none;}
+body{background:#0A0F1E;transition:background .6s;}
+body.delhi{background:#0A0F1E;--ac:#4A7FD4;--acg:rgba(74,127,212,.15);--acd:rgba(74,127,212,.28);--tx:#E8EEF8;--txm:rgba(232,238,248,.42);--txu:rgba(232,238,248,.07);--br:rgba(74,127,212,.14);}
+body.blr{background:#071A0F;--ac:#3DB865;--acg:rgba(61,184,101,.15);--acd:rgba(61,184,101,.28);--tx:#E3F5EB;--txm:rgba(227,245,235,.42);--txu:rgba(227,245,235,.07);--br:rgba(61,184,101,.14);}
+body.mum{background:#110A1C;--ac:#8B5CF6;--acg:rgba(139,92,246,.15);--acd:rgba(139,92,246,.28);--tx:#EDE8F8;--txm:rgba(237,232,248,.42);--txu:rgba(237,232,248,.07);--br:rgba(139,92,246,.14);}
+#cur{position:fixed;width:10px;height:10px;background:var(--ac,#4A7FD4);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:width .18s,height .18s,background .5s;}
+#ring{position:fixed;width:34px;height:34px;border:1px solid var(--acd,rgba(74,127,212,.28));border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:left .09s ease,top .09s ease,border-color .5s;}
+#blob{position:fixed;width:380px;height:380px;border-radius:50%;pointer-events:none;z-index:0;transform:translate(-50%,-50%);background:radial-gradient(circle,var(--acg,rgba(74,127,212,.15)) 0%,transparent 68%);transition:background .7s;left:50%;top:40%;}
+.page{position:relative;z-index:1;}
+
+/* NAV */
+nav{display:flex;align-items:center;justify-content:space-between;padding:1.4rem 2.8rem;border-bottom:.5px solid var(--br,rgba(74,127,212,.14));}
+.logo{font-size:19px;font-weight:800;color:var(--tx);letter-spacing:-.02em;}
+.logo em{color:var(--ac);font-style:normal;transition:color .5s;}
+.cities{display:flex;gap:5px;}
+.cbtn{font-family:'Syne Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;padding:6px 14px;border-radius:100px;border:1px solid var(--br);color:var(--txm);background:transparent;cursor:none;transition:all .22s;}
+.cbtn.on{background:var(--ac);color:#fff;border-color:var(--ac);}
+.nlinks{display:flex;align-items:center;gap:1.4rem;}
+.nl{font-family:'Syne Mono',monospace;font-size:10px;color:var(--txm);cursor:none;}
+.nget{font-size:10px;font-weight:700;color:var(--ac);border:1px solid var(--acd);padding:6px 15px;border-radius:100px;cursor:none;transition:color .5s,border-color .5s;}
+
+/* HERO */
+.hero{padding:3.2rem 2.8rem 2.4rem;position:relative;overflow:hidden;min-height:340px;}
+.brow{font-family:'Syne Mono',monospace;font-size:9.5px;letter-spacing:.2em;color:var(--ac);text-transform:uppercase;display:flex;align-items:center;gap:9px;margin-bottom:1.6rem;transition:color .5s;}
+.brow::before{content:'';width:22px;height:1px;background:var(--ac);transition:background .5s;}
+.hl{font-size:clamp(48px,6.5vw,78px);font-weight:800;line-height:.9;letter-spacing:-.03em;color:var(--tx);margin-bottom:1.5rem;}
+.hl .city{color:var(--ac);transition:color .5s;}
+.hl .ghost{color:transparent;-webkit-text-stroke:1.2px var(--txu);transition:-webkit-text-stroke-color .5s;}
+.sub{font-size:13px;color:var(--txm);line-height:1.8;max-width:360px;margin-bottom:2rem;}
+.ctarow{display:flex;align-items:center;gap:1.6rem;}
+.btnp{background:var(--ac);color:#fff;font-family:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:13px 26px;border-radius:100px;border:none;cursor:none;transition:opacity .18s;}
+.btng{font-family:'Syne Mono',monospace;font-size:10px;color:var(--txm);letter-spacing:.07em;text-transform:uppercase;}
+.livepill{position:absolute;top:1.5rem;right:2.8rem;display:inline-flex;align-items:center;gap:6px;border:1px solid var(--br);border-radius:100px;padding:5px 12px;font-family:'Syne Mono',monospace;font-size:9px;color:var(--txm);}
+.ldot{width:5px;height:5px;border-radius:50%;background:var(--ac);animation:bl 1.4s ease-in-out infinite;transition:background .5s;}
+@keyframes bl{0%,100%{opacity:1;}50%{opacity:.25;}}
+.bgn{position:absolute;right:-1.5rem;bottom:-3rem;font-size:240px;font-weight:800;color:var(--txu);line-height:1;pointer-events:none;user-select:none;letter-spacing:-.05em;transition:color .5s;}
+
+/* MARQUEE */
+.mqbar{border-top:.5px solid var(--br);border-bottom:.5px solid var(--br);height:38px;overflow:hidden;display:flex;align-items:center;}
+.mqtrack{display:flex;animation:mq 24s linear infinite;white-space:nowrap;}
+.mqi{font-family:'Syne Mono',monospace;font-size:8.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--txm);padding:0 2.2rem;display:flex;align-items:center;gap:.55rem;}
+.mdot{width:4px;height:4px;border-radius:50%;background:var(--ac);transition:background .5s;flex-shrink:0;}
+@keyframes mq{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
+
+/* CARDS */
+.cards{padding:1.4rem 2.8rem 2rem;display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+.card{border:1px solid var(--br);border-radius:14px;padding:14px 15px;background:rgba(255,255,255,.025);cursor:none;transition:border-color .22s,transform .18s,background .5s;}
+.card:hover{border-color:var(--acd);transform:translateY(-3px);}
+.ctop{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:9px;}
+.ctag{font-family:'Syne Mono',monospace;font-size:7.5px;letter-spacing:.1em;text-transform:uppercase;padding:3px 9px;border-radius:100px;background:var(--acg);color:var(--ac);transition:background .5s,color .5s;}
+.ctime{font-family:'Syne Mono',monospace;font-size:8.5px;color:var(--txm);}
+.cname{font-size:13px;font-weight:700;color:var(--tx);line-height:1.25;margin-bottom:4px;}
+.cloc{font-size:10px;color:var(--txm);margin-bottom:10px;display:flex;align-items:center;gap:3px;}
+.cloc::before{content:'↗';font-size:8px;opacity:.45;}
+.cfoot{display:flex;align-items:center;justify-content:space-between;border-top:.5px solid var(--br);padding-top:8px;}
+.cgo{font-size:11px;font-weight:700;color:var(--ac);transition:color .5s;}
+.avs{display:flex;}
+.av{width:19px;height:19px;border-radius:50%;margin-left:-6px;font-size:8px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid transparent;}
+.av:first-child{margin-left:0;}
+</style>
+
+<div id="cur"></div>
+<div id="ring"></div>
+<div id="blob"></div>
+
+<div class="page">
+<nav>
+  <div class="logo">mi<em>lo</em></div>
+  <div class="cities">
+    <button class="cbtn on" data-c="delhi">Delhi</button>
+    <button class="cbtn" data-c="blr">Bangalore</button>
+    <button class="cbtn" data-c="mum">Mumbai</button>
+  </div>
+  <div class="nlinks">
+    <span class="nl">Radar</span>
+    <span class="nl">Log in</span>
+    <span class="nget">Get App</span>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="livepill"><div class="ldot"></div><span id="lbl">14 live · Delhi</span></div>
+  <div class="bgn" id="bgn">14</div>
+  <div class="brow">Your city's social radar</div>
+  <div class="hl">
+    <div>your <span class="city" id="cn">Delhi</span></div>
+    <div>is more <span class="ghost">alive</span></div>
+    <div>than you know.</div>
+  </div>
+  <div class="sub">Spontaneous plans. Real connections. No queues — just the people and places that make your city worth showing up for.</div>
+  <div class="ctarow">
+    <button class="btnp" id="explbtn">Explore tonight →</button>
+    <span class="btng">↓ what's near you</span>
+  </div>
+</div>
+
+<div class="mqbar"><div class="mqtrack" id="mq"></div></div>
+
+<div class="cards" id="cards"></div>
+</div>
+
+<script>
+const cur=document.getElementById('cur');
+const ring=document.getElementById('ring');
+const blob=document.getElementById('blob');
+
+document.addEventListener('mousemove',e=>{
+  cur.style.left=e.clientX+'px';cur.style.top=e.clientY+'px';
+  setTimeout(()=>{ring.style.left=e.clientX+'px';ring.style.top=e.clientY+'px';},85);
+  blob.style.transition='left .07s ease,top .07s ease,background .7s';
+  blob.style.left=e.clientX+'px';blob.style.top=e.clientY+'px';
+});
+
+const db={
+  delhi:{name:'Delhi',lbl:'14 live · Delhi',num:'14',
+    mq:['Chai Circle · Lodi','Open Mic · Hauz Khas','Rooftop Jam · Mehrauli','Art Walk · Lodhi Colony','Book Club · Khan Market','Street Food · CP'],
+    cards:[
+      {tag:'● Live now',time:'NOW',name:'Open Mic Night',loc:'Hauz Khas Village',go:'23 going',avs:['A','R','S'],avc:['#4A7FD4','#3DB865','#8B5CF6']},
+      {tag:'Tonight',time:'8 PM',name:'Rooftop Sundowner',loc:'Mehrauli, South Delhi',go:'17 going',avs:['P','N'],avc:['#4A7FD4','#8B5CF6']},
+      {tag:'Tomorrow',time:'7 AM',name:'Morning Chai Walk',loc:'Chandni Chowk',go:'12 going',avs:['K','M','T'],avc:['#3DB865','#4A7FD4','#8B5CF6']},
+      {tag:'Weekend',time:'SAT 6PM',name:'Art Walk · Lodhi',loc:'Lodhi Road, Delhi',go:'41 going',avs:['V','D'],avc:['#8B5CF6','#4A7FD4']}
+    ]},
+  blr:{name:'Bangalore',lbl:'9 live · Bangalore',num:'9',
+    mq:['Indie Gig · Indiranagar','Startup Social · Koramangala','Cycling · Cubbon Park','Terrace Sessions · HSR','Book Club · MG Road','Food Walk · VV Puram'],
+    cards:[
+      {tag:'● Live now',time:'NOW',name:'Indie Gig',loc:'Indiranagar, BLR',go:'31 going',avs:['A','R'],avc:['#3DB865','#4A7FD4']},
+      {tag:'Tonight',time:'7 PM',name:'Startup Social',loc:'Koramangala 5th Block',go:'19 going',avs:['S','P','N'],avc:['#3DB865','#8B5CF6','#4A7FD4']},
+      {tag:'Tomorrow',time:'8 AM',name:'Cycling Group',loc:'Cubbon Park',go:'24 going',avs:['K','V'],avc:['#4A7FD4','#3DB865']},
+      {tag:'Weekend',time:'SUN 5PM',name:'Terrace Sessions',loc:'HSR Layout, BLR',go:'28 going',avs:['M','T'],avc:['#3DB865','#8B5CF6']}
+    ]},
+  mum:{name:'Mumbai',lbl:'22 live · Mumbai',num:'22',
+    mq:['Flea Market · Bandra','Jazz Night · Lower Parel','Beach Walk · Versova','Art Show · Colaba','Food Walk · Dharavi','Jam Session · Andheri'],
+    cards:[
+      {tag:'● Live now',time:'NOW',name:'Bandra Flea Market',loc:'Pali Hill, Bandra West',go:'67 going',avs:['A','R','S'],avc:['#8B5CF6','#4A7FD4','#3DB865']},
+      {tag:'Tonight',time:'9 PM',name:'Jazz Night',loc:'Lower Parel, Mumbai',go:'44 going',avs:['P','N'],avc:['#8B5CF6','#3DB865']},
+      {tag:'Tomorrow',time:'6 AM',name:'Beach Walk',loc:'Versova Beach',go:'18 going',avs:['K','M'],avc:['#4A7FD4','#8B5CF6']},
+      {tag:'Weekend',time:'SAT 7PM',name:'Art Show Opening',loc:'Colaba Causeway',go:'55 going',avs:['V','D','T'],avc:['#8B5CF6','#4A7FD4','#3DB865']}
+    ]}
+};
+
+function renderMQ(city){
+  const items=[...db[city].mq,...db[city].mq];
+  document.getElementById('mq').innerHTML=items.map(t=>`<span class="mqi"><div class="mdot"></div>${t}</span>`).join('');
+}
+
+function renderCards(city){
+  document.getElementById('cards').innerHTML=db[city].cards.map(c=>`
+    <div class="card">
+      <div class="ctop"><div class="ctag">${c.tag}</div><div class="ctime">${c.time}</div></div>
+      <div class="cname">${c.name}</div>
+      <div class="cloc">${c.loc}</div>
+      <div class="cfoot">
+        <div class="cgo">${c.go}</div>
+        <div class="avs">${c.avs.map((a,i)=>`<div class="av" style="background:${c.avc[i]};color:#fff">${a}</div>`).join('')}</div>
+      </div>
+    </div>`).join('');
+}
+
+function switchCity(city){
+  document.body.className=city;
+  document.getElementById('cn').textContent=db[city].name;
+  document.getElementById('lbl').textContent=db[city].lbl;
+  document.getElementById('bgn').textContent=db[city].num;
+  document.querySelectorAll('.cbtn').forEach(b=>b.classList.toggle('on',b.dataset.c===city));
+  renderMQ(city);renderCards(city);
+  setTimeout(()=>{cur.style.background='var(--ac)';},10);
+}
+
+document.querySelectorAll('.cbtn').forEach(b=>b.addEventListener('click',()=>switchCity(b.dataset.c)));
+[...document.querySelectorAll('button,.nget')].forEach(el=>{
+  el.addEventListener('mouseenter',()=>{cur.style.width='30px';cur.style.height='30px';cur.style.opacity='.5';});
+  el.addEventListener('mouseleave',()=>{cur.style.width='10px';cur.style.height='10px';cur.style.opacity='1';});
+});
+
+switchCity('delhi');
+</script>

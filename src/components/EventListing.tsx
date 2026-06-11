@@ -132,7 +132,35 @@ function Dropdown({ label, value, options, onChange, icon }: DropdownProps) {
   );
 }
 
-export default function EventListing({ selectedCity, onAuthRequired }: { selectedCity: string | null; onAuthRequired: () => void }) {
+type EventListingProps = {
+  selectedCity: string | null;
+  onAuthRequired: () => void;
+  initialTimeFilter?: string | null;
+  initialPriceFilter?: string | null;
+  initialSearchQuery?: string | null;
+};
+
+function normalizeTimeFilter(value: string | null | undefined) {
+  if (!value) return null;
+  const v = value.trim();
+  if (v === "All" || v === "Today" || v === "Tomorrow" || v === "Week" || v === "Month") return v;
+  return null;
+}
+
+function normalizePriceFilter(value: string | null | undefined) {
+  if (!value) return null;
+  const v = value.trim();
+  if (v === "All" || v === "Free" || v === "Paid") return v;
+  return null;
+}
+
+export default function EventListing({
+  selectedCity,
+  onAuthRequired,
+  initialTimeFilter,
+  initialPriceFilter,
+  initialSearchQuery,
+}: EventListingProps) {
   const isMobile = useIsMobile();
   const supabase = createClient();
   const { isAuthenticated } = useAuth();
@@ -149,6 +177,21 @@ export default function EventListing({ selectedCity, onAuthRequired }: { selecte
   const [joinedEvents, setJoinedEvents] = useState<Set<string>>(new Set());
   const [bookmarkedEvents, setBookmarkedEvents] = useState<Set<string>>(new Set());
   const { user } = useAuth();
+
+  const didApplyInitialFilters = useRef(false);
+  useEffect(() => {
+    if (didApplyInitialFilters.current) return;
+
+    const normalizedTime = normalizeTimeFilter(initialTimeFilter);
+    const normalizedPrice = normalizePriceFilter(initialPriceFilter);
+    const normalizedQ = (initialSearchQuery ?? "").trim();
+
+    if (normalizedTime) setTimeFilter(normalizedTime);
+    if (normalizedPrice) setPriceFilter(normalizedPrice);
+    if (normalizedQ) setSearchQuery(normalizedQ);
+
+    didApplyInitialFilters.current = true;
+  }, [initialTimeFilter, initialPriceFilter, initialSearchQuery]);
 
   const fetchEvents = async () => {
     setIsLoading(true);
