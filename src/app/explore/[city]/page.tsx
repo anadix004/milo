@@ -58,6 +58,7 @@ export default function ExplorePage() {
         onProfileClick={() => (isAuthenticated ? router.push("/profile") : router.push("/login"))}
         onEventClick={() => router.push(isAuthenticated ? "/explore" : "/login")}
         onNotificationsClick={() => {}}
+        isSidebarOpen={false}
       />
 
       <BottomNav
