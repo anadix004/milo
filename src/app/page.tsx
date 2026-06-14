@@ -37,29 +37,29 @@ export default function Home() {
   };
 
   return (
-    <main className="w-full h-[100dvh] bg-[#000000] overflow-hidden flex flex-col">
+    <main className="w-full min-h-[100dvh] bg-[#000000] flex flex-col overflow-y-auto">
       <Preloader progress={progress} isReady={isReady} />
-      
-      <Header 
+
+      <Header
         onProfileClick={() => handleAuthGate(() => setActiveModal("profile"))}
         onEventClick={() => handleAuthGate(() => setActiveModal("event"))}
         onNotificationsClick={() => setActiveModal("notifications")}
-        isSidebarOpen={activeModal === "profile"} 
+        isSidebarOpen={activeModal === "profile"}
       />
-      
-      <ProfileSidebar 
-        isOpen={activeModal === "profile"} 
-        onClose={closeModals} 
+
+      <ProfileSidebar
+        isOpen={activeModal === "profile"}
+        onClose={closeModals}
         onAuthClick={() => setActiveModal("auth")}
       />
 
-      <EventSubmission 
+      <EventSubmission
         isOpen={activeModal === "event"}
         onClose={closeModals}
         onAuthRedirect={() => setActiveModal("auth")}
       />
 
-      <AuthModal 
+      <AuthModal
         isOpen={activeModal === "auth"}
         onClose={() => setActiveModal(null)}
       />
@@ -69,7 +69,7 @@ export default function Home() {
         onClose={closeModals}
       />
 
-      <BottomNav 
+      <BottomNav
         onProfileClick={() => handleAuthGate(() => setActiveModal("profile"))}
         onEventClick={() => handleAuthGate(() => setActiveModal("event"))}
         onNotificationsClick={() => setActiveModal("notifications")}
