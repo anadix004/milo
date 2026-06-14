@@ -40,7 +40,7 @@ function parseSheet(filePath, defaultCityId) {
   const workbook = xlsx.readFile(absolutePath);
   const sheetName = workbook.SheetNames[0];
   const sheet = workbook.Sheets[sheetName];
-  const data = xlsx.utils.sheet_to_json(sheet);
+  const data = xlsx.utils.sheet_to_json(sheet, { raw: false });
 
   return data.map((row) => {
     // Determine cityId
@@ -91,13 +91,14 @@ function parseSheet(filePath, defaultCityId) {
 
 async function run() {
   console.log("Parsing sheets...");
-  const events = [
-    ...parseSheet('../Event_sheets/delhi_events.csv', 'delhi'),
-    ...parseSheet('../Event_sheets/bangalore_events.xlsx', 'bengaluru'),
-    ...parseSheet('../Event_sheets/mumbai_events.xlsx', 'mumbai'),
-  ];
+  
+  // Parse the unified event_sheet.xlsx
+  const allEvents = parseSheet('../Event_sheets/event_sheet.xlsx', 'unknown');
 
-  console.log(`Found ${events.length} events to insert.`);
+  // Filter for Mumbai and Bengaluru only
+  const events = allEvents.filter(e => e.cityId === 'mumbai' || e.cityId === 'bengaluru');
+
+  console.log(`Found ${events.length} events to insert for Mumbai and Bangalore.`);
 
   if (events.length === 0) {
     console.log("No events to insert.");
@@ -112,6 +113,19 @@ async function run() {
     .limit(1);
     
   const userId = adminUsers && adminUsers.length > 0 ? adminUsers[0].id : null;
+
+  // Wipe out existing events for mumbai and bengaluru
+  console.log("Cleaning up old events for Mumbai and Bangalore...");
+  const { error: deleteError } = await supabase
+    .from('events')
+    .delete()
+    .in('cityId', ['mumbai', 'bengaluru']);
+    
+  if (deleteError) {
+    console.error("Failed to delete old events:", deleteError);
+  } else {
+    console.log("Successfully deleted old events for Mumbai and Bangalore.");
+  }
 
   let successCount = 0;
   for (const event of events) {
