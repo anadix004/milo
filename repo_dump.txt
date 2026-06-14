@@ -3756,11 +3756,12 @@ FILE: src/app/globals.css
 
   /* ── Static text colours — NEVER change per city ── */
   --tx:  #E8EEF8;
-  --txm: rgba(232,238,248,.42);
-  --txu: rgba(232,238,248,.07);
+  /* PHASE 2 FIX: Increased opacity for readability (was .42/.07) */
+  --txm: rgba(232,238,248,.60);
+  --txu: rgba(232,238,248,.15);
 }
 
-/* ── Per-city accent overrides — background/text are untouched ── */
+/* ── Per-city accent overrides ── */
 body.city-delhi {
   --ac:  #4A7FD4;
   --acg: rgba(74,127,212,.15);
@@ -3793,14 +3794,14 @@ body {
   color: var(--foreground);
   overflow-x: hidden;
   touch-action: manipulation;
-  /* Custom cursor hidden on desktop; shown on mobile */
   cursor: auto;
 }
 
-/* Hide default cursor on desktop only */
 @media (pointer: fine) {
   body { cursor: none !important; }
   button, a, [role="button"] { cursor: none !important; }
+  /* PHASE 2 FIX: Restore text cursor for inputs */
+  input, textarea, select, [contenteditable] { cursor: text !important; }
 }
 
 button:not(.no-min-size), a:not(.no-min-size), [role="button"]:not(.no-min-size) {
@@ -3814,14 +3815,13 @@ button:not(.no-min-size), a:not(.no-min-size), [role="button"]:not(.no-min-size)
 /* ============================================================
    CURSOR BLOB — hide on touch devices
    ============================================================ */
-#cur, #ring, #blob {
-  display: none;
-}
+#cur, #ring, #blob { display: none; }
 @media (pointer: fine) {
   #cur  { display: block !important; }
   #ring { display: block !important; }
   #blob { display: block !important; }
 }
+
 
 /* ============================================================
    MARQUEE BAR
@@ -3843,10 +3843,11 @@ button:not(.no-min-size), a:not(.no-min-size), [role="button"]:not(.no-min-size)
   will-change: transform;
 }
 
+/* PHASE 2 FIX: Increased font size (was 8.5px) */
 .milo-mqi {
   font-family: var(--font-roboto-mono, monospace);
-  font-size: 8.5px;
-  letter-spacing: .16em;
+  font-size: 11px;
+  letter-spacing: .12em;
   text-transform: uppercase;
   color: var(--txm);
   padding: 0 2.2rem;
@@ -3888,6 +3889,9 @@ button:not(.no-min-size), a:not(.no-min-size), [role="button"]:not(.no-min-size)
   flex-direction: column;
 }
 
+/* PHASE 2 FIX: Mobile touch feedback (UI-LOW-01) */
+.milo-card:active { transform: scale(0.98); }
+
 .milo-card:hover {
   transform: translateY(-4px);
   border-color: var(--acd);
@@ -3925,13 +3929,14 @@ button:not(.no-min-size), a:not(.no-min-size), [role="button"]:not(.no-min-size)
   pointer-events: none;
 }
 
-/* Tag gradient pills — time-slot based */
+/* Tag gradient pills */
+/* PHASE 2 FIX: Increased font size (was 7.5px) */
 .milo-ctag {
   display: inline-flex;
   align-items: center;
-  font-size: 7.5px;
+  font-size: 10px;
   font-family: var(--font-roboto-mono, monospace);
-  letter-spacing: .12em;
+  letter-spacing: .10em;
   text-transform: uppercase;
   padding: 3px 10px;
   border-radius: 100px;
@@ -3946,14 +3951,15 @@ button:not(.no-min-size), a:not(.no-min-size), [role="button"]:not(.no-min-size)
 .milo-ctag--weekend  { background: linear-gradient(90deg, #8b5cf6, #ff6b6b); }
 .milo-ctag--default  { background: var(--acg); color: var(--ac); }
 
-/* Time badge — top-right corner of image */
+/* Time badge */
+/* PHASE 2 FIX: Increased font size (was 8px) */
 .milo-ctime {
   position: absolute;
   top: 10px;
   right: 11px;
   font-family: var(--font-roboto-mono, monospace);
-  font-size: 8px;
-  letter-spacing: .1em;
+  font-size: 11px;
+  letter-spacing: .08em;
   color: rgba(255,255,255,.85);
   background: rgba(0,0,0,.45);
   backdrop-filter: blur(6px);
@@ -3962,7 +3968,7 @@ button:not(.no-min-size), a:not(.no-min-size), [role="button"]:not(.no-min-size)
   border: 0.5px solid rgba(255,255,255,.12);
 }
 
-/* Tag badge — absolute on image (bottom-left) */
+/* Tag badge */
 .milo-ctag-wrap {
   position: absolute;
   bottom: 10px;
@@ -4062,6 +4068,7 @@ button:not(.no-min-size), a:not(.no-min-size), [role="button"]:not(.no-min-size)
 @media (max-width: 600px) {
   .milo-card-grid { grid-template-columns: 1fr; }
 }
+
 
 /* ============================================================
    NEON PULSE ANIMATION
@@ -4210,10 +4217,11 @@ nav, header {
   color: var(--tx);
 }
 
+/* PHASE 2 FIX: Increased font size (was 10px) */
 .milo-pulse-sub {
   font-family: "Syne Mono", var(--font-roboto-mono, monospace);
-  font-size: 10px;
-  letter-spacing: .14em;
+  font-size: 11px;
+  letter-spacing: .10em;
   text-transform: uppercase;
   color: var(--txm);
 }
@@ -4226,6 +4234,7 @@ nav, header {
   white-space: nowrap;
 }
 
+/* PHASE 2 FIX: Increased font size (was 9px) */
 .milo-pulse-stat {
   display: flex;
   align-items: baseline;
@@ -4236,10 +4245,11 @@ nav, header {
   background: rgba(0,0,0,0.18);
 }
 
+/* PHASE 2 FIX: Increased font size (was 9px) */
 .milo-pulse-k {
   font-family: "Syne Mono", var(--font-roboto-mono, monospace);
-  font-size: 9px;
-  letter-spacing: .16em;
+  font-size: 11px;
+  letter-spacing: .10em;
   text-transform: uppercase;
   color: var(--txm);
 }
@@ -4256,6 +4266,7 @@ nav, header {
   .milo-pulse-left { min-width: 0; }
   .milo-pulse-right { gap: 10px; }
 }
+
 
 /* ============================================================
    LANDING (baharmilo_full_redesign.html) CLASSNAMES
@@ -4294,10 +4305,11 @@ nav, header {
   justify-self: center;
 }
 
+/* PHASE 2 FIX: Increased font size (was 9px) */
 .cbtn {
   font-family: "Syne Mono", var(--font-roboto-mono, monospace);
-  font-size: 9px;
-  letter-spacing: .12em;
+  font-size: 11px;
+  letter-spacing: .10em;
   text-transform: uppercase;
   padding: 6px 14px;
   border-radius: 100px;
@@ -4322,13 +4334,14 @@ nav, header {
   white-space: nowrap;
 }
 
+/* PHASE 2 FIX: Increased font size (was 10px), reduced letter-spacing */
 .nl {
   display: inline-flex;
   align-items: center;
   height: 28px;
   line-height: 1;
   font-family: "Syne Mono", var(--font-roboto-mono, monospace);
-  font-size: 10px;
+  font-size: 11px;
   color: var(--txm);
   background: transparent;
   border: 0;
@@ -4337,8 +4350,9 @@ nav, header {
 
 .nl:hover { color: var(--tx); }
 
+/* PHASE 2 FIX: Increased font size (was 10px) */
 .nget {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   color: var(--ac);
   border: 1px solid var(--acd);
@@ -4358,6 +4372,7 @@ nav, header {
   min-height: 340px;
 }
 
+/* PHASE 2 FIX: Increased font size (was 9px) */
 .livepill {
   position: absolute;
   top: 1.5rem;
@@ -4369,7 +4384,7 @@ nav, header {
   border-radius: 100px;
   padding: 5px 12px;
   font-family: "Syne Mono", var(--font-roboto-mono, monospace);
-  font-size: 9px;
+  font-size: 11px;
   color: var(--txm);
 }
 
@@ -4396,12 +4411,13 @@ nav, header {
   transition: color .5s;
 }
 
+/* PHASE 2 FIX: Increased font size (was 9.5px) */
 .brow {
   font-family: "Syne Mono", var(--font-roboto-mono, monospace);
-  font-size: 9.5px;
-  letter-spacing: .2em;
-  color: var(--ac);
+  font-size: 11px;
+  letter-spacing: .14em;
   text-transform: uppercase;
+  color: var(--ac);
   display: flex;
   align-items: center;
   gap: 9px;
@@ -4445,13 +4461,14 @@ nav, header {
 
 .ctarow { display: flex; align-items: center; gap: 1.6rem; }
 
+/* PHASE 2 FIX: Increased font size (was 11px) */
 .btnp {
   background: var(--ac);
   color: #fff;
   font-family: "Syne", var(--font-lexend, system-ui);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 800;
-  letter-spacing: .07em;
+  letter-spacing: .06em;
   text-transform: uppercase;
   padding: 13px 26px;
   border-radius: 100px;
@@ -4461,11 +4478,12 @@ nav, header {
 
 .btnp:hover { transform: translateY(-1px); opacity: .95; }
 
+/* PHASE 2 FIX: Increased font size (was 10px) */
 .btng {
   font-family: "Syne Mono", var(--font-roboto-mono, monospace);
-  font-size: 10px;
+  font-size: 11px;
   color: var(--txm);
-  letter-spacing: .07em;
+  letter-spacing: .06em;
   text-transform: uppercase;
 }
 
@@ -4487,10 +4505,11 @@ nav, header {
   will-change: transform;
 }
 
+/* PHASE 2 FIX: Increased font size (was 8.5px) */
 .mqi {
   font-family: "Syne Mono", var(--font-roboto-mono, monospace);
-  font-size: 8.5px;
-  letter-spacing: .16em;
+  font-size: 11px;
+  letter-spacing: .12em;
   text-transform: uppercase;
   color: var(--txm);
   padding: 0 2.2rem;
@@ -4534,6 +4553,7 @@ nav, header {
   .livepill { right: 1.1rem; }
 }
 
+
 /* ============================================================
    MARKETING PAGES — DESIGN TOKEN EXTENSIONS
    Additive only. Existing tokens are untouched.
@@ -4542,41 +4562,49 @@ nav, header {
 /* Tailwind v4 theme extension — generates text-gold, bg-gold,
    text-tx, text-tx2, text-tx3, border-bdr, border-bdr2, etc. */
 @theme {
-  --color-gold:    #C9A84C;
-  --color-goldDim: rgba(201,168,76,.08);
-  --color-goldBdr: rgba(201,168,76,.20);
-  --color-tx:      #E8EEF8;
-  --color-tx2:     rgba(232,238,248,.52);
-  --color-tx3:     rgba(232,238,248,.26);
-  --color-bdr:     rgba(255,255,255,.05);
-  --color-bdr2:    rgba(255,255,255,.10);
-  --color-sf:      #050505;
-  --color-teal-a:  #3ce6b4;
+  --color-gold: #C9A84C;
+  --color-goldDim: rgba(201, 168, 76, .08);
+  --color-goldBdr: rgba(201, 168, 76, .20);
+  --color-tx: #E8EEF8;
+  --color-tx2: rgba(232, 238, 248, .52);
+  --color-tx3: rgba(232, 238, 248, .26);
+  --color-bdr: rgba(255, 255, 255, .05);
+  --color-bdr2: rgba(255, 255, 255, .10);
+  --color-sf: #050505;
+  --color-teal-a: #3ce6b4;
 }
 
 /* Font display/body shortcuts mapping to existing Next.js font vars */
-.font-d { font-family: var(--font-lexend, 'Syne', system-ui); }
-.font-b { font-family: var(--font-jakarta, 'Plus Jakarta Sans', system-ui); }
-.font-mono { font-family: var(--font-roboto-mono, 'Roboto Mono', monospace); }
+.font-d {
+  font-family: var(--font-lexend, 'Syne', system-ui);
+}
+
+.font-b {
+  font-family: var(--font-jakarta, 'Plus Jakarta Sans', system-ui);
+}
+
+.font-mono {
+  font-family: var(--font-roboto-mono, 'Roboto Mono', monospace);
+}
 
 /* Glass card — used by new marketing pages */
 .glass {
-  background: rgba(255,255,255,.018);
+  background: rgba(255, 255, 255, .018);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border: .5px solid rgba(255,255,255,.055);
-  transition: background .45s cubic-bezier(.175,.885,.32,1.275),
-              border-color .45s cubic-bezier(.175,.885,.32,1.275),
-              transform .45s cubic-bezier(.175,.885,.32,1.275),
-              box-shadow .45s cubic-bezier(.175,.885,.32,1.275);
+  border: .5px solid rgba(255, 255, 255, .055);
+  transition: background .45s cubic-bezier(.175, .885, .32, 1.275),
+    border-color .45s cubic-bezier(.175, .885, .32, 1.275),
+    transform .45s cubic-bezier(.175, .885, .32, 1.275),
+    box-shadow .45s cubic-bezier(.175, .885, .32, 1.275);
   position: relative;
 }
 
 .glass:hover {
-  background: rgba(255,255,255,.035);
-  border-color: rgba(201,168,76,.18);
+  background: rgba(255, 255, 255, .035);
+  border-color: rgba(201, 168, 76, .18);
   transform: translateY(-3px);
-  box-shadow: 0 24px 60px -15px rgba(0,0,0,.65), 0 0 40px rgba(201,168,76,.04);
+  box-shadow: 0 24px 60px -15px rgba(0, 0, 0, .65), 0 0 40px rgba(201, 168, 76, .04);
 }
 
 /* Noise texture pseudo-element */
@@ -4592,38 +4620,66 @@ nav, header {
 }
 
 /* Shimmer sweep on hover */
-.shim { position: relative; overflow: hidden; }
+.shim {
+  position: relative;
+  overflow: hidden;
+}
+
 .shim::after {
   content: '';
   position: absolute;
-  top: -50%; left: -50%;
-  width: 200%; height: 200%;
-  background: linear-gradient(to bottom right, rgba(255,255,255,0), rgba(255,255,255,.07) 50%, rgba(255,255,255,0));
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(to bottom right, rgba(255, 255, 255, 0), rgba(255, 255, 255, .07) 50%, rgba(255, 255, 255, 0));
   transform: rotate(45deg) translateY(100%);
-  transition: transform .65s cubic-bezier(.19,1,.22,1);
+  transition: transform .65s cubic-bezier(.19, 1, .22, 1);
 }
-.shim:hover::after { transform: rotate(45deg) translateY(-100%); }
+
+.shim:hover::after {
+  transform: rotate(45deg) translateY(-100%);
+}
 
 /* Scroll-reveal initial state (JS animates to opacity:1 translateY:0) */
-.sr { opacity: 0; transform: translateY(32px); }
+.sr {
+  opacity: 0;
+  transform: translateY(32px);
+}
 
 /* Image hover zoom */
-.img-h { overflow: hidden; }
-.img-h img { transition: transform .8s cubic-bezier(.25,1,.5,1); }
-.img-h:hover img { transform: scale(1.05); }
+.img-h {
+  overflow: hidden;
+}
+
+.img-h img {
+  transition: transform .8s cubic-bezier(.25, 1, .5, 1);
+}
+
+.img-h:hover img {
+  transform: scale(1.05);
+}
 
 /* Site nav underline link */
-.site-nav-link { position: relative; }
+.site-nav-link {
+  position: relative;
+}
+
 .site-nav-link::after {
   content: '';
   position: absolute;
-  bottom: -3px; left: 0;
-  width: 0; height: 1.5px;
+  bottom: -3px;
+  left: 0;
+  width: 0;
+  height: 1.5px;
   background: #C9A84C;
-  transition: width .35s cubic-bezier(.175,.885,.32,1.275);
+  transition: width .35s cubic-bezier(.175, .885, .32, 1.275);
 }
+
 .site-nav-link:hover::after,
-.site-nav-link.active::after { width: 100%; }
+.site-nav-link.active::after {
+  width: 100%;
+}
 
 /* Film grain — fixed overlay for new pages */
 .film-grain {
@@ -4638,20 +4694,32 @@ nav, header {
 
 /* Gold live-dot pulse */
 .gold-dot {
-  width: 5px; height: 5px;
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
   background: #C9A84C;
   animation: gold-pulse 1.4s ease-in-out infinite;
   flex-shrink: 0;
 }
+
 @keyframes gold-pulse {
-  0%, 100% { opacity: 1; box-shadow: 0 0 8px rgba(201,168,76,.5); }
-  50%       { opacity: .25; box-shadow: none; }
+
+  0%,
+  100% {
+    opacity: 1;
+    box-shadow: 0 0 8px rgba(201, 168, 76, .5);
+  }
+
+  50% {
+    opacity: .25;
+    box-shadow: none;
+  }
 }
 
 /* City accent dot (uses --ac) */
 .accent-dot {
-  width: 5px; height: 5px;
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
   background: var(--ac);
   animation: milo-blink 1.4s ease-in-out infinite;
@@ -4659,11 +4727,20 @@ nav, header {
 
 /* Page hero fade-in */
 @keyframes page-in {
-  from { opacity: 0; transform: translateY(20px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-.page-in { animation: page-in .7s cubic-bezier(.25,1,.5,1) forwards; }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
 
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-in {
+  animation: page-in .7s cubic-bezier(.25, 1, .5, 1) forwards;
+}
 
 ================================================================================
 FILE: src/app/icon.svg
@@ -4934,29 +5011,29 @@ export default function Home() {
   };
 
   return (
-    <main className="w-full h-[100dvh] bg-[#000000] overflow-hidden flex flex-col">
+    <main className="w-full min-h-[100dvh] bg-[#000000] flex flex-col overflow-y-auto">
       <Preloader progress={progress} isReady={isReady} />
-      
-      <Header 
+
+      <Header
         onProfileClick={() => handleAuthGate(() => setActiveModal("profile"))}
         onEventClick={() => handleAuthGate(() => setActiveModal("event"))}
         onNotificationsClick={() => setActiveModal("notifications")}
-        isSidebarOpen={activeModal === "profile"} 
+        isSidebarOpen={activeModal === "profile"}
       />
-      
-      <ProfileSidebar 
-        isOpen={activeModal === "profile"} 
-        onClose={closeModals} 
+
+      <ProfileSidebar
+        isOpen={activeModal === "profile"}
+        onClose={closeModals}
         onAuthClick={() => setActiveModal("auth")}
       />
 
-      <EventSubmission 
+      <EventSubmission
         isOpen={activeModal === "event"}
         onClose={closeModals}
         onAuthRedirect={() => setActiveModal("auth")}
       />
 
-      <AuthModal 
+      <AuthModal
         isOpen={activeModal === "auth"}
         onClose={() => setActiveModal(null)}
       />
@@ -4966,7 +5043,7 @@ export default function Home() {
         onClose={closeModals}
       />
 
-      <BottomNav 
+      <BottomNav
         onProfileClick={() => handleAuthGate(() => setActiveModal("profile"))}
         onEventClick={() => handleAuthGate(() => setActiveModal("event"))}
         onNotificationsClick={() => setActiveModal("notifications")}
@@ -4979,7 +5056,6 @@ export default function Home() {
     </main>
   );
 }
-
 
 ================================================================================
 FILE: src/app/sitemap.ts
@@ -5203,6 +5279,7 @@ FILE: src/app/(pages)/city/[slug]/city-client.tsx
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 
 // Three city colour schemes as decided:
 // Delhi   → Nocturnal Aura   (deep indigo-blue)
@@ -5352,8 +5429,8 @@ export default function CityClient({ slug, events }: { slug: string; events: any
                     style={{ animationDelay: `${idx * 0.04}s` }}>
                     <div className="img-h relative h-[160px] flex-shrink-0">
                       {e.image ? (
-                        <img src={e.image} alt={e.title}
-                          className="w-full h-full object-cover opacity-55 mix-blend-lighten" />
+                        <Image src={e.image} alt={e.title} fill
+                          className="object-cover opacity-55 mix-blend-lighten" />
                       ) : (
                         <div className="w-full h-full"
                           style={{ background: `linear-gradient(135deg, ${aColor}22 0%, rgba(5,5,5,.9) 100%)` }} />
@@ -6097,6 +6174,7 @@ FILE: src/app/(pages)/events/events-client.tsx
 import { useState, useEffect } from 'react'
 import { createClient } from '@/utils/supabase/client'
 import Link from 'next/link'
+import Image from 'next/image'
 
 const FILTERS = ['All', 'Techno', 'Social', 'Meetups', 'Art & Culture', 'Food & Walk', 'Comedy', 'Sports']
 const CITIES  = ['All Cities', 'Delhi', 'Mumbai', 'Bangalore']
@@ -6238,8 +6316,8 @@ function EventCard({ event, idx }: { event: any; idx: number }) {
       {/* Image */}
       <div className="img-h relative h-[180px] flex-shrink-0">
         {event.image ? (
-          <img src={event.image} alt={event.title}
-            className="w-full h-full object-cover opacity-60 mix-blend-lighten" />
+          <Image src={event.image} alt={event.title} fill
+            className="object-cover opacity-60 mix-blend-lighten" />
         ) : (
           <div className="w-full h-full"
             style={{ background: `linear-gradient(135deg, ${accentColor}22 0%, rgba(5,5,5,.8) 100%)` }} />
@@ -6312,6 +6390,7 @@ FILE: src/app/(pages)/events/[id]/event-detail-client.tsx
 
 import { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { createClient } from '@/utils/supabase/client'
 
 interface Event {
@@ -6366,9 +6445,9 @@ export default function EventDetailClient({ event, rsvps, vibes }: {
           <div className="lg:col-span-8">
             {/* Hero image */}
             {event.image && (
-              <div className="img-h rounded-2xl overflow-hidden mb-8 h-[280px] md:h-[420px]">
-                <img src={event.image} alt={event.title}
-                  className="w-full h-full object-cover opacity-55 mix-blend-lighten" />
+              <div className="img-h relative rounded-2xl overflow-hidden mb-8 h-[280px] md:h-[420px]">
+                <Image src={event.image} alt={event.title} fill priority
+                  className="object-cover opacity-55 mix-blend-lighten" />
               </div>
             )}
 
@@ -6410,11 +6489,11 @@ export default function EventDetailClient({ event, rsvps, vibes }: {
                 <h2 className="font-d text-[18px] font-bold mb-4" style={{ color: '#E8EEF8' }}>Vibe Checks</h2>
                 <div className="grid grid-cols-3 md:grid-cols-4 gap-2">
                   {vibes.map(v => (
-                    <div key={v.id} className="aspect-square rounded-xl overflow-hidden img-h">
+                    <div key={v.id} className="relative aspect-square rounded-xl overflow-hidden img-h">
                       {v.type === 'video' ? (
                         <video src={v.url} className="w-full h-full object-cover opacity-70" muted playsInline />
                       ) : (
-                        <img src={v.url} alt="Vibe check" className="w-full h-full object-cover opacity-70" />
+                        <Image src={v.url} alt="Vibe check" fill className="object-cover opacity-70" />
                       )}
                     </div>
                   ))}
@@ -7034,7 +7113,7 @@ export default function EventDetailPage() {
     async function checkJoined() {
       if (!isAuthenticated || !user || !event) return;
       const { data } = await supabase
-        .from('vibe_checks')
+        .from('rsvps')
         .select('*')
         .eq('event_id', event.id)
         .eq('profile_id', user.id)
@@ -7058,7 +7137,7 @@ export default function EventDetailPage() {
     try {
       if (!isJoined) {
         const { error } = await supabase
-          .from('vibe_checks')
+          .from('rsvps')
           .insert({
             event_id: event.id,
             profile_id: user.id,
@@ -7359,6 +7438,7 @@ FILE: src/app/profile/page.tsx
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { LogOut, Settings, UserRoundPen } from "lucide-react";
 import DigitalPassport from "@/components/profile/DigitalPassport";
@@ -7441,7 +7521,7 @@ export default function ProfilePage() {
           <div className="relative h-40 md:h-48">
             {user?.cover_url ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={user.cover_url} alt="" className="absolute inset-0 w-full h-full object-cover opacity-80" />
+              <Image src={user.cover_url} alt="" fill className="absolute inset-0 object-cover opacity-80" />
             ) : (
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(99,102,241,0.55),transparent_55%),radial-gradient(circle_at_70%_40%,rgba(16,185,129,0.35),transparent_60%),radial-gradient(circle_at_60%_90%,rgba(236,72,153,0.35),transparent_55%)]" />
             )}
@@ -7452,7 +7532,7 @@ export default function ProfilePage() {
                 <div className="w-16 h-16 md:w-20 md:h-20 rounded-[1.25rem] border border-white/15 bg-white/5 overflow-hidden flex items-center justify-center shrink-0">
                   {user?.avatar_url ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={user.avatar_url} alt="" className="w-full h-full object-cover" />
+                    <Image src={user.avatar_url} alt="" fill className="object-cover" />
                   ) : (
                     <div className="w-full h-full bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.25),transparent_60%)]" />
                   )}
@@ -7957,14 +8037,23 @@ FILE: src/app/api/admin/team/route.ts
 ================================================================================
 import { createClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
+import { z } from 'zod';
+
+const schema = z.object({
+  email: z.string().email("Invalid email format"),
+  action: z.enum(['invite', 'promote', 'revoke'])
+});
 
 export async function POST(request: Request) {
   try {
-    const { email, action } = await request.json();
+    const body = await request.json();
+    const result = schema.safeParse(body);
     
-    if (!email) {
-      return NextResponse.json({ error: 'Email is required' }, { status: 400 });
+    if (!result.success) {
+      return NextResponse.json({ error: result.error.issues?.[0]?.message || 'Invalid input' }, { status: 400 });
     }
+
+    const { email, action } = result.data;
 
     const supabaseAdmin = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -8519,8 +8608,8 @@ FILE: src/utils/supabase.ts
 ================================================================================
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder';
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
@@ -9948,7 +10037,7 @@ export default function EventListing({
     if (!user) return;
     try {
       const { data, error } = await supabase
-        .from("vibe_checks")
+        .from("rsvps")
         .select("event_id")
         .eq("profile_id", user.id)
         .eq("type", "join");
@@ -10049,7 +10138,7 @@ export default function EventListing({
 
     try {
       const { error } = await supabase
-        .from("vibe_checks")
+        .from("rsvps")
         .insert({
           event_id: id,
           profile_id: user.id,
@@ -10242,8 +10331,12 @@ export default function EventListing({
       </div>
 
       {isLoading ? (
-        <div className="py-40 flex items-center justify-center text-white/20">
-          <Loader2 className="animate-spin" size={40} />
+        <div className="max-w-[1440px] mx-auto px-6 py-12">
+          <div className="milo-card-grid">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <SkeletonEventCard key={i} />
+            ))}
+          </div>
         </div>
       ) : homepageSections ? (
         <div className="space-y-24 py-12">
@@ -10397,6 +10490,26 @@ function stableCount(seed: string, min: number, range: number): number {
     h = (Math.imul(31, h) + seed.charCodeAt(i)) | 0;
   }
   return min + (Math.abs(h) % range);
+}
+
+function SkeletonEventCard() {
+  return (
+    <div className="milo-card animate-pulse">
+      <div className="milo-card-img bg-white/5" />
+      <div className="milo-card-body">
+        <div className="h-5 bg-white/10 rounded w-3/4 mb-3" />
+        <div className="h-3 bg-white/10 rounded w-1/2" />
+      </div>
+      <div className="milo-cfoot flex items-center justify-between">
+        <div className="h-3 bg-white/10 rounded w-1/3" />
+        <div className="flex -space-x-2">
+          <div className="w-5 h-5 rounded-full bg-white/10 border-2 border-black" />
+          <div className="w-5 h-5 rounded-full bg-white/10 border-2 border-black" />
+          <div className="w-5 h-5 rounded-full bg-white/10 border-2 border-black" />
+        </div>
+      </div>
+    </div>
+  );
 }
 
 function EventGridCard({ event, onExpand }: { event: EventData, onExpand: (e: EventData) => void }) {
@@ -12730,6 +12843,7 @@ FILE: src/components/Preloader.tsx
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
 import BrandLogo from "./BrandLogo";
+import Image from "next/image";
 
 interface PreloaderProps {
   progress: number;
@@ -12757,10 +12871,12 @@ export default function Preloader({ progress, isReady }: PreloaderProps) {
         >
           {/* Cinematic Background: Desaturated Crowd Atmos */}
           <div className="absolute inset-0 z-0">
-             <img 
+             <Image 
                src="/assets/preloader_bg.png" 
                alt="Crowd Atmosphere" 
-               className="w-full h-full object-cover grayscale opacity-30 scale-110"
+               fill
+               priority
+               className="object-cover grayscale opacity-30 scale-110"
              />
              {/* Deepening Gradient Overlay */}
              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/60" />

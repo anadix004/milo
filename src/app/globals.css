@@ -109,7 +109,8 @@ button:not(.no-min-size), a:not(.no-min-size), [role="button"]:not(.no-min-size)
   #ring { display: block !important; }
   #blob { display: block !important; }
 }
-\n
+
+
 /* ============================================================
    MARQUEE BAR
    ============================================================ */
@@ -355,7 +356,8 @@ button:not(.no-min-size), a:not(.no-min-size), [role="button"]:not(.no-min-size)
 @media (max-width: 600px) {
   .milo-card-grid { grid-template-columns: 1fr; }
 }
-\n
+
+
 /* ============================================================
    NEON PULSE ANIMATION
    ============================================================ */
@@ -552,7 +554,8 @@ nav, header {
   .milo-pulse-left { min-width: 0; }
   .milo-pulse-right { gap: 10px; }
 }
-\n
+
+
 /* ============================================================
    LANDING (baharmilo_full_redesign.html) CLASSNAMES
    Keep these classnames stable so the cursor hover bindings work.
@@ -837,7 +840,9 @@ nav, header {
   .milo-hero { padding: 2.6rem 1.1rem 1.8rem; min-height: 300px; }
   .livepill { right: 1.1rem; }
 }
-\n\n/* ============================================================
+
+
+/* ============================================================
    MARKETING PAGES — DESIGN TOKEN EXTENSIONS
    Additive only. Existing tokens are untouched.
    ============================================================ */
