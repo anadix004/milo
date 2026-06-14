@@ -13,61 +13,60 @@
 
   /* Base dark surfaces */
   --bg-primary: #000000;
-  --bg-surface: rgba(255, 255, 255, 0.04);
-  --border-default: rgba(255, 255, 255, 0.07);
-  --border-emphasis: rgba(255, 255, 255, 0.14);
-  --text-primary: rgba(255, 255, 255, 0.97);
-  --text-secondary: rgba(255, 255, 255, 0.5);
-  --text-ghost: rgba(255, 255, 255, 0.25);
+  --bg-surface: rgba(255,255,255,0.04);
+  --border-default: rgba(255,255,255,0.07);
+  --border-emphasis: rgba(255,255,255,0.14);
+  --text-primary: rgba(255,255,255,0.97);
+  --text-secondary: rgba(255,255,255,0.5);
+  --text-ghost: rgba(255,255,255,0.25);
 
   /* Category aura colours — raw hex, used in gradients only */
-  --aura-club: #f9643c;
-  --aura-dj: #f9643c;
-  --aura-party: #e83ca0;
-  --aura-comedy: #ffc83c;
-  --aura-open-mic: #b48cff;
-  --aura-networking: #b48cff;
-  --aura-sports: #3ce6b4;
-  --aura-other: #50a0ff;
+  --aura-club:        #f9643c;
+  --aura-dj:          #f9643c;
+  --aura-party:       #e83ca0;
+  --aura-comedy:      #ffc83c;
+  --aura-open-mic:    #b48cff;
+  --aura-networking:  #b48cff;
+  --aura-sports:      #3ce6b4;
+  --aura-other:       #50a0ff;
 
   /* Aura gradient rules */
-  --aura-opacity-card: 0.18;
+  --aura-opacity-card:     0.18;
   --aura-opacity-selected: 0.28;
-  --aura-opacity-glow: 0.45;
-  --aura-blur-radius: 80px;
+  --aura-opacity-glow:     0.45;
+  --aura-blur-radius:      80px;
 
   /* ── City accent defaults (Delhi) ── */
-  --ac: #4A7FD4;
-  --acg: rgba(74, 127, 212, .15);
-  --acd: rgba(74, 127, 212, .28);
-  --br: rgba(74, 127, 212, .14);
+  --ac:  #4A7FD4;
+  --acg: rgba(74,127,212,.15);
+  --acd: rgba(74,127,212,.28);
+  --br:  rgba(74,127,212,.14);
 
   /* ── Static text colours — NEVER change per city ── */
-  --tx: #E8EEF8;
-  --txm: rgba(232, 238, 248, .42);
-  --txu: rgba(232, 238, 248, .07);
+  --tx:  #E8EEF8;
+  /* PHASE 2 FIX: Increased opacity for readability (was .42/.07) */
+  --txm: rgba(232,238,248,.60);
+  --txu: rgba(232,238,248,.15);
 }
 
-/* ── Per-city accent overrides — background/text are untouched ── */
+/* ── Per-city accent overrides ── */
 body.city-delhi {
-  --ac: #4A7FD4;
-  --acg: rgba(74, 127, 212, .15);
-  --acd: rgba(74, 127, 212, .28);
-  --br: rgba(74, 127, 212, .14);
+  --ac:  #4A7FD4;
+  --acg: rgba(74,127,212,.15);
+  --acd: rgba(74,127,212,.28);
+  --br:  rgba(74,127,212,.14);
 }
-
 body.city-blr {
-  --ac: #3DB865;
-  --acg: rgba(61, 184, 101, .15);
-  --acd: rgba(61, 184, 101, .28);
-  --br: rgba(61, 184, 101, .14);
+  --ac:  #3DB865;
+  --acg: rgba(61,184,101,.15);
+  --acd: rgba(61,184,101,.28);
+  --br:  rgba(61,184,101,.14);
 }
-
 body.city-mum {
-  --ac: #8B5CF6;
-  --acg: rgba(139, 92, 246, .15);
-  --acd: rgba(139, 92, 246, .28);
-  --br: rgba(139, 92, 246, .14);
+  --ac:  #8B5CF6;
+  --acg: rgba(139,92,246,.15);
+  --acd: rgba(139,92,246,.28);
+  --br:  rgba(139,92,246,.14);
 }
 
 /* ============================================================
@@ -83,71 +82,34 @@ body {
   color: var(--foreground);
   overflow-x: hidden;
   touch-action: manipulation;
-  /* Custom cursor hidden on desktop; shown on mobile */
   cursor: auto;
 }
 
-/* Hide default cursor on desktop only */
 @media (pointer: fine) {
-  body {
-    cursor: none !important;
-  }
-
-  button,
-  a,
-  [role="button"] {
-    cursor: none !important;
-  }
-
-  /* FIX UI-CRIT-02: Restore text cursor on interactive text elements */
-  input,
-  textarea,
-  select,
-  [contenteditable] {
-    cursor: text !important;
-  }
+  body { cursor: none !important; }
+  button, a, [role="button"] { cursor: none !important; }
+  /* PHASE 2 FIX: Restore text cursor for inputs */
+  input, textarea, select, [contenteditable] { cursor: text !important; }
 }
 
-button:not(.no-min-size),
-a:not(.no-min-size),
-[role="button"]:not(.no-min-size) {
+button:not(.no-min-size), a:not(.no-min-size), [role="button"]:not(.no-min-size) {
   min-height: 44px;
   min-width: 44px;
 }
 
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
 /* ============================================================
    CURSOR BLOB — hide on touch devices
-   FIX UI-CRIT-03: Add aria-hidden for screen readers
    ============================================================ */
-#cur,
-#ring,
-#blob {
-  display: none;
-}
-
+#cur, #ring, #blob { display: none; }
 @media (pointer: fine) {
-  #cur {
-    display: block !important;
-  }
-
-  #ring {
-    display: block !important;
-  }
-
-  #blob {
-    display: block !important;
-  }
+  #cur  { display: block !important; }
+  #ring { display: block !important; }
+  #blob { display: block !important; }
 }
-
+\n
 /* ============================================================
    MARQUEE BAR
    ============================================================ */
@@ -168,10 +130,11 @@ a:not(.no-min-size),
   will-change: transform;
 }
 
+/* PHASE 2 FIX: Increased font size (was 8.5px) */
 .milo-mqi {
   font-family: var(--font-roboto-mono, monospace);
-  font-size: 8.5px;
-  letter-spacing: .16em;
+  font-size: 11px;
+  letter-spacing: .12em;
   text-transform: uppercase;
   color: var(--txm);
   padding: 0 2.2rem;
@@ -190,13 +153,8 @@ a:not(.no-min-size),
 }
 
 @keyframes milo-mq {
-  0% {
-    transform: translateX(0);
-  }
-
-  100% {
-    transform: translateX(-50%);
-  }
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
 }
 
 /* ============================================================
@@ -207,27 +165,25 @@ a:not(.no-min-size),
 .milo-card {
   border: 1px solid var(--br);
   border-radius: 18px;
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(255,255,255,0.03);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   cursor: pointer;
-  transition: border-color .3s, transform .25s cubic-bezier(.34, 1.56, .64, 1), box-shadow .3s, background .5s;
+  transition: border-color .3s, transform .25s cubic-bezier(.34,1.56,.64,1), box-shadow .3s, background .5s;
   overflow: hidden;
   position: relative;
   display: flex;
   flex-direction: column;
 }
 
+/* PHASE 2 FIX: Mobile touch feedback (UI-LOW-01) */
+.milo-card:active { transform: scale(0.98); }
+
 .milo-card:hover {
   transform: translateY(-4px);
   border-color: var(--acd);
   box-shadow: 0 8px 32px var(--acg), 0 0 0 1px var(--acd);
-  background: rgba(255, 255, 255, 0.055);
-}
-
-/* FIX UI-LOW-01: Mobile touch feedback */
-.milo-card:active {
-  transform: scale(0.98);
+  background: rgba(255,255,255,0.055);
 }
 
 /* Image area */
@@ -256,63 +212,50 @@ a:not(.no-min-size),
 .milo-card-img-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(0, 0, 0, .65) 0%, transparent 60%);
+  background: linear-gradient(to top, rgba(0,0,0,.65) 0%, transparent 60%);
   pointer-events: none;
 }
 
-/* Tag gradient pills — time-slot based */
+/* Tag gradient pills */
+/* PHASE 2 FIX: Increased font size (was 7.5px) */
 .milo-ctag {
   display: inline-flex;
   align-items: center;
-  font-size: 7.5px;
+  font-size: 10px;
   font-family: var(--font-roboto-mono, monospace);
-  letter-spacing: .12em;
+  letter-spacing: .10em;
   text-transform: uppercase;
   padding: 3px 10px;
   border-radius: 100px;
   font-weight: 700;
   color: #fff;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, .4);
+  text-shadow: 0 1px 3px rgba(0,0,0,.4);
 }
 
-.milo-ctag--live {
-  background: linear-gradient(90deg, #ff6b6b, #feca57);
-}
+.milo-ctag--live     { background: linear-gradient(90deg, #ff6b6b, #feca57); }
+.milo-ctag--tonight  { background: linear-gradient(90deg, #4a7fd4, #8b5cf6); }
+.milo-ctag--tomorrow { background: linear-gradient(90deg, #3db865, #4a7fd4); }
+.milo-ctag--weekend  { background: linear-gradient(90deg, #8b5cf6, #ff6b6b); }
+.milo-ctag--default  { background: var(--acg); color: var(--ac); }
 
-.milo-ctag--tonight {
-  background: linear-gradient(90deg, #4a7fd4, #8b5cf6);
-}
-
-.milo-ctag--tomorrow {
-  background: linear-gradient(90deg, #3db865, #4a7fd4);
-}
-
-.milo-ctag--weekend {
-  background: linear-gradient(90deg, #8b5cf6, #ff6b6b);
-}
-
-.milo-ctag--default {
-  background: var(--acg);
-  color: var(--ac);
-}
-
-/* Time badge — top-right corner of image */
+/* Time badge */
+/* PHASE 2 FIX: Increased font size (was 8px) */
 .milo-ctime {
   position: absolute;
   top: 10px;
   right: 11px;
   font-family: var(--font-roboto-mono, monospace);
-  font-size: 8px;
-  letter-spacing: .1em;
-  color: rgba(255, 255, 255, .85);
-  background: rgba(0, 0, 0, .45);
+  font-size: 11px;
+  letter-spacing: .08em;
+  color: rgba(255,255,255,.85);
+  background: rgba(0,0,0,.45);
   backdrop-filter: blur(6px);
   padding: 3px 8px;
   border-radius: 100px;
-  border: 0.5px solid rgba(255, 255, 255, .12);
+  border: 0.5px solid rgba(255,255,255,.12);
 }
 
-/* Tag badge — absolute on image (bottom-left) */
+/* Tag badge */
 .milo-ctag-wrap {
   position: absolute;
   bottom: 10px;
@@ -356,7 +299,7 @@ a:not(.no-min-size),
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-top: 0.5px solid rgba(255, 255, 255, .07);
+  border-top: 0.5px solid rgba(255,255,255,.07);
   padding: 9px 14px 12px;
   margin-top: auto;
 }
@@ -385,14 +328,12 @@ a:not(.no-min-size),
   align-items: center;
   justify-content: center;
   border: 2px solid var(--ac);
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, .4);
+  box-shadow: 0 0 0 1px rgba(0,0,0,.4);
   transition: border-color .5s;
   color: #fff;
 }
 
-.milo-av:first-child {
-  margin-left: 0;
-}
+.milo-av:first-child { margin-left: 0; }
 
 /* ============================================================
    CARD GRID
@@ -404,34 +345,25 @@ a:not(.no-min-size),
 }
 
 @media (max-width: 1280px) {
-  .milo-card-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
+  .milo-card-grid { grid-template-columns: repeat(3, 1fr); }
 }
 
 @media (max-width: 900px) {
-  .milo-card-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
+  .milo-card-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
 @media (max-width: 600px) {
-  .milo-card-grid {
-    grid-template-columns: 1fr;
-  }
+  .milo-card-grid { grid-template-columns: 1fr; }
 }
-
+\n
 /* ============================================================
    NEON PULSE ANIMATION
    ============================================================ */
 @keyframes neon-pulse {
-
-  0%,
-  100% {
+  0%, 100% {
     opacity: 0.7;
     filter: brightness(1) drop-shadow(0 0 2px currentColor);
   }
-
   50% {
     opacity: 1;
     filter: brightness(1.2) drop-shadow(0 0 15px currentColor);
@@ -443,56 +375,29 @@ a:not(.no-min-size),
 }
 
 @layer utilities {
-  .writing-vertical-rl {
-    writing-mode: vertical-rl;
-  }
-
-  .perspective-1000 {
-    perspective: 1000px;
-  }
+  .writing-vertical-rl { writing-mode: vertical-rl; }
+  .perspective-1000    { perspective: 1000px; }
 }
 
 @keyframes marquee-left {
-  from {
-    transform: translateX(0);
-  }
-
-  to {
-    transform: translateX(-50%);
-  }
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
 }
 
 @keyframes marquee-right {
-  from {
-    transform: translateX(-50%);
-  }
-
-  to {
-    transform: translateX(0);
-  }
+  from { transform: translateX(-50%); }
+  to   { transform: translateX(0); }
 }
 
-.animate-marquee-left {
-  animation: marquee-left 40s linear infinite;
-}
-
-.animate-marquee-right {
-  animation: marquee-right 40s linear infinite;
-}
+.animate-marquee-left  { animation: marquee-left  40s linear infinite; }
+.animate-marquee-right { animation: marquee-right 40s linear infinite; }
 
 /* ============================================================
    LIVE DOT BLINK
    ============================================================ */
 @keyframes milo-blink {
-
-  0%,
-  100% {
-    opacity: 1;
-  }
-
-  50% {
-    opacity: .25;
-  }
+  0%, 100% { opacity: 1; }
+  50%       { opacity: .25; }
 }
 
 .milo-live-dot {
@@ -508,8 +413,7 @@ a:not(.no-min-size),
 /* ============================================================
    SMOOTH ACCENT TRANSITIONS on nav/header elements
    ============================================================ */
-nav,
-header {
+nav, header {
   transition: border-color .5s;
 }
 
@@ -518,40 +422,16 @@ header {
    ============================================================ */
 
 @keyframes milo-float {
-  0% {
-    transform: translate3d(-8px, 10px, 0) scale(1);
-    opacity: .85;
-  }
-
-  50% {
-    transform: translate3d(12px, -8px, 0) scale(1.06);
-    opacity: 1;
-  }
-
-  100% {
-    transform: translate3d(-8px, 10px, 0) scale(1);
-    opacity: .85;
-  }
+  0%   { transform: translate3d(-8px, 10px, 0) scale(1); opacity: .85; }
+  50%  { transform: translate3d(12px, -8px, 0) scale(1.06); opacity: 1; }
+  100% { transform: translate3d(-8px, 10px, 0) scale(1); opacity: .85; }
 }
 
 @keyframes milo-scan {
-  0% {
-    transform: translateY(-120%);
-    opacity: 0;
-  }
-
-  20% {
-    opacity: .28;
-  }
-
-  60% {
-    opacity: .18;
-  }
-
-  100% {
-    transform: translateY(120%);
-    opacity: 0;
-  }
+  0%   { transform: translateY(-120%); opacity: 0; }
+  20%  { opacity: .28; }
+  60%  { opacity: .18; }
+  100% { transform: translateY(120%); opacity: 0; }
 }
 
 .milo-spotlight-grain {
@@ -559,8 +439,8 @@ header {
   inset: 0;
   pointer-events: none;
   background:
-    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.05) 0 1px, rgba(0, 0, 0, 0) 1px 3px),
-    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.03) 0 1px, rgba(0, 0, 0, 0) 1px 4px);
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.05) 0 1px, rgba(0,0,0,0) 1px 3px),
+    repeating-linear-gradient(0deg, rgba(255,255,255,0.03) 0 1px, rgba(0,0,0,0) 1px 4px);
   mix-blend-mode: overlay;
   opacity: .06;
 }
@@ -579,14 +459,14 @@ header {
 .milo-spotlight-orb--2 {
   width: 420px;
   height: 420px;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.06) 0%, transparent 60%);
+  background: radial-gradient(circle, rgba(255,255,255,0.06) 0%, transparent 60%);
   animation-duration: 11.5s;
 }
 
 .milo-spotlight-scanline {
   position: absolute;
   inset: -40% 0;
-  background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.12), transparent);
+  background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.12), transparent);
   opacity: 0;
   animation: milo-scan 5.8s ease-in-out infinite;
   mix-blend-mode: overlay;
@@ -602,9 +482,9 @@ header {
   justify-content: space-between;
   gap: 16px;
   padding: 10px 14px;
-  border: 0.5px solid rgba(255, 255, 255, 0.08);
+  border: 0.5px solid rgba(255,255,255,0.08);
   border-radius: 18px;
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(255,255,255,0.03);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
 }
@@ -623,10 +503,11 @@ header {
   color: var(--tx);
 }
 
+/* PHASE 2 FIX: Increased font size (was 10px) */
 .milo-pulse-sub {
   font-family: "Syne Mono", var(--font-roboto-mono, monospace);
-  font-size: 10px;
-  letter-spacing: .14em;
+  font-size: 11px;
+  letter-spacing: .10em;
   text-transform: uppercase;
   color: var(--txm);
 }
@@ -639,20 +520,22 @@ header {
   white-space: nowrap;
 }
 
+/* PHASE 2 FIX: Increased font size (was 9px) */
 .milo-pulse-stat {
   display: flex;
   align-items: baseline;
   gap: 8px;
   padding: 6px 10px;
   border-radius: 14px;
-  border: 0.5px solid rgba(255, 255, 255, 0.07);
-  background: rgba(0, 0, 0, 0.18);
+  border: 0.5px solid rgba(255,255,255,0.07);
+  background: rgba(0,0,0,0.18);
 }
 
+/* PHASE 2 FIX: Increased font size (was 9px) */
 .milo-pulse-k {
   font-family: "Syne Mono", var(--font-roboto-mono, monospace);
-  font-size: 9px;
-  letter-spacing: .16em;
+  font-size: 11px;
+  letter-spacing: .10em;
   text-transform: uppercase;
   color: var(--txm);
 }
@@ -665,19 +548,11 @@ header {
 }
 
 @media (max-width: 740px) {
-  .milo-pulse {
-    border-radius: 16px;
-  }
-
-  .milo-pulse-left {
-    min-width: 0;
-  }
-
-  .milo-pulse-right {
-    gap: 10px;
-  }
+  .milo-pulse { border-radius: 16px; }
+  .milo-pulse-left { min-width: 0; }
+  .milo-pulse-right { gap: 10px; }
 }
-
+\n
 /* ============================================================
    LANDING (baharmilo_full_redesign.html) CLASSNAMES
    Keep these classnames stable so the cursor hover bindings work.
@@ -689,7 +564,7 @@ header {
   align-items: center;
   padding: 1.4rem 2.8rem;
   border-bottom: 0.5px solid var(--br);
-  background: rgba(0, 0, 0, 0.15);
+  background: rgba(0,0,0,0.15);
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
 }
@@ -715,10 +590,11 @@ header {
   justify-self: center;
 }
 
+/* PHASE 2 FIX: Increased font size (was 9px) */
 .cbtn {
   font-family: "Syne Mono", var(--font-roboto-mono, monospace);
-  font-size: 9px;
-  letter-spacing: .12em;
+  font-size: 11px;
+  letter-spacing: .10em;
   text-transform: uppercase;
   padding: 6px 14px;
   border-radius: 100px;
@@ -743,25 +619,25 @@ header {
   white-space: nowrap;
 }
 
+/* PHASE 2 FIX: Increased font size (was 10px), reduced letter-spacing */
 .nl {
   display: inline-flex;
   align-items: center;
   height: 28px;
   line-height: 1;
   font-family: "Syne Mono", var(--font-roboto-mono, monospace);
-  font-size: 10px;
+  font-size: 11px;
   color: var(--txm);
   background: transparent;
   border: 0;
   padding: 0;
 }
 
-.nl:hover {
-  color: var(--tx);
-}
+.nl:hover { color: var(--tx); }
 
+/* PHASE 2 FIX: Increased font size (was 10px) */
 .nget {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   color: var(--ac);
   border: 1px solid var(--acd);
@@ -771,9 +647,7 @@ header {
   background: transparent;
 }
 
-.nget:hover {
-  background: rgba(255, 255, 255, 0.04);
-}
+.nget:hover { background: rgba(255,255,255,0.04); }
 
 /* HERO (landing) */
 .milo-hero {
@@ -783,6 +657,7 @@ header {
   min-height: 340px;
 }
 
+/* PHASE 2 FIX: Increased font size (was 9px) */
 .livepill {
   position: absolute;
   top: 1.5rem;
@@ -794,7 +669,7 @@ header {
   border-radius: 100px;
   padding: 5px 12px;
   font-family: "Syne Mono", var(--font-roboto-mono, monospace);
-  font-size: 9px;
+  font-size: 11px;
   color: var(--txm);
 }
 
@@ -821,12 +696,13 @@ header {
   transition: color .5s;
 }
 
+/* PHASE 2 FIX: Increased font size (was 9.5px) */
 .brow {
   font-family: "Syne Mono", var(--font-roboto-mono, monospace);
-  font-size: 9.5px;
-  letter-spacing: .2em;
-  color: var(--ac);
+  font-size: 11px;
+  letter-spacing: .14em;
   text-transform: uppercase;
+  color: var(--ac);
   display: flex;
   align-items: center;
   gap: 9px;
@@ -852,10 +728,7 @@ header {
   margin-bottom: 1.5rem;
 }
 
-.hl .city {
-  color: var(--ac);
-  transition: color .5s;
-}
+.hl .city { color: var(--ac); transition: color .5s; }
 
 .hl .ghost {
   color: transparent;
@@ -871,36 +744,31 @@ header {
   margin-bottom: 2rem;
 }
 
-.ctarow {
-  display: flex;
-  align-items: center;
-  gap: 1.6rem;
-}
+.ctarow { display: flex; align-items: center; gap: 1.6rem; }
 
+/* PHASE 2 FIX: Increased font size (was 11px) */
 .btnp {
   background: var(--ac);
   color: #fff;
   font-family: "Syne", var(--font-lexend, system-ui);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 800;
-  letter-spacing: .07em;
+  letter-spacing: .06em;
   text-transform: uppercase;
   padding: 13px 26px;
   border-radius: 100px;
   border: none;
-  transition: opacity .18s, transform .25s cubic-bezier(.34, 1.56, .64, 1);
+  transition: opacity .18s, transform .25s cubic-bezier(.34,1.56,.64,1);
 }
 
-.btnp:hover {
-  transform: translateY(-1px);
-  opacity: .95;
-}
+.btnp:hover { transform: translateY(-1px); opacity: .95; }
 
+/* PHASE 2 FIX: Increased font size (was 10px) */
 .btng {
   font-family: "Syne Mono", var(--font-roboto-mono, monospace);
-  font-size: 10px;
+  font-size: 11px;
   color: var(--txm);
-  letter-spacing: .07em;
+  letter-spacing: .06em;
   text-transform: uppercase;
 }
 
@@ -922,10 +790,11 @@ header {
   will-change: transform;
 }
 
+/* PHASE 2 FIX: Increased font size (was 8.5px) */
 .mqi {
   font-family: "Syne Mono", var(--font-roboto-mono, monospace);
-  font-size: 8.5px;
-  letter-spacing: .16em;
+  font-size: 11px;
+  letter-spacing: .12em;
   text-transform: uppercase;
   color: var(--txm);
   padding: 0 2.2rem;
@@ -949,60 +818,26 @@ header {
   gap: 0;
 }
 
-.mqbar--b {
-  opacity: .82;
-}
-
-.mqbar--c {
-  opacity: .68;
-}
+.mqbar--b { opacity: .82; }
+.mqbar--c { opacity: .68; }
 
 @keyframes milo-mq-rev {
-  0% {
-    transform: translateX(-50%);
-  }
-
-  100% {
-    transform: translateX(0);
-  }
+  0%   { transform: translateX(-50%); }
+  100% { transform: translateX(0); }
 }
 
-.mqtrack--a {
-  animation-duration: 26s;
-}
-
-.mqtrack--b {
-  animation: milo-mq-rev 34s linear infinite;
-}
-
-.mqtrack--c {
-  animation-duration: 44s;
-}
+.mqtrack--a { animation-duration: 26s; }
+.mqtrack--b { animation: milo-mq-rev 34s linear infinite; }
+.mqtrack--c { animation-duration: 44s; }
 
 @media (max-width: 740px) {
-  .milo-nav {
-    padding: 1.1rem 1.1rem;
-  }
-
-  .nlinks {
-    gap: .9rem;
-  }
-
-  .sub {
-    max-width: 100%;
-  }
-
-  .milo-hero {
-    padding: 2.6rem 1.1rem 1.8rem;
-    min-height: 300px;
-  }
-
-  .livepill {
-    right: 1.1rem;
-  }
+  .milo-nav { padding: 1.1rem 1.1rem; }
+  .nlinks { gap: .9rem; }
+  .sub { max-width: 100%; }
+  .milo-hero { padding: 2.6rem 1.1rem 1.8rem; min-height: 300px; }
+  .livepill { right: 1.1rem; }
 }
-
-/* ============================================================
+\n\n/* ============================================================
    MARKETING PAGES — DESIGN TOKEN EXTENSIONS
    Additive only. Existing tokens are untouched.
    ============================================================ */
