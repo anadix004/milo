@@ -144,7 +144,7 @@ CREATE TABLE IF NOT EXISTS public.rsvps (
   profile_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
   type TEXT DEFAULT 'join',
   created_at TIMESTAMPTZ DEFAULT now(),
-  UNIQUE(event_id, profile_id)
+  UNIQUE(event_id, profile_id, type)  -- SEC-04 FIX: include 'type' so join + bookmark are independent rows
 );
 
 ALTER TABLE public.rsvps ENABLE ROW LEVEL SECURITY;

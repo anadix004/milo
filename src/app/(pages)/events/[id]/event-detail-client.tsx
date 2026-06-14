@@ -30,7 +30,7 @@ export default function EventDetailClient({ event, rsvps, vibes }: {
     const supabase = createClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) { window.location.href = '/login'; return }
-    await supabase.from('rsvps').upsert({ event_id: event.id, profile_id: user.id, type }, { onConflict: 'event_id,profile_id' })
+    await supabase.from('rsvps').upsert({ event_id: event.id, profile_id: user.id, type }, { onConflict: 'event_id,profile_id,type' })
     setRsvpType(type)
   }
 
