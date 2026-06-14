@@ -50,7 +50,7 @@ export default function EventDetailPage() {
     async function checkJoined() {
       if (!isAuthenticated || !user || !event) return;
       const { data } = await supabase
-        .from('vibe_checks')
+        .from('rsvps')
         .select('*')
         .eq('event_id', event.id)
         .eq('profile_id', user.id)
@@ -74,7 +74,7 @@ export default function EventDetailPage() {
     try {
       if (!isJoined) {
         const { error } = await supabase
-          .from('vibe_checks')
+          .from('rsvps')
           .insert({
             event_id: event.id,
             profile_id: user.id,

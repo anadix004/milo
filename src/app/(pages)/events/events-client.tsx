@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@/utils/supabase/client'
 import Link from 'next/link'
+import Image from 'next/image'
 
 const FILTERS = ['All', 'Techno', 'Social', 'Meetups', 'Art & Culture', 'Food & Walk', 'Comedy', 'Sports']
 const CITIES  = ['All Cities', 'Delhi', 'Mumbai', 'Bangalore']
@@ -144,8 +145,8 @@ function EventCard({ event, idx }: { event: any; idx: number }) {
       {/* Image */}
       <div className="img-h relative h-[180px] flex-shrink-0">
         {event.image ? (
-          <img src={event.image} alt={event.title}
-            className="w-full h-full object-cover opacity-60 mix-blend-lighten" />
+          <Image src={event.image} alt={event.title} fill
+            className="object-cover opacity-60 mix-blend-lighten" />
         ) : (
           <div className="w-full h-full"
             style={{ background: `linear-gradient(135deg, ${accentColor}22 0%, rgba(5,5,5,.8) 100%)` }} />

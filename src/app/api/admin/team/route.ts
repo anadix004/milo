@@ -1,13 +1,24 @@
 import { createClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
+import { z } from 'zod';
+
+const schema = z.object({
+  email: z.string().email("Invalid email format"),
+  action: z.enum(['invite', 'promote', 'revoke'], {
+    errorMap: () => ({ message: "Invalid action" })
+  })
+});
 
 export async function POST(request: Request) {
   try {
-    const { email, action } = await request.json();
+    const body = await request.json();
+    const result = schema.safeParse(body);
     
-    if (!email) {
-      return NextResponse.json({ error: 'Email is required' }, { status: 400 });
+    if (!result.success) {
+      return NextResponse.json({ error: result.error.errors[0].message }, { status: 400 });
     }
+
+    const { email, action } = result.data;
 
     const supabaseAdmin = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,

@@ -217,7 +217,7 @@ export default function EventListing({
     if (!user) return;
     try {
       const { data, error } = await supabase
-        .from("vibe_checks")
+        .from("rsvps")
         .select("event_id")
         .eq("profile_id", user.id)
         .eq("type", "join");
@@ -318,7 +318,7 @@ export default function EventListing({
 
     try {
       const { error } = await supabase
-        .from("vibe_checks")
+        .from("rsvps")
         .insert({
           event_id: id,
           profile_id: user.id,
@@ -511,8 +511,12 @@ export default function EventListing({
       </div>
 
       {isLoading ? (
-        <div className="py-40 flex items-center justify-center text-white/20">
-          <Loader2 className="animate-spin" size={40} />
+        <div className="max-w-[1440px] mx-auto px-6 py-12">
+          <div className="milo-card-grid">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <SkeletonEventCard key={i} />
+            ))}
+          </div>
         </div>
       ) : homepageSections ? (
         <div className="space-y-24 py-12">
@@ -666,6 +670,26 @@ function stableCount(seed: string, min: number, range: number): number {
     h = (Math.imul(31, h) + seed.charCodeAt(i)) | 0;
   }
   return min + (Math.abs(h) % range);
+}
+
+function SkeletonEventCard() {
+  return (
+    <div className="milo-card animate-pulse">
+      <div className="milo-card-img bg-white/5" />
+      <div className="milo-card-body">
+        <div className="h-5 bg-white/10 rounded w-3/4 mb-3" />
+        <div className="h-3 bg-white/10 rounded w-1/2" />
+      </div>
+      <div className="milo-cfoot flex items-center justify-between">
+        <div className="h-3 bg-white/10 rounded w-1/3" />
+        <div className="flex -space-x-2">
+          <div className="w-5 h-5 rounded-full bg-white/10 border-2 border-black" />
+          <div className="w-5 h-5 rounded-full bg-white/10 border-2 border-black" />
+          <div className="w-5 h-5 rounded-full bg-white/10 border-2 border-black" />
+        </div>
+      </div>
+    </div>
+  );
 }
 
 function EventGridCard({ event, onExpand }: { event: EventData, onExpand: (e: EventData) => void }) {

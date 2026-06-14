@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { createClient } from '@/utils/supabase/client'
 
 interface Event {
@@ -56,9 +57,9 @@ export default function EventDetailClient({ event, rsvps, vibes }: {
           <div className="lg:col-span-8">
             {/* Hero image */}
             {event.image && (
-              <div className="img-h rounded-2xl overflow-hidden mb-8 h-[280px] md:h-[420px]">
-                <img src={event.image} alt={event.title}
-                  className="w-full h-full object-cover opacity-55 mix-blend-lighten" />
+              <div className="img-h relative rounded-2xl overflow-hidden mb-8 h-[280px] md:h-[420px]">
+                <Image src={event.image} alt={event.title} fill priority
+                  className="object-cover opacity-55 mix-blend-lighten" />
               </div>
             )}
 
@@ -100,11 +101,11 @@ export default function EventDetailClient({ event, rsvps, vibes }: {
                 <h2 className="font-d text-[18px] font-bold mb-4" style={{ color: '#E8EEF8' }}>Vibe Checks</h2>
                 <div className="grid grid-cols-3 md:grid-cols-4 gap-2">
                   {vibes.map(v => (
-                    <div key={v.id} className="aspect-square rounded-xl overflow-hidden img-h">
+                    <div key={v.id} className="relative aspect-square rounded-xl overflow-hidden img-h">
                       {v.type === 'video' ? (
                         <video src={v.url} className="w-full h-full object-cover opacity-70" muted playsInline />
                       ) : (
-                        <img src={v.url} alt="Vibe check" className="w-full h-full object-cover opacity-70" />
+                        <Image src={v.url} alt="Vibe check" fill className="object-cover opacity-70" />
                       )}
                     </div>
                   ))}

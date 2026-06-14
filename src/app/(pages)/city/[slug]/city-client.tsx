@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 
 // Three city colour schemes as decided:
 // Delhi   → Nocturnal Aura   (deep indigo-blue)
@@ -150,8 +151,8 @@ export default function CityClient({ slug, events }: { slug: string; events: any
                     style={{ animationDelay: `${idx * 0.04}s` }}>
                     <div className="img-h relative h-[160px] flex-shrink-0">
                       {e.image ? (
-                        <img src={e.image} alt={e.title}
-                          className="w-full h-full object-cover opacity-55 mix-blend-lighten" />
+                        <Image src={e.image} alt={e.title} fill
+                          className="object-cover opacity-55 mix-blend-lighten" />
                       ) : (
                         <div className="w-full h-full"
                           style={{ background: `linear-gradient(135deg, ${aColor}22 0%, rgba(5,5,5,.9) 100%)` }} />

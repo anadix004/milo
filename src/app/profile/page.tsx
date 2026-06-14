@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { LogOut, Settings, UserRoundPen } from "lucide-react";
 import DigitalPassport from "@/components/profile/DigitalPassport";
@@ -83,7 +84,7 @@ export default function ProfilePage() {
           <div className="relative h-40 md:h-48">
             {user?.cover_url ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={user.cover_url} alt="" className="absolute inset-0 w-full h-full object-cover opacity-80" />
+              <Image src={user.cover_url} alt="" fill className="absolute inset-0 object-cover opacity-80" />
             ) : (
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(99,102,241,0.55),transparent_55%),radial-gradient(circle_at_70%_40%,rgba(16,185,129,0.35),transparent_60%),radial-gradient(circle_at_60%_90%,rgba(236,72,153,0.35),transparent_55%)]" />
             )}
@@ -94,7 +95,7 @@ export default function ProfilePage() {
                 <div className="w-16 h-16 md:w-20 md:h-20 rounded-[1.25rem] border border-white/15 bg-white/5 overflow-hidden flex items-center justify-center shrink-0">
                   {user?.avatar_url ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={user.avatar_url} alt="" className="w-full h-full object-cover" />
+                    <Image src={user.avatar_url} alt="" fill className="object-cover" />
                   ) : (
                     <div className="w-full h-full bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.25),transparent_60%)]" />
                   )}
