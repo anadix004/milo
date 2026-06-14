@@ -4,9 +4,7 @@ import { z } from 'zod';
 
 const schema = z.object({
   email: z.string().email("Invalid email format"),
-  action: z.enum(['invite', 'promote', 'revoke'], {
-    errorMap: () => ({ message: "Invalid action" })
-  })
+  action: z.enum(['invite', 'promote', 'revoke'])
 });
 
 export async function POST(request: Request) {
@@ -15,7 +13,7 @@ export async function POST(request: Request) {
     const result = schema.safeParse(body);
     
     if (!result.success) {
-      return NextResponse.json({ error: result.error.errors[0].message }, { status: 400 });
+      return NextResponse.json({ error: result.error.issues?.[0]?.message || 'Invalid input' }, { status: 400 });
     }
 
     const { email, action } = result.data;
