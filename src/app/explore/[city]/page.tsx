@@ -1,19 +1,33 @@
 "use client";
 
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Header from "@/components/Header";
 import BottomNav from "@/components/mobile/BottomNav";
 import EventListing from "@/components/EventListing";
 import { useAuth } from "@/components/AuthContext";
 import { useLocation } from "@/components/LocationContext";
+import AuthModal from "@/components/AuthModal";
+import EventSubmission from "@/components/EventSubmission";
+import { useState } from "react";
 
-export default function ExplorePage() {
+/**
+ * FIX 1: Wrapped in <Suspense> — useSearchParams() requires this in Next.js App Router.
+ *         Without it the build throws: "useSearchParams() should be wrapped in a suspense boundary".
+ *
+ * FIX 2: Plus button (onEventClick) now opens EventSubmission modal instead of
+ *         router.push("/explore") which 404'd. The /explore index page we added also
+ *         handles direct navigation as a safety net.
+ */
+
+function ExploreContent() {
   const params = useParams();
   const router = useRouter();
-  const searchParams = useSearchParams();
+  const searchParams = useSearchParams(); // safe inside Suspense
   const { isAuthenticated } = useAuth();
   const { selectedCity, setSelectedCity } = useLocation();
+
+  const [activeModal, setActiveModal] = useState<"auth" | "event" | null>(null);
 
   const getCityCode = (urlCity: string): string => {
     const map: Record<string, string> = {
@@ -24,56 +38,99 @@ export default function ExplorePage() {
     return map[urlCity] || urlCity;
   };
 
-  const getCitySlug = (cityCode: string | null): string | null => {
-    if (!cityCode) return null;
-    if (cityCode === "del") return "delhi";
-    if (cityCode === "mum") return "mumbai";
-    if (cityCode === "blr") return "bengaluru";
-    return null;
-  };
-
-  const ensureCitySlug = () => {
-    const city = selectedCity ?? "del";
-    const slug = getCitySlug(city);
-    if (!slug) return null;
-    return slug;
-  };
-
-  // Sync city url param with context
+  // Sync URL param → location context
   useEffect(() => {
     const urlCity = params?.city as string;
     if (urlCity) {
-      const code = getCityCode(urlCity);
-      setSelectedCity(code);
+      setSelectedCity(getCityCode(urlCity));
     }
   }, [params, setSelectedCity]);
 
-  const initialTime = searchParams.get("time");
-  const initialPrice = searchParams.get("price");
-  const initialQ = searchParams.get("q");
+  const handleAuthRequired = () => {
+    if (isAuthenticated) return;
+    setActiveModal("auth");
+  };
+
+  const handleEventClick = () => {
+    if (isAuthenticated) {
+      setActiveModal("event");
+    } else {
+      setActiveModal("auth");
+    }
+  };
+
+  const handleProfileClick = () => {
+    if (isAuthenticated) {
+      router.push("/profile");
+    } else {
+      setActiveModal("auth");
+    }
+  };
 
   return (
     <main className="w-full min-h-screen overflow-x-hidden pt-[76px] pb-[80px] bg-black">
       <Header
-        onProfileClick={() => (isAuthenticated ? router.push("/profile") : router.push("/login"))}
-        onEventClick={() => router.push(isAuthenticated ? "/explore" : "/login")}
+        onProfileClick={handleProfileClick}
+        onEventClick={handleEventClick}
         onNotificationsClick={() => {}}
         isSidebarOpen={false}
       />
 
       <BottomNav
-        onProfileClick={() => (isAuthenticated ? router.push("/profile") : router.push("/login"))}
-        onEventClick={() => router.push(isAuthenticated ? "/explore" : "/login")}
+        onProfileClick={handleProfileClick}
+        onEventClick={handleEventClick}
         onNotificationsClick={() => {}}
       />
 
       <EventListing
         selectedCity={selectedCity}
-        onAuthRequired={() => router.push("/login")}
-        initialTimeFilter={initialTime}
-        initialPriceFilter={initialPrice}
-        initialSearchQuery={initialQ}
+        onAuthRequired={handleAuthRequired}
+        initialTimeFilter={searchParams.get("time")}
+        initialPriceFilter={searchParams.get("price")}
+        initialSearchQuery={searchParams.get("q")}
+      />
+
+      {/* FIX: Modals now live here so Plus button works correctly */}
+      <AuthModal
+        isOpen={activeModal === "auth"}
+        onClose={() => setActiveModal(null)}
+      />
+      <EventSubmission
+        isOpen={activeModal === "event"}
+        onClose={() => setActiveModal(null)}
+        onAuthRedirect={() => setActiveModal("auth")}
       />
     </main>
+  );
+}
+
+export default function ExplorePage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-black flex items-center justify-center">
+          <div className="flex items-end gap-1.5 h-10">
+            {[0, 1, 2, 3, 4].map((i) => (
+              <div
+                key={i}
+                className="w-1 rounded-full"
+                style={{
+                  background: "linear-gradient(to top, #4A7FD4, #b48cff)",
+                  animation: `bar-bounce 1.1s ease-in-out ${i * 0.1}s infinite`,
+                }}
+              />
+            ))}
+          </div>
+          <style>{`
+            @keyframes bar-bounce {
+              0%, 100% { height: 8px; opacity: .35; }
+              50% { height: 40px; opacity: 1; }
+            }
+          `}</style>
+        </div>
+      }
+    >
+      <ExploreContent />
+    </Suspense>
   );
 }

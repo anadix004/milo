@@ -1,53 +1,18 @@
 ================================================================================
-REPOSITORY STRUCTURE
+REPOSITORY STRUCTURE (CODE ONLY)
 ================================================================================
 
 📁 milo/
-    📄 .env.example
-    📄 .gitignore
-    📄 .npmrc
-    📄 AGENTS.md
-    📄 CLAUDE.md
-    📄 README.md
-    📄 baharmilo_full_redesign.html
-    📄 check_admin.js
-    📄 check_head.js
     📄 eslint.config.mjs
     📄 middleware.ts
-    📄 migration_scrape_sync.sql
-    📄 migration_v2.sql
-    📄 migration_v3_missing_tables.sql
-    📄 migration_v4_triggers.sql
     📄 next-env.d.ts
     📄 next.config.ts
     📄 package.json
     📄 postcss.config.mjs
-    📄 supabase_setup.sql
-    📄 test-supabase.js
     📄 tsconfig.json
-    📁 scraper/
-        📄 README.md
-        📄 scrape.cjs
-    📁 Event_sheets/
-        📄 bangalore_events.xlsx
-        📄 mumbai_events.xlsx
-    📁 audits/
-        📄 Final Pre-Launch Polish.md
-        📄 manual testing report.md
-        📄 milo_audit_report.md
-        📄 milo_comprehensive_audit.md
-    📁 supabase/
-        📄 .gitignore
-        📄 config.toml
-    📁 scripts/
-        📄 import_sheet_events.mjs
-        📄 live_scraper.mjs
-        📄 seed_events.mjs
-        📄 stealth_scraper.mjs
     📁 src/
         📁 app/
             📄 globals.css
-            📄 icon.svg
             📄 layout.tsx
             📄 loading.tsx
             📄 manifest.ts
@@ -116,9 +81,6 @@ REPOSITORY STRUCTURE
             📄 scrapeSync.ts
             📄 supabase.ts
             📄 supabaseAdmin.ts
-            📁 supabase/
-                📄 client.ts
-                📄 server.ts
         📁 components/
             📄 AuthContext.tsx
             📄 AuthModal.tsx
@@ -182,453 +144,6 @@ REPOSITORY STRUCTURE
             📄 aura.ts
             📄 supabase-server.ts
             📄 utils.ts
-
-
-================================================================================
-FILE: .env.example
-================================================================================
-# ================================
-# MILO Platform — Environment Setup
-# ================================
-# Copy this file to .env.local and fill in your Supabase credentials.
-
-# Your Supabase project URL (from Project Settings → API)
-NEXT_PUBLIC_SUPABASE_URL=https://your-project-ref.supabase.co
-
-# Your Supabase anon/public key (from Project Settings → API)
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
-
-# Your Supabase service role key (server-side only, NEVER expose to client)
-SUPABASE_SERVICE_ROLE_KEY=your-service-role-key-here
-
-# Shared password for team accounts created via admin whitelist
-TEAM_SHARED_PASSWORD=milo_team_2026
-
-
-================================================================================
-FILE: .gitignore
-================================================================================
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
-# dependencies
-/node_modules
-/.pnp
-.pnp.*
-.yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/versions
-
-# testing
-/coverage
-
-# next.js
-/.next/
-/out/
-next-env.d.ts
-
-# production
-/build
-
-# assets
-# (All assets now tracked for Vercel deployment)
-/public/nothing_to_ignore_here
-
-# misc
-.DS_Store
-*.pem
-*.tsbuildinfo
-.git_corrupted
-node_modules_corrupt
-.env.local
-/.agents/
-
-
-================================================================================
-FILE: .npmrc
-================================================================================
-legacy-peer-deps=true
-
-
-================================================================================
-FILE: AGENTS.md
-================================================================================
-# Milo Website — AI Agent Context
-
-> **Read this entire file before writing a single line of code.**
-> This is the authoritative context document for the Milo marketing website.
-
----
-
-## ⚠️ Next.js Note
-This project uses Next.js with the App Router. APIs, conventions, and file structure may differ from your training data. Read `node_modules/next/dist/docs/` before writing any code. Heed all deprecation notices.
-
----
-
-## What This Project Is
-
-The **Milo marketing website** — an immersive landing page that markets the Milo events app to GenZ students. This is NOT the mobile app. The design standard is "Lusion-level": cinematic, 3D, scroll-driven.
-
-- **GitHub:** github.com/anadix004/milo
-- **Local path:** ~/Documents/College/Milo Website/milo/
-- **Related app:** github.com/A6AN/Events_App
-
----
-
-## Tech Stack
-
-| Layer | Technology |
-|---|---|
-| Framework | Next.js (App Router) |
-| 3D Engine | Three.js / React Three Fiber |
-| Animation | GSAP (GreenSock) + Framer Motion |
-| Scroll | Lenis (inertial smooth scroll) |
-| Language | TypeScript |
-| Backend | Supabase (event scraping/sync) |
-
----
-
-## Design Philosophy: The "Lusion Standard"
-
-- **Aesthetic:** Cyber-Metropolitan / Premium Dark Mode
-- **Motion:** Physics-based spring animations — NO linear movement
-- **Depth:** Multi-layer parallax + WebGL particle systems
-- **Interactivity:** Zero-latency transitions between 3D and 2D UI
-- **Performance target:** 60 FPS on MacBook Air M-series
-- **Always dark** — same palette as the mobile app
-
----
-
-## Page Sections (User Journey)
-
-### Phase 1: The Metropolitan Hero
-- Dark neon-lit 3D skyline
-- Three 3D buildings: Mumbai · Delhi · Bangalore
-- City click → "High-Speed Camera Dive" to street level
-- Tech: Three.js + GSAP ScrollTrigger
-
-### Phase 2: The Event Nebula
-- Events as floating "data beads" in a 3D cloud
-- Dynamic themes per category:
-  - Techno: Neon/Glitch shaders
-  - Social: Frosted Glass
-  - Meetups: Neural Grid/Radar
-- Card click → Liquid Morph → full-screen event overlay
-
-### Phase 3: The Identity Scan
-- Glassmorphism sidebar profile section
-- Custom sign-up (phone OTP, no Apple Login)
-- 3D avatar updates based on gender
-
-### Phase 4: The Great Fall
-- Scroll-scrubbed video: character falls through city vortex
-- Lands at city-wise WhatsApp QR code
-- City-specific community group links
-
----
-
-## Shared Design Tokens (same as mobile app)
-
-| Token | Value |
-|---|---|
-| Background | `#0a0a0a` |
-| Primary accent | `#C9A84C` (Gold) |
-| Purple | `#b48cff` |
-| Coral | `#f9643c` |
-| Teal | `#3ce6b4` |
-| Heading font | Syne 700/800 |
-| UI font | DM Sans 300–600 |
-| Borders | `0.5px rgba(255,255,255,0.08)` |
-
-Full design doc: available via MCP tool `get_design_system`
-
----
-
-## Key Files
-
-```
-milo/
-  src/
-    app/                    ← Next.js App Router pages
-    components/             ← React components
-  public/                   ← Static assets
-  baharmilo_full_redesign.html  ← Standalone HTML prototype (active reference)
-  migration_*.sql           ← Website's own Supabase migrations (event scraping)
-  district_delhi_events*.csv ← Scraped Delhi event data
-```
-
-**Active design reference:** `baharmilo_full_redesign.html` — this standalone HTML file is the current most advanced design. Read it before doing any UI work.
-
----
-
-## MCP Server
-
-A local MCP server provides live context tools. Server at:
-`~/Documents/College/milo-mcp/`
-
-Available tools:
-- `get_website_context` — full website project context
-- `get_design_system` — shared Milo design doc
-- `get_github_file` (repo: "website") — fetch any file from this repo
-- `list_github_files` (repo: "website") — browse this repo
-
----
-
-## Rules
-
-1. **Never light mode** — always dark, same rules as the mobile app
-2. **Performance first** — 60 FPS target, optimize all 3D assets
-3. **Read `baharmilo_full_redesign.html`** before working on any UI section
-4. **Spring physics for motion** — no CSS linear transitions for major movements
-5. **Check Next.js App Router docs** — don't assume old Pages Router patterns work
-
-
-================================================================================
-FILE: CLAUDE.md
-================================================================================
-@AGENTS.md
-
-
-================================================================================
-FILE: README.md
-================================================================================
-# milo-web-page
-a 2nd and more advance approach towards making milo's page 
-📝 Milo: Premium 3D Events Radar — Technical Specification1. Project Vision: "The FOMO Prevention Engine"Milo is a high-end, immersive web experience designed to bridge the gap between digital discovery and real-world event attendance. Moving away from static lists, Milo uses Creative Coding and 3D Scrollytelling to create a cinematic journey for event seekers in major Indian hubs.2. Core Visual Philosophy (The "Lusion" Standard)Aesthetic: Cyber-Metropolitan / Premium Dark Mode.Motion: Physics-based spring animations (no linear movement).Depth: Multi-layered parallax with WebGL particle systems.Interactivity: "Smooth Workable" — Zero-latency transitions between 3D space and 2D UI.3. The User Journey (Feature Breakdown)Phase 1: The Metropolitan Hero (City Selection)Visual: A dark, neon-lit digital skyline.Interaction: Three iconic 3D buildings representing Mumbai, Delhi, and Bangalore.The Dive: Clicking a city triggers a "High-Speed Camera Dive" into the street level.Tech: Three.js + GSAP ScrollTrigger for camera pathing.Phase 2: The Event Nebula (Theme-Aware Grid)Visual: Events appear as floating "data beads" in a central 3D cloud.Dynamic Themes: Each event card carries a unique DNA:Techno: Neon/Glitch shaders.Social: Frosted Glass/Minimalism.Meetups: Neural Grid/Radar pulses.The Morph: Clicking a card triggers a "Liquid Morph" (SVG/Shader transition) expanding into a full-screen overlay with "About" and "Join Plan."Phase 3: The Identity Scan (Onboarding)Visual: A sidebar profile section using Glassmorphism.Logic: Custom sign-up flow (No Apple Login).Data: Gender, DOB, and DP (Selfie/Avatar) upload with a "Digital Scan" effect.Character Sync: 3D Model (Boy/Girl) updates outfits/poses based on user gender selection.Phase 4: The Great Fall (The Finale)Visual: A scroll-scrubbed video sequence of the Milo Explorer falling through a digital city vortex.The Landing: The character lands in front of a giant, pulsing City-Wise WhatsApp QR Code.CTA: Floating "Milo Stickers" and a direct link to the community group for the selected city.4. The Technical StackLayerTechnologyFrameworkNext.js 16+ (App Router)3D EngineThree.js / React Three FiberAnimationGSAP (GreenSock) + Framer MotionScrollingLenis Scroll (Inertial Scrolling)AssetsWebP Image Sequences (Canvas Scrubbing)AudioWeb Audio API (Spatial Soundscapes)5. Implementation RoadmapEnvironment Setup: Initialize Canvas and Lenis smooth scroll.Hero Construction: Build the 3D City landmarks and camera "Dive" logic.Event Grid: Implement the "Theme-Aware" card system with morphing overlays.The Fall: Integrate the image sequence for the final scroll-scrubbing animation.Community Logic: Dynamic WhatsApp QR/Link generation based on city state.Design Note: "Premium" is not a look, it is a performance. Ensure all 3D assets are optimized for MacBook Air M-series hardware to maintain a constant 60FPS.
-
-
-================================================================================
-FILE: baharmilo_full_redesign.html
-================================================================================
-
-<!DOCTYPE html>
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Syne+Mono&display=swap');
-*{margin:0;padding:0;box-sizing:border-box;}
-html,body{width:100%;font-family:'Syne',sans-serif;cursor:none;}
-body{background:#0A0F1E;transition:background .6s;}
-body.delhi{background:#0A0F1E;--ac:#4A7FD4;--acg:rgba(74,127,212,.15);--acd:rgba(74,127,212,.28);--tx:#E8EEF8;--txm:rgba(232,238,248,.42);--txu:rgba(232,238,248,.07);--br:rgba(74,127,212,.14);}
-body.blr{background:#071A0F;--ac:#3DB865;--acg:rgba(61,184,101,.15);--acd:rgba(61,184,101,.28);--tx:#E3F5EB;--txm:rgba(227,245,235,.42);--txu:rgba(227,245,235,.07);--br:rgba(61,184,101,.14);}
-body.mum{background:#110A1C;--ac:#8B5CF6;--acg:rgba(139,92,246,.15);--acd:rgba(139,92,246,.28);--tx:#EDE8F8;--txm:rgba(237,232,248,.42);--txu:rgba(237,232,248,.07);--br:rgba(139,92,246,.14);}
-#cur{position:fixed;width:10px;height:10px;background:var(--ac,#4A7FD4);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:width .18s,height .18s,background .5s;}
-#ring{position:fixed;width:34px;height:34px;border:1px solid var(--acd,rgba(74,127,212,.28));border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:left .09s ease,top .09s ease,border-color .5s;}
-#blob{position:fixed;width:380px;height:380px;border-radius:50%;pointer-events:none;z-index:0;transform:translate(-50%,-50%);background:radial-gradient(circle,var(--acg,rgba(74,127,212,.15)) 0%,transparent 68%);transition:background .7s;left:50%;top:40%;}
-.page{position:relative;z-index:1;}
-
-/* NAV */
-nav{display:flex;align-items:center;justify-content:space-between;padding:1.4rem 2.8rem;border-bottom:.5px solid var(--br,rgba(74,127,212,.14));}
-.logo{font-size:19px;font-weight:800;color:var(--tx);letter-spacing:-.02em;}
-.logo em{color:var(--ac);font-style:normal;transition:color .5s;}
-.cities{display:flex;gap:5px;}
-.cbtn{font-family:'Syne Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;padding:6px 14px;border-radius:100px;border:1px solid var(--br);color:var(--txm);background:transparent;cursor:none;transition:all .22s;}
-.cbtn.on{background:var(--ac);color:#fff;border-color:var(--ac);}
-.nlinks{display:flex;align-items:center;gap:1.4rem;}
-.nl{font-family:'Syne Mono',monospace;font-size:10px;color:var(--txm);cursor:none;}
-.nget{font-size:10px;font-weight:700;color:var(--ac);border:1px solid var(--acd);padding:6px 15px;border-radius:100px;cursor:none;transition:color .5s,border-color .5s;}
-
-/* HERO */
-.hero{padding:3.2rem 2.8rem 2.4rem;position:relative;overflow:hidden;min-height:340px;}
-.brow{font-family:'Syne Mono',monospace;font-size:9.5px;letter-spacing:.2em;color:var(--ac);text-transform:uppercase;display:flex;align-items:center;gap:9px;margin-bottom:1.6rem;transition:color .5s;}
-.brow::before{content:'';width:22px;height:1px;background:var(--ac);transition:background .5s;}
-.hl{font-size:clamp(48px,6.5vw,78px);font-weight:800;line-height:.9;letter-spacing:-.03em;color:var(--tx);margin-bottom:1.5rem;}
-.hl .city{color:var(--ac);transition:color .5s;}
-.hl .ghost{color:transparent;-webkit-text-stroke:1.2px var(--txu);transition:-webkit-text-stroke-color .5s;}
-.sub{font-size:13px;color:var(--txm);line-height:1.8;max-width:360px;margin-bottom:2rem;}
-.ctarow{display:flex;align-items:center;gap:1.6rem;}
-.btnp{background:var(--ac);color:#fff;font-family:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:13px 26px;border-radius:100px;border:none;cursor:none;transition:opacity .18s;}
-.btng{font-family:'Syne Mono',monospace;font-size:10px;color:var(--txm);letter-spacing:.07em;text-transform:uppercase;}
-.livepill{position:absolute;top:1.5rem;right:2.8rem;display:inline-flex;align-items:center;gap:6px;border:1px solid var(--br);border-radius:100px;padding:5px 12px;font-family:'Syne Mono',monospace;font-size:9px;color:var(--txm);}
-.ldot{width:5px;height:5px;border-radius:50%;background:var(--ac);animation:bl 1.4s ease-in-out infinite;transition:background .5s;}
-@keyframes bl{0%,100%{opacity:1;}50%{opacity:.25;}}
-.bgn{position:absolute;right:-1.5rem;bottom:-3rem;font-size:240px;font-weight:800;color:var(--txu);line-height:1;pointer-events:none;user-select:none;letter-spacing:-.05em;transition:color .5s;}
-
-/* MARQUEE */
-.mqbar{border-top:.5px solid var(--br);border-bottom:.5px solid var(--br);height:38px;overflow:hidden;display:flex;align-items:center;}
-.mqtrack{display:flex;animation:mq 24s linear infinite;white-space:nowrap;}
-.mqi{font-family:'Syne Mono',monospace;font-size:8.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--txm);padding:0 2.2rem;display:flex;align-items:center;gap:.55rem;}
-.mdot{width:4px;height:4px;border-radius:50%;background:var(--ac);transition:background .5s;flex-shrink:0;}
-@keyframes mq{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
-
-/* CARDS */
-.cards{padding:1.4rem 2.8rem 2rem;display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
-.card{border:1px solid var(--br);border-radius:14px;padding:14px 15px;background:rgba(255,255,255,.025);cursor:none;transition:border-color .22s,transform .18s,background .5s;}
-.card:hover{border-color:var(--acd);transform:translateY(-3px);}
-.ctop{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:9px;}
-.ctag{font-family:'Syne Mono',monospace;font-size:7.5px;letter-spacing:.1em;text-transform:uppercase;padding:3px 9px;border-radius:100px;background:var(--acg);color:var(--ac);transition:background .5s,color .5s;}
-.ctime{font-family:'Syne Mono',monospace;font-size:8.5px;color:var(--txm);}
-.cname{font-size:13px;font-weight:700;color:var(--tx);line-height:1.25;margin-bottom:4px;}
-.cloc{font-size:10px;color:var(--txm);margin-bottom:10px;display:flex;align-items:center;gap:3px;}
-.cloc::before{content:'↗';font-size:8px;opacity:.45;}
-.cfoot{display:flex;align-items:center;justify-content:space-between;border-top:.5px solid var(--br);padding-top:8px;}
-.cgo{font-size:11px;font-weight:700;color:var(--ac);transition:color .5s;}
-.avs{display:flex;}
-.av{width:19px;height:19px;border-radius:50%;margin-left:-6px;font-size:8px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid transparent;}
-.av:first-child{margin-left:0;}
-</style>
-
-<div id="cur"></div>
-<div id="ring"></div>
-<div id="blob"></div>
-
-<div class="page">
-<nav>
-  <div class="logo">mi<em>lo</em></div>
-  <div class="cities">
-    <button class="cbtn on" data-c="delhi">Delhi</button>
-    <button class="cbtn" data-c="blr">Bangalore</button>
-    <button class="cbtn" data-c="mum">Mumbai</button>
-  </div>
-  <div class="nlinks">
-    <span class="nl">Radar</span>
-    <span class="nl">Log in</span>
-    <span class="nget">Get App</span>
-  </div>
-</nav>
-
-<div class="hero">
-  <div class="livepill"><div class="ldot"></div><span id="lbl">14 live · Delhi</span></div>
-  <div class="bgn" id="bgn">14</div>
-  <div class="brow">Your city's social radar</div>
-  <div class="hl">
-    <div>your <span class="city" id="cn">Delhi</span></div>
-    <div>is more <span class="ghost">alive</span></div>
-    <div>than you know.</div>
-  </div>
-  <div class="sub">Spontaneous plans. Real connections. No queues — just the people and places that make your city worth showing up for.</div>
-  <div class="ctarow">
-    <button class="btnp" id="explbtn">Explore tonight →</button>
-    <span class="btng">↓ what's near you</span>
-  </div>
-</div>
-
-<div class="mqbar"><div class="mqtrack" id="mq"></div></div>
-
-<div class="cards" id="cards"></div>
-</div>
-
-<script>
-const cur=document.getElementById('cur');
-const ring=document.getElementById('ring');
-const blob=document.getElementById('blob');
-
-document.addEventListener('mousemove',e=>{
-  cur.style.left=e.clientX+'px';cur.style.top=e.clientY+'px';
-  setTimeout(()=>{ring.style.left=e.clientX+'px';ring.style.top=e.clientY+'px';},85);
-  blob.style.transition='left .07s ease,top .07s ease,background .7s';
-  blob.style.left=e.clientX+'px';blob.style.top=e.clientY+'px';
-});
-
-const db={
-  delhi:{name:'Delhi',lbl:'14 live · Delhi',num:'14',
-    mq:['Chai Circle · Lodi','Open Mic · Hauz Khas','Rooftop Jam · Mehrauli','Art Walk · Lodhi Colony','Book Club · Khan Market','Street Food · CP'],
-    cards:[
-      {tag:'● Live now',time:'NOW',name:'Open Mic Night',loc:'Hauz Khas Village',go:'23 going',avs:['A','R','S'],avc:['#4A7FD4','#3DB865','#8B5CF6']},
-      {tag:'Tonight',time:'8 PM',name:'Rooftop Sundowner',loc:'Mehrauli, South Delhi',go:'17 going',avs:['P','N'],avc:['#4A7FD4','#8B5CF6']},
-      {tag:'Tomorrow',time:'7 AM',name:'Morning Chai Walk',loc:'Chandni Chowk',go:'12 going',avs:['K','M','T'],avc:['#3DB865','#4A7FD4','#8B5CF6']},
-      {tag:'Weekend',time:'SAT 6PM',name:'Art Walk · Lodhi',loc:'Lodhi Road, Delhi',go:'41 going',avs:['V','D'],avc:['#8B5CF6','#4A7FD4']}
-    ]},
-  blr:{name:'Bangalore',lbl:'9 live · Bangalore',num:'9',
-    mq:['Indie Gig · Indiranagar','Startup Social · Koramangala','Cycling · Cubbon Park','Terrace Sessions · HSR','Book Club · MG Road','Food Walk · VV Puram'],
-    cards:[
-      {tag:'● Live now',time:'NOW',name:'Indie Gig',loc:'Indiranagar, BLR',go:'31 going',avs:['A','R'],avc:['#3DB865','#4A7FD4']},
-      {tag:'Tonight',time:'7 PM',name:'Startup Social',loc:'Koramangala 5th Block',go:'19 going',avs:['S','P','N'],avc:['#3DB865','#8B5CF6','#4A7FD4']},
-      {tag:'Tomorrow',time:'8 AM',name:'Cycling Group',loc:'Cubbon Park',go:'24 going',avs:['K','V'],avc:['#4A7FD4','#3DB865']},
-      {tag:'Weekend',time:'SUN 5PM',name:'Terrace Sessions',loc:'HSR Layout, BLR',go:'28 going',avs:['M','T'],avc:['#3DB865','#8B5CF6']}
-    ]},
-  mum:{name:'Mumbai',lbl:'22 live · Mumbai',num:'22',
-    mq:['Flea Market · Bandra','Jazz Night · Lower Parel','Beach Walk · Versova','Art Show · Colaba','Food Walk · Dharavi','Jam Session · Andheri'],
-    cards:[
-      {tag:'● Live now',time:'NOW',name:'Bandra Flea Market',loc:'Pali Hill, Bandra West',go:'67 going',avs:['A','R','S'],avc:['#8B5CF6','#4A7FD4','#3DB865']},
-      {tag:'Tonight',time:'9 PM',name:'Jazz Night',loc:'Lower Parel, Mumbai',go:'44 going',avs:['P','N'],avc:['#8B5CF6','#3DB865']},
-      {tag:'Tomorrow',time:'6 AM',name:'Beach Walk',loc:'Versova Beach',go:'18 going',avs:['K','M'],avc:['#4A7FD4','#8B5CF6']},
-      {tag:'Weekend',time:'SAT 7PM',name:'Art Show Opening',loc:'Colaba Causeway',go:'55 going',avs:['V','D','T'],avc:['#8B5CF6','#4A7FD4','#3DB865']}
-    ]}
-};
-
-function renderMQ(city){
-  const items=[...db[city].mq,...db[city].mq];
-  document.getElementById('mq').innerHTML=items.map(t=>`<span class="mqi"><div class="mdot"></div>${t}</span>`).join('');
-}
-
-function renderCards(city){
-  document.getElementById('cards').innerHTML=db[city].cards.map(c=>`
-    <div class="card">
-      <div class="ctop"><div class="ctag">${c.tag}</div><div class="ctime">${c.time}</div></div>
-      <div class="cname">${c.name}</div>
-      <div class="cloc">${c.loc}</div>
-      <div class="cfoot">
-        <div class="cgo">${c.go}</div>
-        <div class="avs">${c.avs.map((a,i)=>`<div class="av" style="background:${c.avc[i]};color:#fff">${a}</div>`).join('')}</div>
-      </div>
-    </div>`).join('');
-}
-
-function switchCity(city){
-  document.body.className=city;
-  document.getElementById('cn').textContent=db[city].name;
-  document.getElementById('lbl').textContent=db[city].lbl;
-  document.getElementById('bgn').textContent=db[city].num;
-  document.querySelectorAll('.cbtn').forEach(b=>b.classList.toggle('on',b.dataset.c===city));
-  renderMQ(city);renderCards(city);
-  setTimeout(()=>{cur.style.background='var(--ac)';},10);
-}
-
-document.querySelectorAll('.cbtn').forEach(b=>b.addEventListener('click',()=>switchCity(b.dataset.c)));
-[...document.querySelectorAll('button,.nget')].forEach(el=>{
-  el.addEventListener('mouseenter',()=>{cur.style.width='30px';cur.style.height='30px';cur.style.opacity='.5';});
-  el.addEventListener('mouseleave',()=>{cur.style.width='10px';cur.style.height='10px';cur.style.opacity='1';});
-});
-
-switchCity('delhi');
-</script>
-
-
-================================================================================
-FILE: check_admin.js
-================================================================================
-const { createClient } = require('@supabase/supabase-js');
-
-const supabaseUrl = 'https://thfeoltkysxrdrkagjuf.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRoZmVvbHRreXN4cmRya2FnanVmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NTQwMzUxMywiZXhwIjoyMDkwOTc5NTEzfQ.72yreHJ2HeyoDzL8GZCX82l3ETvfvsG2vpTbb_utKm0';
-
-const supabase = createClient(supabaseUrl, supabaseKey);
-
-async function run() {
-  const { data, error } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('email', 'milo.anadi@gmail.com');
-  console.log({ data, error });
-}
-
-run();
-
-
-================================================================================
-FILE: check_head.js
-================================================================================
-const { createClient } = require('@supabase/supabase-js');
-
-const supabaseUrl = 'https://thfeoltkysxrdrkagjuf.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRoZmVvbHRreXN4cmRya2FnanVmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NTQwMzUxMywiZXhwIjoyMDkwOTc5NTEzfQ.72yreHJ2HeyoDzL8GZCX82l3ETvfvsG2vpTbb_utKm0';
-
-const supabase = createClient(supabaseUrl, supabaseKey);
-
-async function run() {
-  console.log("Starting query...");
-  try {
-    const { count, error } = await supabase
-      .from('rsvps')
-      .select('*', { count: 'exact', head: true });
-    
-    console.log("Query finished:", { count, error });
-  } catch (err) {
-    console.log("Query threw an error:", err);
-  }
-}
-
-run();
 
 
 ================================================================================
@@ -739,200 +254,6 @@ export const config = {
     '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }
-
-
-================================================================================
-FILE: migration_scrape_sync.sql
-================================================================================
--- ============================================
--- MILO: Scrape & Sync Migration
--- Adds source_url column for deduplication.
--- Run in Supabase Dashboard → SQL Editor
--- ============================================
-
-
-================================================================================
-FILE: migration_v2.sql
-================================================================================
--- ============================================
--- MILO PLATFORM: Migration V2 (Polish & Features)
--- ============================================
-
--- 1. ADD PERSISTENCE TO PROFILES
-ALTER TABLE public.profiles 
-ADD COLUMN IF NOT EXISTS is_ghost BOOLEAN DEFAULT false;
-
--- 2. MESSAGES TABLE (REAL-TIME CHAT)
-CREATE TABLE IF NOT EXISTS public.messages (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  event_id UUID REFERENCES public.events(id) ON DELETE CASCADE,
-  profile_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
-  text TEXT NOT NULL,
-  is_system BOOLEAN DEFAULT false,
-  created_at TIMESTAMPTZ DEFAULT now()
-);
-
--- Enable RLS for messages
-ALTER TABLE public.messages ENABLE ROW LEVEL SECURITY;
-
--- Messages policies
-DROP POLICY IF EXISTS "Anyone can view messages" ON public.messages;
-CREATE POLICY "Anyone can view messages"
-  ON public.messages FOR SELECT
-  USING (true);
-
-DROP POLICY IF EXISTS "Authenticated users can send messages" ON public.messages;
-CREATE POLICY "Authenticated users can send messages"
-  ON public.messages FOR INSERT
-  WITH CHECK (auth.uid() = profile_id);
-
--- 3. RSVPS TABLE (ACTIVITY TRACKING)
-CREATE TABLE IF NOT EXISTS public.rsvps (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  event_id UUID REFERENCES public.events(id) ON DELETE CASCADE,
-  profile_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
-  type TEXT CHECK (type IN ('join', 'bookmark')) NOT NULL,
-  created_at TIMESTAMPTZ DEFAULT now(),
-  UNIQUE(event_id, profile_id, type)
-);
-
--- Enable RLS for RSVPs
-ALTER TABLE public.rsvps ENABLE ROW LEVEL SECURITY;
-
--- RSVPs policies
-DROP POLICY IF EXISTS "Users can view their own RSVPs" ON public.rsvps;
-CREATE POLICY "Users can view their own RSVPs"
-  ON public.rsvps FOR SELECT
-  USING (auth.uid() = profile_id);
-
-DROP POLICY IF EXISTS "Users can manage their own RSVPs" ON public.rsvps;
-CREATE POLICY "Users can manage their own RSVPs"
-  ON public.rsvps FOR ALL
-  USING (auth.uid() = profile_id);
-
--- 4. ENABLE REALTIME
--- Note: You may need to enable this in the Supabase Dashboard UI 
--- (Database -> Replication -> supabase_realtime publication)
--- ALTER PUBLICATION supabase_realtime ADD TABLE public.messages;
--- ALTER PUBLICATION supabase_realtime ADD TABLE public.events;
-
-
-================================================================================
-FILE: migration_v3_missing_tables.sql
-================================================================================
--- ============================================
--- MILO PLATFORM: Migration V3 (Missing Tables)
--- Fixes bugs identified in the comprehensive audit
--- ============================================
-
--- 1. BOOKMARKS TABLE
--- Used to "Save" or "Bookmark" events on the radar
-CREATE TABLE IF NOT EXISTS public.bookmarks (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  profile_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
-  event_id UUID REFERENCES public.events(id) ON DELETE CASCADE,
-  created_at TIMESTAMPTZ DEFAULT now(),
-  UNIQUE(profile_id, event_id)
-);
-
-ALTER TABLE public.bookmarks ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "Users can view their own bookmarks" ON public.bookmarks;
-CREATE POLICY "Users can view their own bookmarks"
-  ON public.bookmarks FOR SELECT
-  USING (auth.uid() = profile_id);
-
-DROP POLICY IF EXISTS "Users can insert their own bookmarks" ON public.bookmarks;
-CREATE POLICY "Users can insert their own bookmarks"
-  ON public.bookmarks FOR INSERT
-  WITH CHECK (auth.uid() = profile_id);
-
-DROP POLICY IF EXISTS "Users can delete their own bookmarks" ON public.bookmarks;
-CREATE POLICY "Users can delete their own bookmarks"
-  ON public.bookmarks FOR DELETE
-  USING (auth.uid() = profile_id);
-
-
--- 2. VIBE_CHECKS TABLE
--- Used for the story-like "Vibe Check" feature on event pages
-CREATE TABLE IF NOT EXISTS public.vibe_checks (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  event_id UUID REFERENCES public.events(id) ON DELETE CASCADE,
-  profile_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
-  type TEXT CHECK (type IN ('image', 'video')),
-  url TEXT NOT NULL,
-  user_name TEXT,
-  user_avatar TEXT,
-  created_at TIMESTAMPTZ DEFAULT now()
-);
-
-ALTER TABLE public.vibe_checks ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "Vibe checks are visible to everyone" ON public.vibe_checks;
-CREATE POLICY "Vibe checks are visible to everyone"
-  ON public.vibe_checks FOR SELECT
-  USING (true);
-
-DROP POLICY IF EXISTS "Authenticated users can post vibes" ON public.vibe_checks;
-CREATE POLICY "Authenticated users can post vibes"
-  ON public.vibe_checks FOR INSERT
-  WITH CHECK (auth.uid() IS NOT NULL);
-
-DROP POLICY IF EXISTS "Admins or owners can delete vibes" ON public.vibe_checks;
-CREATE POLICY "Admins or owners can delete vibes"
-  ON public.vibe_checks FOR DELETE
-  USING (
-    (SELECT role FROM public.profiles WHERE id = auth.uid()) IN ('admin', 'owner')
-    OR auth.uid() = profile_id
-  );
-
--- Verify and Grant Permissions
-GRANT ALL ON public.bookmarks TO authenticated;
-GRANT ALL ON public.bookmarks TO service_role;
-GRANT ALL ON public.vibe_checks TO authenticated;
-GRANT ALL ON public.vibe_checks TO service_role;
-GRANT SELECT ON public.vibe_checks TO anon;
-
-
-================================================================================
-FILE: migration_v4_triggers.sql
-================================================================================
--- ============================================
--- MILO PLATFORM: Migration V4 (Trigger Optimization)
--- Fixes race condition in profile creation by allowing
--- metadata-based role assignment.
--- ============================================
-
-CREATE OR REPLACE FUNCTION public.handle_new_user()
-RETURNS trigger AS $$
-DECLARE
-  target_role TEXT;
-BEGIN
-  -- Extract role from metadata or default to 'user'
-  target_role := COALESCE(new.raw_user_meta_data->>'role', 'user');
-
-  INSERT INTO public.profiles (id, email, display_name, username, role)
-  VALUES (
-    new.id,
-    new.email,
-    COALESCE(new.raw_user_meta_data->>'display_name', new.raw_user_meta_data->>'full_name', 'User'),
-    COALESCE(new.raw_user_meta_data->>'username', split_part(new.email, '@', 1)),
-    target_role
-  )
-  ON CONFLICT (id) DO UPDATE 
-  SET role = EXCLUDED.role,
-      display_name = EXCLUDED.display_name,
-      updated_at = now();
-      
-  RETURN new;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
--- Ensure trigger is active
-DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
-CREATE TRIGGER on_auth_user_created
-  AFTER INSERT ON auth.users
-  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
 
 
 ================================================================================
@@ -1052,260 +373,6 @@ export default config;
 
 
 ================================================================================
-FILE: supabase_setup.sql
-================================================================================
--- ============================================
--- MILO PLATFORM: Fresh Database Setup (RE-RUNNABLE)
--- Run this in Supabase Dashboard → SQL Editor
--- ============================================
-
--- 1. PROFILES TABLE
-CREATE TABLE IF NOT EXISTS public.profiles (
-  id UUID REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
-  email TEXT,
-  display_name TEXT,
-  username TEXT,
-  avatar_url TEXT,
-  role TEXT DEFAULT 'user' CHECK (role IN ('owner', 'admin', 'team', 'user')),
-  city TEXT,
-  bio TEXT,
-  created_at TIMESTAMPTZ DEFAULT now(),
-  updated_at TIMESTAMPTZ DEFAULT now()
-);
-
--- Enable RLS
-ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
-
--- Profiles policies (DROP first to be re-runnable)
-DROP POLICY IF EXISTS "Public profiles are visible to everyone" ON public.profiles;
-CREATE POLICY "Public profiles are visible to everyone"
-  ON public.profiles FOR SELECT
-  USING (true);
-
-DROP POLICY IF EXISTS "Users can update their own profile" ON public.profiles;
-CREATE POLICY "Users can update their own profile"
-  ON public.profiles FOR UPDATE
-  USING (auth.uid() = id);
-
-DROP POLICY IF EXISTS "Users can insert their own profile" ON public.profiles;
-CREATE POLICY "Users can insert their own profile"
-  ON public.profiles FOR INSERT
-  WITH CHECK (auth.uid() = id);
-
-DROP POLICY IF EXISTS "Service role can do anything" ON public.profiles;
-CREATE POLICY "Service role can do anything"
-  ON public.profiles
-  USING (auth.role() = 'service_role');
-
--- 2. EVENTS TABLE
-CREATE TABLE IF NOT EXISTS public.events (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  title TEXT NOT NULL,
-  description TEXT,
-  location TEXT,
-  "cityId" TEXT,
-  date TEXT,
-  price TEXT DEFAULT 'Free',
-  category TEXT DEFAULT 'Culture',
-  image TEXT,
-  video_url TEXT,
-  venue_address TEXT,
-  ticket_links JSONB DEFAULT '[]',
-  aadhaar_id TEXT,
-  user_id UUID REFERENCES auth.users(id),
-  is_verified BOOLEAN DEFAULT false,
-  featured BOOLEAN DEFAULT false,
-  created_at TIMESTAMPTZ DEFAULT now()
-);
-
--- Enable RLS
-ALTER TABLE public.events ENABLE ROW LEVEL SECURITY;
-
--- Events policies
-DROP POLICY IF EXISTS "Verified events are visible to everyone" ON public.events;
-CREATE POLICY "Verified events are visible to everyone"
-  ON public.events FOR SELECT
-  USING (true);
-
-DROP POLICY IF EXISTS "Authenticated users can insert events" ON public.events;
-CREATE POLICY "Authenticated users can insert events"
-  ON public.events FOR INSERT
-  WITH CHECK (auth.uid() IS NOT NULL);
-
--- SEC-01 FIX: Only the event owner or admin/owner-role users can update events
-DROP POLICY IF EXISTS "Admins can update events" ON public.events;
-DROP POLICY IF EXISTS "Users can update their own events" ON public.events;
-CREATE POLICY "Users can update their own events"
-  ON public.events FOR UPDATE
-  USING (
-    auth.uid() = user_id
-    OR (SELECT role FROM public.profiles WHERE id = auth.uid()) IN ('admin', 'owner')
-  );
-
--- SEC-01 FIX: Only the event owner or admin/owner-role users can delete events
-DROP POLICY IF EXISTS "Admins can delete events" ON public.events;
-DROP POLICY IF EXISTS "Users can delete their own events" ON public.events;
-CREATE POLICY "Users can delete their own events"
-  ON public.events FOR DELETE
-  USING (
-    auth.uid() = user_id
-    OR (SELECT role FROM public.profiles WHERE id = auth.uid()) IN ('admin', 'owner')
-  );
-
--- 3. AUTO-CREATE PROFILE ON SIGNUP
-CREATE OR REPLACE FUNCTION public.handle_new_user()
-RETURNS trigger AS $$
-BEGIN
-  INSERT INTO public.profiles (id, email, display_name, username, role)
-  VALUES (
-    new.id,
-    new.email,
-    COALESCE(new.raw_user_meta_data->>'display_name', new.raw_user_meta_data->>'full_name', 'User'),
-    COALESCE(new.raw_user_meta_data->>'username', split_part(new.email, '@', 1)),
-    'user'
-  )
-  ON CONFLICT (id) DO NOTHING;
-  RETURN new;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
-DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
-CREATE TRIGGER on_auth_user_created
-  AFTER INSERT ON auth.users
-  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
-
--- 4. CREATE STORAGE BUCKET FOR EVENT ASSETS
-INSERT INTO storage.buckets (id, name, public)
-VALUES ('event-assets', 'event-assets', true)
-ON CONFLICT (id) DO NOTHING;
-
--- Storage policies
-DROP POLICY IF EXISTS "Anyone can view event assets" ON storage.objects;
-CREATE POLICY "Anyone can view event assets"
-  ON storage.objects FOR SELECT
-  USING (bucket_id = 'event-assets');
-
-DROP POLICY IF EXISTS "Authenticated users can upload event assets" ON storage.objects;
-CREATE POLICY "Authenticated users can upload event assets"
-  ON storage.objects FOR INSERT
-  WITH CHECK (bucket_id = 'event-assets' AND auth.uid() IS NOT NULL);
-
--- ============================================
--- DB-01 FIX: Missing RSVPS table
--- ============================================
-
-CREATE TABLE IF NOT EXISTS public.rsvps (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  event_id UUID REFERENCES public.events(id) ON DELETE CASCADE,
-  profile_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
-  type TEXT DEFAULT 'join',
-  created_at TIMESTAMPTZ DEFAULT now(),
-  UNIQUE(event_id, profile_id)
-);
-
-ALTER TABLE public.rsvps ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "Users can read their own RSVPs" ON public.rsvps;
-CREATE POLICY "Users can read their own RSVPs"
-  ON public.rsvps FOR SELECT
-  USING (auth.uid() = profile_id);
-
-DROP POLICY IF EXISTS "Users can insert their own RSVPs" ON public.rsvps;
-CREATE POLICY "Users can insert their own RSVPs"
-  ON public.rsvps FOR INSERT
-  WITH CHECK (auth.uid() = profile_id);
-
-DROP POLICY IF EXISTS "Users can delete their own RSVPs" ON public.rsvps;
-CREATE POLICY "Users can delete their own RSVPs"
-  ON public.rsvps FOR DELETE
-  USING (auth.uid() = profile_id);
-
--- ============================================
--- DB-01 FIX: Missing AVATARS storage bucket
--- ============================================
-
-INSERT INTO storage.buckets (id, name, public)
-VALUES ('avatars', 'avatars', true)
-ON CONFLICT (id) DO NOTHING;
-
-DROP POLICY IF EXISTS "Anyone can view avatars" ON storage.objects;
-CREATE POLICY "Anyone can view avatars"
-  ON storage.objects FOR SELECT
-  USING (bucket_id = 'avatars');
-
-DROP POLICY IF EXISTS "Authenticated users can upload avatars" ON storage.objects;
-CREATE POLICY "Authenticated users can upload avatars"
-  ON storage.objects FOR INSERT
-  WITH CHECK (bucket_id = 'avatars' AND auth.uid() IS NOT NULL);
-
-DROP POLICY IF EXISTS "Users can update their own avatar" ON storage.objects;
-CREATE POLICY "Users can update their own avatar"
-  ON storage.objects FOR UPDATE
-  USING (bucket_id = 'avatars' AND auth.uid()::text = (storage.foldername(name))[1]);
-
--- Done! Your fresh Milo backend is ready.
-
-
-================================================================================
-FILE: test-supabase.js
-================================================================================
-const { createClient } = require('@supabase/supabase-js');
-require('dotenv').config({ path: '.env.local' });
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-if (!supabaseUrl || !supabaseKey) {
-  console.error("Missing Supabase credentials in .env.local");
-  process.exit(1);
-}
-
-const supabase = createClient(supabaseUrl, supabaseKey);
-
-async function testSupabase() {
-  console.log("Testing Supabase Connection...");
-  
-  // Test 1: Profiles
-  const { data: profiles, error: profileErr } = await supabase.from('profiles').select('id').limit(1);
-  if (profileErr) {
-    console.error("❌ Error accessing 'profiles':", profileErr.message);
-  } else {
-    console.log("✅ 'profiles' table accessible. Found", profiles.length, "records.");
-  }
-
-  // Test 2: Events
-  const { data: events, error: eventsErr } = await supabase.from('events').select('id, title').limit(1);
-  if (eventsErr) {
-    console.error("❌ Error accessing 'events':", eventsErr.message);
-  } else {
-    console.log("✅ 'events' table accessible. Found", events.length, "records.");
-  }
-
-  // Test 3: RSVPs (testing the join as well)
-  const { data: rsvps, error: rsvpsErr } = await supabase
-    .from('rsvps')
-    .select(`
-      id,
-      event:events (
-        id,
-        title
-      )
-    `)
-    .limit(1);
-    
-  if (rsvpsErr) {
-    console.error("❌ Error accessing 'rsvps' with events join:", rsvpsErr.message);
-  } else {
-    console.log("✅ 'rsvps' table and join accessible. Found", rsvps.length, "records.");
-  }
-
-  console.log("Done testing.");
-}
-
-testSupabase();
-
-
-================================================================================
 FILE: tsconfig.json
 ================================================================================
 {
@@ -1351,2360 +418,6 @@ FILE: tsconfig.json
     "node_modules_corrupt"
   ]
 }
-
-
-================================================================================
-FILE: scraper/README.md
-================================================================================
-# Milo Event Scraper (standalone)
-
-Scrapes public event pages and outputs a CSV (no website integration).
-
-## Usage (recommended: seed URLs)
-
-Scrape event pages starting from listing/search pages:
-
-```bash
-node scraper/scrape.cjs \
-  --seed "https://allevents.in/delhi" \
-  --seed "https://insider.in/all-events-in-delhi" \
-  --max-events 60 \
-  --out ./events.csv
-```
-
-## Usage (direct event URLs)
-
-```bash
-node scraper/scrape.cjs \
-  --event-url "https://example.com/events/some-event" \
-  --event-url "https://example.com/event/another" \
-  --out ./events.csv
-```
-
-## Usage (presets)
-
-```bash
-node scraper/scrape.cjs --preset district --city delhi --out ./events.csv
-```
-
-## Notes
-- This scraper only uses normal HTTP fetch + HTML parsing (JSON-LD + OpenGraph). No login scraping, no CAPTCHA bypass.
-- Output includes the exact source URL and best-effort canonical URL.
-
-
-================================================================================
-FILE: scraper/scrape.cjs
-================================================================================
-const { writeFile } = require("node:fs/promises");
-const { resolve: resolvePath } = require("node:path");
-
-const DEFAULT_UA =
-  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Safari/537.36";
-
-const cityAliases = {
-  delhi: "delhi",
-  "new-delhi": "delhi",
-  ncr: "delhi",
-  mumbai: "mumbai",
-  bombay: "mumbai",
-  bengaluru: "bengaluru",
-  bangalore: "bengaluru",
-  blr: "bengaluru",
-};
-
-function presetSeedUrls({ presets, city }) {
-  const cityKey = cityAliases[String(city).toLowerCase()] ?? "delhi";
-  const presetSet = new Set((presets ?? []).map((p) => String(p).toLowerCase().trim()).filter(Boolean));
-
-  const out = [];
-  if (presetSet.has("district")) out.push(`https://www.district.in/events/?city=${encodeURIComponent(cityKey)}`);
-  if (presetSet.has("allevents")) {
-    if (cityKey === "delhi") out.push("https://allevents.in/new-delhi");
-    if (cityKey === "mumbai") out.push("https://allevents.in/mumbai/events");
-    if (cityKey === "bengaluru") out.push("https://allevents.in/bangalore");
-  }
-  return out;
-}
-
-const args = parseArgs(process.argv.slice(2));
-const options = {
-  seedUrls: (args.seed ?? []).map(canonicalizeUrl).filter(Boolean),
-  eventUrls: (args["event-url"] ?? []).map(canonicalizeUrl).filter(Boolean),
-  preset: (args.preset ?? []).map((s) => String(s).toLowerCase().trim()).filter(Boolean),
-  city: String(args.city ?? "delhi"),
-  outPath: String(args.out ?? "./events.csv"),
-  maxEvents: numArg(args["max-events"], 80),
-  maxPerSeed: numArg(args["max-per-seed"], 120),
-  concurrency: numArg(args.concurrency, 6),
-  delayMs: numArg(args["delay-ms"], 300),
-  userAgent: String(args["user-agent"] ?? DEFAULT_UA),
-  sameHostOnly: boolArg(args["same-host-only"], true),
-  dryRun: boolArg(args["dry-run"], false),
-  verbose: boolArg(args.verbose, true),
-};
-
-const presetSeeds = presetSeedUrls({ presets: options.preset, city: options.city });
-options.seedUrls.unshift(...presetSeeds);
-
-if (!options.seedUrls.length && !options.eventUrls.length) {
-  usageAndExit("Provide at least one --seed or --event-url.");
-}
-
-void (async () => {
-  const startedAt = Date.now();
-  if (options.verbose) {
-    console.log(
-      `Seeds: ${options.seedUrls.length} | Direct event URLs: ${options.eventUrls.length} | maxEvents=${options.maxEvents} maxPerSeed=${options.maxPerSeed}`
-    );
-  }
-
-  const discovered = [];
-  for (const seedUrl of options.seedUrls) {
-    if (options.verbose) console.log(`Discovering: ${seedUrl}`);
-    const links = await discoverEventLinks({
-      seedUrl,
-      maxLinks: options.maxPerSeed,
-      userAgent: options.userAgent,
-      sameHostOnly: options.sameHostOnly,
-    });
-    if (options.verbose) console.log(`- found ${links.length} candidate links`);
-    discovered.push(...links);
-  }
-
-  const allEventUrls = Array.from(new Set([...options.eventUrls, ...discovered]))
-    .slice(0, options.maxEvents)
-    .filter(Boolean);
-
-  if (!allEventUrls.length) {
-    usageAndExit("No event URLs found from seeds. Try --same-host-only false or pass direct --event-url.");
-  }
-
-  if (options.verbose) console.log(`Scraping ${allEventUrls.length} event pages...`);
-
-  const results = await mapConcurrent(
-    allEventUrls,
-    options.concurrency,
-    async (url) => {
-      await sleep(options.delayMs);
-      return scrapeEventPage({ url, userAgent: options.userAgent });
-    },
-    { stopOnError: false }
-  );
-
-  const okRows = results.filter((r) => r.ok).map((r) => r.value);
-  const failRows = results.filter((r) => !r.ok);
-
-  console.log(
-    `Scraped ${okRows.length}/${allEventUrls.length} pages in ${Math.round((Date.now() - startedAt) / 1000)}s`
-  );
-  if (failRows.length) {
-    console.log(`Failed: ${failRows.length}`);
-    for (const f of failRows.slice(0, 10)) console.log(`- ${f.error.url}: ${f.error.message}`);
-  }
-
-  if (!options.dryRun) {
-    const csv = toCsv(okRows, [
-      "source_host",
-      "url",
-      "canonical_url",
-      "title",
-      "description",
-      "start_date",
-      "end_date",
-      "venue",
-      "address",
-      "city_guess",
-      "price",
-      "currency",
-      "image",
-      "images",
-      "organizer",
-      "tags",
-      "scraped_at",
-    ]);
-    const outAbs = resolvePath(process.cwd(), options.outPath);
-    await writeFile(outAbs, csv, "utf8");
-    console.log(`Wrote CSV: ${outAbs}`);
-  }
-})().catch((e) => {
-  console.error(e);
-  process.exit(1);
-});
-
-function usageAndExit(message) {
-  console.error(message);
-  console.error(
-    `\nUsage:\n` +
-      `  node scraper/scrape.cjs --seed <url> [--seed <url> ...] --out ./events.csv\n` +
-      `  node scraper/scrape.cjs --preset district --city delhi --out ./events.csv\n` +
-      `\nFlags:\n` +
-      `  --seed <url>             Listing/search page(s) to discover event links\n` +
-      `  --event-url <url>        Direct event page(s)\n` +
-      `  --preset <name>          district, allevents (best-effort; sites may change)\n` +
-      `  --city <city>            delhi, mumbai, bengaluru\n` +
-      `  --out <path>             CSV output path (default: ./events.csv)\n` +
-      `  --max-events <n>         Max event pages to scrape (default: 80)\n` +
-      `  --max-per-seed <n>       Max links discovered per seed (default: 120)\n` +
-      `  --concurrency <n>        Concurrent fetches (default: 6)\n` +
-      `  --delay-ms <n>           Delay between requests (default: 300)\n` +
-      `  --same-host-only <bool>  Only follow seed host links (default: true)\n` +
-      `  --dry-run <bool>         Do not write CSV\n`
-  );
-  process.exit(1);
-}
-
-function parseArgs(argv) {
-  const out = {};
-  let i = 0;
-  while (i < argv.length) {
-    const token = argv[i];
-    if (!token.startsWith("--")) {
-      i += 1;
-      continue;
-    }
-    const key = token.slice(2);
-    const next = argv[i + 1];
-    const isBool = next == null || next.startsWith("--");
-    const value = isBool ? "true" : next;
-    if (out[key] == null) out[key] = [];
-    out[key].push(value);
-    i += isBool ? 1 : 2;
-  }
-  for (const [k, v] of Object.entries(out)) {
-    if (Array.isArray(v) && v.length === 1) out[k] = v[0];
-  }
-  for (const k of ["seed", "event-url", "preset"]) {
-    if (out[k] == null) out[k] = [];
-    if (!Array.isArray(out[k])) out[k] = [out[k]];
-  }
-  return out;
-}
-
-function numArg(v, def) {
-  const raw = Array.isArray(v) ? v.at(-1) : v;
-  const n = Number(raw);
-  return Number.isFinite(n) && n > 0 ? Math.floor(n) : def;
-}
-
-function boolArg(v, def) {
-  const raw = Array.isArray(v) ? v.at(-1) : v;
-  if (raw == null) return def;
-  const s = String(raw).toLowerCase().trim();
-  if (["1", "true", "yes", "y"].includes(s)) return true;
-  if (["0", "false", "no", "n"].includes(s)) return false;
-  return def;
-}
-
-async function fetchHtml({ url, userAgent, timeoutMs = 35_000, retries = 2 }) {
-  let attempt = 0;
-  // eslint-disable-next-line no-constant-condition
-  while (true) {
-    attempt += 1;
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), timeoutMs);
-    try {
-      const res = await fetch(url, {
-        redirect: "follow",
-        signal: controller.signal,
-        headers: {
-          "user-agent": userAgent,
-          accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-          "accept-language": "en-US,en;q=0.9",
-        },
-      });
-      if (res.status === 429 || res.status >= 500) throw new Error(`HTTP ${res.status} ${res.statusText}`);
-      if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
-      return await res.text();
-    } catch (e) {
-      const isAbort = e?.name === "AbortError" || String(e?.message || "").toLowerCase().includes("aborted");
-      const canRetry = attempt <= retries + 1;
-      if (!canRetry) throw e;
-      // linear backoff
-      await sleep(Math.min(2000 * attempt, 6000));
-      // retry
-      if (options.verbose) console.log(`Retrying fetch (${attempt}/${retries + 1}): ${url}${isAbort ? " (timeout)" : ""}`);
-      continue;
-    } finally {
-      clearTimeout(timeout);
-    }
-  }
-}
-
-async function discoverEventLinks({ seedUrl, maxLinks, userAgent, sameHostOnly }) {
-  const html = await fetchHtml({ url: seedUrl, userAgent });
-  const seedHost = new URL(seedUrl).host;
-
-  const rawHrefs = [];
-  const hrefRe = /href\s*=\s*["']([^"']+)["']/gi;
-  let match;
-  while ((match = hrefRe.exec(html))) {
-    rawHrefs.push(match[1]);
-    if (rawHrefs.length >= maxLinks * 25) break;
-  }
-
-  // SPA fallback: also scan for embedded route strings / absolute URLs
-  const urlish = [];
-  const absUrlRe = /https?:\/\/[^\s"'<>]+/gi;
-  while ((match = absUrlRe.exec(html))) {
-    urlish.push(match[0]);
-    if (urlish.length >= maxLinks * 25) break;
-  }
-  const routeRe = /["'](\/events\/[^\n"']+)["']/gi;
-  while ((match = routeRe.exec(html))) {
-    urlish.push(match[1]);
-    if (urlish.length >= maxLinks * 25) break;
-  }
-
-  const links = [...rawHrefs, ...urlish]
-    .map((href) => resolveUrl(seedUrl, href))
-    .map((u) => canonicalizeUrl(u))
-    .filter(Boolean);
-
-  const scored = links
-    .map((u) => ({ url: u, score: scoreCandidate(u) }))
-    .filter((x) => x.score > 0)
-    .filter((x) => (sameHostOnly ? new URL(x.url).host === seedHost : true))
-    .filter((x) => isLikelyEventUrl(x.url))
-    .sort((a, b) => b.score - a.score);
-
-  const uniq = [];
-  const seen = new Set();
-  for (const item of scored) {
-    if (seen.has(item.url)) continue;
-    seen.add(item.url);
-    uniq.push(item.url);
-    if (uniq.length >= maxLinks) break;
-  }
-  return uniq;
-}
-
-function isLikelyEventUrl(url) {
-  let u;
-  try {
-    u = new URL(url);
-  } catch {
-    return false;
-  }
-  const host = u.host.toLowerCase();
-  const path = u.pathname.toLowerCase();
-
-  // District: event detail pages usually include "buy-tickets". Category pages often include "book-tickets".
-  if (host.includes("district.in")) {
-    if (!path.startsWith("/events/")) return false;
-    if (path.includes("book-tickets") && !path.includes("buy-tickets")) return false;
-    if (!path.includes("buy-tickets")) return false;
-    return true;
-  }
-
-  // AllEvents: keep /event/ pages and city event listings; discovery still may include noise.
-  if (host.includes("allevents.in")) {
-    if (path.includes("/event/") || path.includes("/events/")) return true;
-  }
-
-  return true;
-}
-
-function scoreCandidate(url) {
-  const u = url.toLowerCase();
-  if (u.startsWith("mailto:") || u.startsWith("tel:")) return 0;
-  if (u.includes("/privacy") || u.includes("/terms") || u.includes("/careers")) return 0;
-  if (u.includes("#")) return 0;
-  if (u.match(/\\.(png|jpg|jpeg|gif|webp|svg|pdf)(\\?|$)/)) return 0;
-
-  let score = 0;
-  if (u.includes("/event")) score += 4;
-  if (u.includes("/events")) score += 2;
-  if (u.includes("ticket") || u.includes("tickets")) score += 1;
-  if (u.includes("show") || u.includes("gig") || u.includes("concert")) score += 1;
-  if (u.includes("utm_")) score -= 1;
-  if (u.split("/").length >= 5) score += 1;
-  return score;
-}
-
-	async function scrapeEventPage({ url, userAgent }) {
-	  try {
-	    const html = await fetchHtml({ url, userAgent });
-	    const canonical =
-	      canonicalizeUrl(extractFirstHref(html, /<link[^>]+rel=["']canonical["'][^>]*>/i)) ||
-	      canonicalizeUrl(extractAttr(html, "link", "rel", "canonical", "href")) ||
-	      url;
-	    const host = new URL(url).host;
-	    const district = host.includes("district.in") ? extractDistrictEvent(html) : null;
-
-	    const { event, og } = extractMetadata(html);
-	    const title = district?.title || event.name || og.title || extractTitle(html);
-	    const description = district?.description || event.description || og.description || "";
-
-	    const images = (
-	      district?.images?.length
-	        ? district.images
-	        : event.images?.length
-	          ? event.images
-	          : og.image
-	            ? [og.image]
-	            : []
-	    )
-	      .map((u) => canonicalizeUrl(u))
-	      .filter(Boolean);
-
-	    const startDate = district?.startDate || event.startDate || "";
-	    const endDate = district?.endDate || event.endDate || "";
-	    const venue = district?.venue || event.venue || "";
-	    const address = district?.address || event.address || "";
-	    const cityGuess = district?.city || event.city || guessCityFromText(`${title} ${description} ${venue} ${address}`);
-
-	    return {
-	      ok: true,
-	      value: {
-	        source_host: host,
-	        url,
-	        canonical_url: canonical,
-	        title,
-	        description,
-	        start_date: startDate,
-	        end_date: endDate,
-	        venue,
-	        address,
-	        city_guess: cityGuess,
-	        price: district?.price || event.price || "",
-	        currency: district?.currency || event.currency || "",
-	        image: images[0] || "",
-	        images: images.length ? JSON.stringify(images) : "",
-	        organizer: district?.organizer || event.organizer || "",
-	        tags:
-	          district?.tags?.length
-	            ? district.tags.join("|")
-	            : event.tags?.length
-	              ? event.tags.join("|")
-	              : "",
-	        scraped_at: new Date().toISOString(),
-	      },
-	    };
-	  } catch (e) {
-	    return { ok: false, error: { url, message: e instanceof Error ? e.message : String(e) } };
-	  }
-	}
-
-	function extractMetadata(html) {
-  const og = {
-    title: extractOg(html, "og:title"),
-    description: extractOg(html, "og:description"),
-    image: extractOg(html, "og:image"),
-  };
-
-  const jsonLdBlocks = extractJsonLdBlocks(html);
-
-  const events = jsonLdBlocks.flatMap((block) => parseJsonLdForEvents(block));
-  const best = events[0] || null;
-
-  return {
-    og,
-    event: {
-      name: safeStr(best?.name),
-      description: safeStr(best?.description),
-      startDate: safeStr(best?.startDate),
-      endDate: safeStr(best?.endDate),
-      images: normalizeImages(best?.image),
-      venue: extractVenue(best),
-      address: extractAddress(best),
-      city: extractCity(best),
-      price: extractPrice(best),
-      currency: extractCurrency(best),
-      organizer: extractOrganizer(best),
-      tags: extractKeywords(best),
-    },
-  };
-	}
-
-	function extractDistrictEvent(html) {
-	  const needle = '\\"eventData\\":';
-	  const pos = html.indexOf(needle);
-	  if (pos === -1) return null;
-	  const start = html.indexOf("{", pos);
-	  if (start === -1) return null;
-	  const end = findJsonObjectEnd(html, start);
-	  if (end === -1) return null;
-
-	  const escaped = html.slice(start, end);
-	  const jsonText = escaped.replace(/\\"/g, '"').replace(/\\\//g, "/");
-
-	  let eventData;
-	  try {
-	    eventData = JSON.parse(jsonText);
-	  } catch {
-	    return null;
-	  }
-
-	  const data = eventData?.data || {};
-	  const venueObj = data?.venue || {};
-
-	  const leastStart = typeof data?.least_show_start_time === "number" ? data.least_show_start_time : null;
-	  const maxEnd = typeof data?.max_show_end_time === "number" ? data.max_show_end_time : null;
-
-	  const images = [];
-	  if (typeof data?.horizontal_cover_image === "string") images.push(data.horizontal_cover_image);
-	  if (typeof data?.cover_image === "string") images.push(data.cover_image);
-	  if (Array.isArray(data?.images)) {
-	    for (const img of data.images) {
-	      const u = img?.xlarge || img?.large || img?.medium || img?.small;
-	      if (typeof u === "string") images.push(u);
-	    }
-	  }
-
-	  const ticketCfg = deepFind(eventData, (k, v) => k === "ticket_price_config" && v && typeof v === "object");
-	  const priceDisplay = ticketCfg?.price_display_string || "";
-	  const minPrice = ticketCfg?.min_price;
-
-	  const organizer =
-	    (typeof data?.brand_details?.name === "string" && data.brand_details.name) ||
-	    (typeof data?.brand_id?.name === "string" && data.brand_id.name) ||
-	    "";
-
-	  const keywordsMeta = extractMeta(html, "keywords");
-	  const tags = keywordsMeta
-	    ? keywordsMeta
-	        .split(",")
-	        .map((s) => s.trim())
-	        .filter(Boolean)
-	        .slice(0, 15)
-	    : [];
-
-	  const descHtml = typeof data?.description === "string" ? data.description : "";
-	  const descText = descHtml ? stripHtml(descHtml) : "";
-
-	  const city = typeof venueObj?.city === "string" ? venueObj.city : "";
-	  const venue = typeof venueObj?.name === "string" ? venueObj.name : "";
-	  const address = city || "";
-
-	  return {
-	    title: typeof data?.name === "string" ? data.name.trim() : "",
-	    description: descText || (typeof data?.meta_description === "string" ? data.meta_description : ""),
-	    startDate: leastStart ? new Date(leastStart * 1000).toISOString() : "",
-	    endDate: maxEnd ? new Date(maxEnd * 1000).toISOString() : "",
-	    venue,
-	    address,
-	    city,
-	    price: priceDisplay || (typeof minPrice === "number" ? String(minPrice) : ""),
-	    currency: priceDisplay || typeof minPrice === "number" ? "INR" : "",
-	    images: Array.from(new Set(images)).slice(0, 25),
-	    organizer,
-	    tags,
-	  };
-	}
-
-	function findJsonObjectEnd(text, startIdx) {
-	  let brace = 0;
-	  let inStr = false;
-	  let esc = false;
-	  for (let i = startIdx; i < text.length; i += 1) {
-	    const ch = text[i];
-	    if (esc) {
-	      esc = false;
-	      continue;
-	    }
-	    if (ch === "\\\\") {
-	      esc = true;
-	      continue;
-	    }
-	    if (ch === '"') {
-	      inStr = !inStr;
-	      continue;
-	    }
-	    if (inStr) continue;
-	    if (ch === "{") brace += 1;
-	    else if (ch === "}") {
-	      brace -= 1;
-	      if (brace === 0) return i + 1;
-	    }
-	  }
-	  return -1;
-	}
-
-	function deepFind(root, predicate) {
-	  const seen = new Set();
-	  const stack = [root];
-	  while (stack.length) {
-	    const cur = stack.pop();
-	    if (!cur || typeof cur !== "object") continue;
-	    if (seen.has(cur)) continue;
-	    seen.add(cur);
-	    if (Array.isArray(cur)) {
-	      for (const v of cur) stack.push(v);
-	    } else {
-	      for (const [k, v] of Object.entries(cur)) {
-	        if (predicate(k, v)) return v;
-	        stack.push(v);
-	      }
-	    }
-	  }
-	  return null;
-	}
-
-	function extractMeta(html, name) {
-	  const re = new RegExp(
-	    `<meta[^>]+name=[\"']${escapeRe(name)}[\"'][^>]*content=[\"']([^\"']+)[\"'][^>]*>`,
-	    "i"
-	  );
-	  const m = html.match(re);
-	  return m?.[1] ? decodeHtml(m[1]).trim() : "";
-	}
-
-	function stripHtml(input) {
-	  return decodeHtml(String(input).replace(/<[^>]+>/g, " "))
-	    .replace(/\\s+/g, " ")
-	    .trim();
-	}
-
-function extractTitle(html) {
-  const m = html.match(/<title[^>]*>([^<]*)<\/title>/i);
-  return m ? decodeHtml(m[1]).trim() : "";
-}
-
-function extractOg(html, prop) {
-  const re = new RegExp(
-    `<meta[^>]+property=[\"']${escapeRe(prop)}[\"'][^>]*content=[\"']([^\"']+)[\"'][^>]*>`,
-    "i"
-  );
-  const m = html.match(re);
-  if (m?.[1]) return decodeHtml(m[1]).trim();
-  // Some sites use name= instead of property=
-  const re2 = new RegExp(
-    `<meta[^>]+name=[\"']${escapeRe(prop)}[\"'][^>]*content=[\"']([^\"']+)[\"'][^>]*>`,
-    "i"
-  );
-  const m2 = html.match(re2);
-  return m2?.[1] ? decodeHtml(m2[1]).trim() : "";
-}
-
-function extractJsonLdBlocks(html) {
-  const blocks = [];
-  const re = /<script[^>]+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi;
-  let m;
-  while ((m = re.exec(html))) {
-    const text = (m[1] || "").trim();
-    if (text) blocks.push(text);
-    if (blocks.length >= 20) break;
-  }
-  return blocks;
-}
-
-function escapeRe(s) {
-  return String(s).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
-
-function decodeHtml(s) {
-  return String(s)
-    .replaceAll("&amp;", "&")
-    .replaceAll("&quot;", '"')
-    .replaceAll("&#39;", "'")
-    .replaceAll("&lt;", "<")
-    .replaceAll("&gt;", ">");
-}
-
-function extractFirstHref(html, tagRe) {
-  const m = html.match(tagRe);
-  if (!m) return "";
-  const tag = m[0];
-  const href = tag.match(/href\s*=\s*["']([^"']+)["']/i);
-  return href?.[1] || "";
-}
-
-function extractAttr(html, tagName, keyAttr, keyValue, outAttr) {
-  const re = new RegExp(
-    `<${escapeRe(tagName)}\\b[^>]*\\b${escapeRe(keyAttr)}\\s*=\\s*["']${escapeRe(keyValue)}["'][^>]*>`,
-    "i"
-  );
-  const m = html.match(re);
-  if (!m) return "";
-  const tag = m[0];
-  const attr = tag.match(new RegExp(`${escapeRe(outAttr)}\\s*=\\s*["']([^"']+)["']`, "i"));
-  return attr?.[1] || "";
-}
-
-function parseJsonLdForEvents(block) {
-  let parsed;
-  try {
-    parsed = JSON.parse(block);
-  } catch {
-    return [];
-  }
-  const items = [];
-  const visit = (node) => {
-    if (!node) return;
-    if (Array.isArray(node)) return node.forEach(visit);
-    if (typeof node !== "object") return;
-    const type = node["@type"];
-    if (type === "Event" || (Array.isArray(type) && type.includes("Event"))) items.push(node);
-    for (const v of Object.values(node)) visit(v);
-  };
-  visit(parsed);
-  return items
-    .map((it) => ({ it, score: (it?.name ? 2 : 0) + (it?.startDate ? 2 : 0) + (it?.location ? 1 : 0) }))
-    .sort((a, b) => b.score - a.score)
-    .map((x) => x.it);
-}
-
-function normalizeImages(imageField) {
-  if (!imageField) return [];
-  if (typeof imageField === "string") return [imageField];
-  if (Array.isArray(imageField)) return imageField.filter((x) => typeof x === "string");
-  if (typeof imageField === "object") {
-    const url = imageField?.url;
-    if (typeof url === "string") return [url];
-  }
-  return [];
-}
-
-function extractVenue(event) {
-  const loc = event?.location;
-  if (!loc) return "";
-  if (typeof loc === "string") return loc;
-  return safeStr(loc?.name);
-}
-
-function extractAddress(event) {
-  const loc = event?.location;
-  const addr = loc?.address;
-  if (!addr) return "";
-  if (typeof addr === "string") return addr;
-  const parts = [
-    safeStr(addr?.streetAddress),
-    safeStr(addr?.addressLocality),
-    safeStr(addr?.addressRegion),
-    safeStr(addr?.postalCode),
-    safeStr(addr?.addressCountry),
-  ].filter(Boolean);
-  return parts.join(", ");
-}
-
-function extractCity(event) {
-  const loc = event?.location;
-  const addr = loc?.address;
-  if (typeof addr === "string") return guessCityFromText(addr);
-  const locality = safeStr(addr?.addressLocality);
-  return locality || "";
-}
-
-function extractPrice(event) {
-  const offers = event?.offers;
-  const offer = Array.isArray(offers) ? offers[0] : offers;
-  const price = offer?.price;
-  if (price == null) return "";
-  if (typeof price === "number") return String(price);
-  if (typeof price === "string") return price;
-  return "";
-}
-
-function extractCurrency(event) {
-  const offers = event?.offers;
-  const offer = Array.isArray(offers) ? offers[0] : offers;
-  const cur = offer?.priceCurrency;
-  return typeof cur === "string" ? cur : "";
-}
-
-function extractOrganizer(event) {
-  const organizer = event?.organizer;
-  if (!organizer) return "";
-  if (typeof organizer === "string") return organizer;
-  return safeStr(organizer?.name);
-}
-
-function extractKeywords(event) {
-  const keywords = event?.keywords;
-  if (!keywords) return [];
-  if (typeof keywords === "string") return keywords.split(",").map((s) => s.trim()).filter(Boolean);
-  if (Array.isArray(keywords)) return keywords.filter((x) => typeof x === "string");
-  return [];
-}
-
-function safeStr(v) {
-  return typeof v === "string" ? v.trim() : "";
-}
-
-function guessCityFromText(text) {
-  const t = String(text || "").toLowerCase();
-  if (t.includes("delhi") || t.includes("new delhi")) return "Delhi";
-  if (t.includes("mumbai")) return "Mumbai";
-  if (t.includes("bengaluru") || t.includes("bangalore")) return "Bengaluru";
-  if (t.includes("pune")) return "Pune";
-  if (t.includes("hyderabad")) return "Hyderabad";
-  if (t.includes("chennai")) return "Chennai";
-  if (t.includes("kolkata")) return "Kolkata";
-  return "";
-}
-
-function resolveUrl(baseUrl, href) {
-  try {
-    return new URL(href, baseUrl).toString();
-  } catch {
-    return href;
-  }
-}
-
-function canonicalizeUrl(input) {
-  if (!input) return null;
-  try {
-    const u = new URL(input);
-    u.hash = "";
-    for (const key of Array.from(u.searchParams.keys())) {
-      const k = key.toLowerCase();
-      if (k.startsWith("utm_") || k === "fbclid" || k === "gclid" || k === "igshid") u.searchParams.delete(key);
-    }
-    return u.toString();
-  } catch {
-    return null;
-  }
-}
-
-async function sleep(ms) {
-  if (!ms) return;
-  await new Promise((r) => setTimeout(r, ms));
-}
-
-async function mapConcurrent(items, concurrency, fn, options) {
-  const stopOnError = Boolean(options?.stopOnError);
-  const results = new Array(items.length);
-  let idx = 0;
-
-  const workers = new Array(Math.min(concurrency, items.length)).fill(0).map(async () => {
-    while (true) {
-      const cur = idx++;
-      if (cur >= items.length) return;
-      try {
-        results[cur] = await fn(items[cur], cur);
-      } catch (e) {
-        if (stopOnError) throw e;
-        results[cur] = {
-          ok: false,
-          error: { url: String(items[cur]), message: e instanceof Error ? e.message : String(e) },
-        };
-      }
-    }
-  });
-  await Promise.all(workers);
-  return results;
-}
-
-function toCsv(rows, columns) {
-  const esc = (v) => {
-    const s = v == null ? "" : String(v);
-    if (s.includes('"') || s.includes(",") || s.includes("\n") || s.includes("\r")) return `"${s.replaceAll('"', '""')}"`;
-    return s;
-  };
-  const header = columns.join(",");
-  const lines = rows.map((r) => columns.map((c) => esc(r?.[c] ?? "")).join(","));
-  return [header, ...lines].join("\n") + "\n";
-}
-
-
-================================================================================
-FILE: Event_sheets/bangalore_events.xlsx
-================================================================================
-PK     ! o��|  |   [Content_Types].xml �(�                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 �TKo�0�O��r����4Q8�qܐ`? 4.�h�(6�?7<4M�
-��m��{8��MS'+h��E?�lᴱ�\|O?�g� )�U�,�b(F����t������ȿH�E���y��S��(�e�K�����|���d�,���Z1�A��5%���S23V$��s-U.���)�P���I����]�l:C@i� ��33�	�1�$g�/#ݻ�82
-��x|`��0�;����}�u�!�@��a�rS˵��s��<ȥ��)�e�A��xe|�o,���;t����^B�� D�ր�N{�b�T =!�������С�Z���������r+�����"���?�f�z�@��y�ȏ�<j��nhg�}�[��9�  �� PK     ! �U0#�   L   _rels/.rels �(�                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 ��MO�0��H�����ݐBKwAH�!T~�I����$ݿ'T�G�~����<���!��4��;#�w����qu*&r�Fq���v�����GJy(v��*����K��#F��D��.W	��=��Z�MY�b���BS�����7��ϛז��
-?�9L�ҙ�sbgٮ|�l!��USh9i�b�r:"y_dl��D���|-N��R"4�2�G�%��Z�4�˝y�7	ë��ɂ���  �� PK     ! �#�       xl/workbook.xml�TMO�0������=$iK#Ri���Z�TBn�6����~��w�4��Qbg<���9��9Z1��&'FL$2�b��?c�#m�Hi.��i|1���|-��\�g BG83�]W'+�>�%�YHUP�Z��T��:c���{^�-(�A�g0�b�6�IU0a�rj���x�[�"�\A�sU:�,J���m
-�Q�������s{C:h����C<�v'pmU�DI-��݆�Q��s	9H��8�C
-\�V��p�Ju�Ȫ��꾁��h�Uk%��}���������졑.�eyK[���j3J�ai�{`�5;XPUyU��~����;��y����_�)A
-��0 ���ʪƎ3	"F��ߊ+g$��H������U*�p��5D8�۲ݰLQ�&9��l(�"�p�f�H�U�R��̈́�7���� �*l�65
-��dx
-)��+( �9ݝ�	d��>�D���eǽ��:~��wL�����N0�\v�WFu�D��d��Z�P�#�
-ݴ�O�h�x�˱���ڀm{�l��T`M�y�"�k�~�Ѷ�!�u�z�ɬ�G�4k�_f����z� )����a�g�c�>�;Bu�b��D������k��v�:����&)������<�*d'��W;��=�  �� PK     ! �>���   �   xl/_rels/workbook.xml.rels �(�                                                                                                                                                                                                                                                                 �RMK�0���0w�v�t/"�U�ɴ)�&!3~��*�]X�K/o�y���v�5���+��zl�;o���b���G�����s�>��,�8��(%���"D��҆4j�0u2js��MY�˴���S쭂��� �)f���C����y��	I<
-y ���!+��E���fMy�k�����K�5=|�t ��G)�s墙�U��tB��)���,���f�����   �� PK     ! �@  M     xl/worksheets/sheet1.xml�X�n�H}_i�񎹘�gdߒ�j���3��ŀ�mF��[Mc�*bǚ�fv�:]u�����[�W^XQ&y6V́�*,��M�=�տ�\h���U�m�}�����J�����\���S�c�R�!+�ꮪ#]/�K�r�X#ۼH�
-��zy(X���ҽn���Q���aT\o�I��<~NYV	����
-�/wɡ<���%tiT<=�8O@���&U�4�������iG��V�?���Կ�fJ����|[
-�Y>���@�▩�E4���%�	쨬�s�tZ.�#�$�ےq���s��ߍ�O���?���8�C���$�a�R��X���;�R�뫺��N�k)�+U�p��,�Lb�ʷ<O���.�����܏U�Q^�y����`f���(c���*�����V3��	��U�¾l�>�U��|�^%��-�o,�����pN$���R��(�=���1���x���Z(�������%�;�=�`�m�CVưJ ������8�SI�ڡȣ����l�܁(�s	1���И	�6�kc`�7���p=@�938_��2�`�ڀg�q�;3����hp�%�1�kc0<o �v	���4p��%�����6�d�Mcb�������|뢰�
-�*��*�W��UB���`�8݇�	ɱKn���_��+�@� �}���>���bļ��1b�G8��#\�X�F��#n�� #n?P��z��SU�D���m��l�ȣI�0E�D�
-a�h�h�D�D��~�"��
-R��A�D
-A�C
-�l�j�Ǻ��JqƱ
-��x& 2�E�
-a�h�H�@�$S˾s���� �Ț]�)H�o�=t�6~��:�4�k_��>�AHhZ��E�ʃC*�m��F1$*�DjH�_�)H�n�=lR�$�_��FZ��}-ݓ��J���[��;�9��d�(ϴN�W�,?���'�4�96�Q`d�0=m�Seꞎ�w�.wdO;������6)�e�A+��l?�d-�j��ٓB��r��nM�R�9.ߔd�z�ʃ6)�YRI�%)�%w�?��z�m����:��(^�>.o�|�������}Ԓ;QO>�4I�:�Y���Eש�7��:��H`d��
-
-ҝ9@�A��'
-����P@�~��{V[Y�����A.��7�	\�p�ȫ�!մ"�h�ϠA���\����[��t?�E��Y��.}�D.-�#�,�K�%� YF�T�
-�CD�m(�V]�Ъ����?����WN��#y
-�-�p��:� ]a�GIU-�(��=��������K�۝~ĮYɓ��@�>`7{5Ӏ���{rƣ/��G�D����'�ڴ��4���#~�V�7���tm1sM۷f�e��v�6�Ù6	B�t?��?ԡ��׷�@�:�5u�a��oh�|�i���Ц�?�<o1<�CB��ZB o	��9wM�զ�
-���k��jA8	����]oV�r�����IV*{8o�gZ��B�{�/pVW �c��v'�N���y^����U�%/8'����!/�"J*��+�)�W8�r꣺� ��?   �� PK     ! �%�f  S     xl/theme/theme1.xml�Y�n7��;{O,ْb�K��6qb�J��]j�w� );�ɱ@��i�K��z(�H�^ҧq��M��B��JZZTl'�l-����p��z�A��!��T/WD��G4�[��~��z���Y��H+�\�|���xC%$%�gr��D�|ceE����e���
-�H��G�Dݔ��V*���,@N���ᐆ�5�`sJ���1SR/�Lh���a�Ѩ�r";L�C�Z���Q�<PbX*x�
-*��l^]��&���-��O����V
-OfL��Z�����0���v��nuF� p��V�2�Zo�ڞ�,���EڝJ�Rs�%�k27��v�Y�b���Z[��W��Uo@__���[�N����7�+�F��P�h6Z@k��z�d�َ���J�� fѥYy���Z��s��2�h��$'CBwp:kx����ʅ%��P�\��s1�������?E��?9~����OǏ?���r6��,.o|��g~�1���7/���2��>�����@Ƞ�D/�|�۳'/�����{�[��>M�D����)�f�JN�|;�	��� m�J�	f>\��ƻ+�x�����Y1V���F�:�]�Y��nh^%��Y�g.�e�>Ƈ>��9��s��Ӡtl�I�#�Ù�1ɈB������]wi(��C��Q���k�>8�4ߴCS��ħ3�ڱ��]��̧�69t���y����:+��H�q����U��`"�2�+x:&��nD����-@ߒ�o`�W^��I�"��#͛��2r��:	Ns��4K���B�=�|�]�f�~?�l���R���Bp�ƎH� �oƢ��N�Mi��b�(T�w�xz:m���K��%x�_Xx��8�#�ϻ��������,��Zm���y_l��ti�<���	#7��%QMo���Д'�(�.��A����J�C�]5#_,ұD9�0ۙe3|���8I��6�a]��H�vyd��ʳጌ�c3N�ige�v��U�TK��V5��R�6S|��,ά	]���܀]��	f$�v�s��-����H&8"���ދ>�'MceF�9���55ٷ�v'��Ֆ��z�m�4n�^�y{"YVNN���VЬ���a���i^����,���P	��&�	׹7�����M�����NȅT�X&64̫"Xf�p#�j�zQ
-�H)��!�6)���k�pHBUvvi��Q@QJ�Xq�DGh��b��u��>�p;a*�~��4mm��-�Eҕ/�ήc�'�(�:E��l�&�g2�'+�t��n�;�*&�/H�r��T��	\�E�!��
-�t��.T¡
-�	
-{.�L�h��Xx
-A��� ����9Kä5L}j��HP8�T"ك�d��b���$YA�DTI\�[�䐰���
-}�(�P7դ(w2���"��nr����M���;�-���^�V*�����=�LO5+�9��y�ڊ���j��Gm�>H��󏊐�'����P[��`�+Q}�6HH[�8�EL��mX�����(��.:�_��7�t�i�Ys�sr������]Xرu������d���h:�ǘ_��?<��}p�6\񏙒�j�\���a$���5[7�  �� PK     ! ��  �  
-   xl/styles.xml�Xmo�8�~���(�i^HX@�U�F��^�R{�}5���9�
-{��~c'!aK��tU"�xb����g�x�%O��EF8L��6
-�"� l��<���id���������2���(��VKT�,0WR�C�ʢNPv�S��M�E�$4���R��"S�j��ݳD�Yh&�[�$H<��NēI2'�ȍ�eI4��d\�9����ȝ�p�\T�h�y	��Xހ^��1��k�k`�����������؞�35y���D���b�dfD|�$�H��O���P�i�m<�~ψ��1��(�CB��uZ�P��SD�\�-F	��B�*�w�/!�|%���x4W���%���˟�w�U�Ul�Uͅ����J�N���|�� ��K���bG����含�����������F?�+���,�nWZ��<{U��N�ͼA8��	W
-ב}|��5��hIF|-�=~�}����l��jh�+�=⊳r�ƝA�$�nsxWek�GP�$,��Q>?nR���r�su�#��m����S�P(�S]!�\�}g���Հ�J���o`國���V�0C!�(�%�yA�+u�<��9�*�x� h����T#�#�� 1	L�bQ�5����j�R_j?�Wc��v�ʣ}c��R.�0�ʘ�?���I��o����jm�>.�
-�U� ��d�4���u2�"�$NϦ�j֭��eݾ�d��8��~.q$5��[�jZW��0�@�N����;��`{�%�W�Ȋ/�5S���U���j7,V�
-�R� c��	�ϊ�#x(�mI���E���z:�������5wk�]�=���?�t�Su�|���&��S@ۖ�ɶ��눭����W�����_�����`��-u��{�m�(^�r��@�5ӭsr�=��O_i��}�}�(��ŚԨ��*�
-p�ۡa[c����
-l\P*"��ׄJ�))>�*JW��W��6�Gc�o4	p,��Rti��E�-p��T>n_f��7^�u�����<s�Uf��]q��th��3�
-��
-���&�������I��u����Y�����,خ=��8n��M�r�aF�HN�Ɩ�jY`6|�����nϾ��vm���P���u�N�;��M���o`��<��-�)��x(I�aiT��"ԔB��y����U���  �� PK     ! �.�V  �     xl/sharedStrings.xml�X�r��}OU��ç�� E�-���D�Wy�%ɻ�O[
-`�8��g��l����|I�(�&(�v+yEbn=}9�4��T)Z	�����ހ��L.u�|���E�t@γ�Y-�Z����O��y�Z�J��g��JQ��Zh�,����-Ʈ��sW
-�+5����+�z@�i�>8�
-���c#�݃�����ɣC4��=���q��=;[	������+�v
-�ً���V�x��ɕ�o|n2�p���c�p}�8�:.��J��s�E�E���Z��eVֻ{]a����K�t뙂m���mC|$�(��U�J�e���G7^�J�2�J�='�K�,����'�W2)�����jo�����d�urH�g��	�H;aWbp�]i)�ە®w�m�c~QSo?�Q�-%4�_�Gߝ_����&.��*�i]J/R�|�
-]�jl��v��]/X���t�U
-���J�ot�贱�>���f���"��iߗt�L��I|����]��h�^�r鼕�I}�!��D���u�%��8g��L���Iڴ���Rx�}�{/ӹ8�zF\�|=��?�j{���Ɨ�S�������>��D�`
-�R��E���N�ϥ���*A�$�CJЄ�Pq}f�O�L���-�Z�ґ2M�aMkcs7��O��p�� �
-�=�8���,�j�̆���pݾBa���6�w���B����_w���QM��~��-���c�负��%FSAR�JZ�rH��n79�/WB5E��\I5���5�<�wȿՐ^6�8�c��F_s�/o�f�ź����g%Y���K���.���Z�s�+��X��9;��z<ׁ�?	+���&��+ tb��\r�zz�`�/eN�'W�D���};(�/'�J��]�o,�F?��7t*V��������鳽=z������NZ���J�otb*`�p_H�[�/6���b�w�M�����u�w��y8oc ��H\_����
-�&ֱ-[_V#���9]_}�8=��W!�|)�j�ַ8<;��)6�+����!��M�4������/^��?����*h�h���DN+#��!
-`����" TT �+��1xj�s�cY��P�M�Dy�I/�@��$5 $\4A%06�,6�i�. ��pa��Q^� :�0L฀i�W��� �T�r [�h 	���P�0LA�u��1�	*2,��P8��u�;s+(Ĭ�3��/T����%>B\�ʃ5��E��+�[3����'�Ӳ��ܶ�`#6��wh��ZS1��3�t�\�(hɊgw�;�gV"8VĴ	�\4Z�^�4��Y�7kM*rbS�J���˶�8/y
-��K�5}q�*�7h���_����g'Ywv�����>j@E��Wh�դ�ILC�[
-�3�䧐�'F�vmL������hL� �b)D窜u&*Dt�Z�u�2�э�Cn5�Z��`�q�#$B�f�vDB� =�ni��^D�r� 6@�9	���}���p>�~$����en���_��f���f�'O�O&��c��̖��\_��EY]�j]l��K �R�9�!������B�#�%:O7Bi-P!@Zˡk���o��&(���P���n��b/�&D�L� ���" I�H���l�CT��H�·bB��V�R��1tX�%O}�	D�0�� ����� ��6Y�n��8{	��JGsC��2�6�H<B�����'�o�?�`Փ)�E��&��NJր��t�:97mǀH�;��E�{hĀ�wN�&��`Ũ��P��k���u��q����"ʴ;h��&@�:�sh;�Ij�a�gTn�[ h�f�n�O!�h6Q�%��D02, �+���
-�B�vM�)�L��@S��9C�>���^�����,��-�Ŭ�340�Dg��d ��
-�<�_�,pZ/Ck,��	�k�a�@/(4���T�f�'8V��@�A��j�g�������wɍ�,�����nN��M�t�wܟ����Rw�!?ڟ̶��d�=�U��!�:����!����5]b��_X��ɓ����S;��:�R��	��t��}~�O X��]��K���h�����+�
-��{hx��uG�  �� PK     ! }un�  F     xl/drawings/drawing1.xml�T�n�0}_i���;�B���j�n�Rw?�P�F������親V�n��x8s�	���У��,�e�;�O��_�b$a5�9�	~�_�_�lN���2 ����V�1�mY�t 򂏔�m��@�ޮ9��۞��%�l)U�t�g<�h�N
-3u���-�Z.�;��	�	tv�i���i���H:4�l��yK듹���SZ�K�Ҧ� �i��?�y^8��y�Ȼ�K;9��T�'#EO����v�o����p+PW�8�#Fp|���]KF�\�j*+0���V�� w-��G�%��,�ݺ(}����o�
-?�Jo�e�y��E?�q�+X����|p~耽䍺��`��*�l����y���\���,�V�#+���;ǱB���������tc�˯�b� � �:$��5�$b<k	�ӭi�@)�iI	�����Ӻ�Y��Yas:�[������נ2����F�V��D'���n ˧G^���6�Q��Up?��p�(��F��t�`�M#r���ҥD�2^v}���`n�DEX���{A�湵-3�
-J�r���,���\?n���Lý���\g2WS���j
-gb��H�`�4�̮����=��wӵ�ar���;�TNY�|�R���+0}  �� PK     ! Co\7�  t  #   xl/worksheets/_rels/sheet1.xml.relsĔ�n�0��H�C�����Q�L7�6ex�;�'qc_G��4o�-P���V����������ƻb61�@��d)
-C:���F|�}��H�E�4b5I�o߿;�23J�S�J��s?*�to<&FC�s�c�i�Ԉz�Ψ�,7*>d��#fq�6"^�G�ح#��2;V�OAO�P~�
-�3):KC1v&��&ּ,�lm���,-)33#�#�� :-�0F;c6C�	���S��z�i�l�`r��	-뾸�&:��7X�_��'��~D���D�)L��ǵ�����Y�$�!~M}X��>E��[��������g�4fT��<�O���L~��u����6�¯ﾡR�_k�nPI~V*��[�����əE��v#XՓ���J�-݊T����w   �� PK     ! �'�&�  4  '   xl/printerSettings/printerSettings1.bin��J�Pƿ6�7*n\�Ki����Ri�VS�T���Ф��2�y���p���f滱�E*��
-�?��I�#=6B#A��)��`"��UU1��Q+�C��Ek^+堮��С�A+��o�5�vK�'#�|��ʕ�Ӕ�˵[������As�����Ld��Y�/xDi�
-	�~W�<��"����v}\��M����QᾍL���Z�f`�W��*�&�2s�y��Ƭ��,�bG���B3
-����F�$^�+�e����I� J�iGh8��n�}�A/>=�j���*�ŧqbǝ�%�v�9�P7�W7���EJi�9��������B�Z��5<C᭧Ҫ|e�U�E;T�,�!�9�g��0M�5h3���	:��tx�����Ot���/���DKY�%��B@! ��B@�q�  �� PK     ! q��T  p   docProps/core.xml �(�                                                                                                                                                                                                                                                                 ���N�0��&��ʏ�� c���IL�h�5������2��f��.\��ӯ��4_D�}�6����y i˸��Rm��%����P�Z��9Um5<�V����H�dTho��06t���9�w�ĺ���"�Ԁ�0L� K�@_�DtD2:#էnF � ��Q��-̟Fe����u:�]����}0|6v]t�������y��s9�*sF3���V�C��/��b���zǁ�����&����Uz[��"ǿ�?��� �|��椼&���q�~x�q]eq�%��!���!�4�<�!&Ut3�tA<�1��)�  �� PK     ! �䞀     docProps/app.xml �(�                                                                                                                                                                                                                                                                 ���N�0E�H�C�=u
-��1B<�D�Xg�X�v����g���+v�>���ج}�BBC!��\dl,]X�iy{t.2$J�c�BlŅ><P�H� 3�X����I�����	�o��ֆ�M+��Y���}
-��q��I��ʣfg(�YK�5-����y�mX�˦���[�gS�XQv����/�-��'G[�+9n��Wl�+����;0]hs�j�ҬK1e�>8�c�����I�b�N64}���_bz��PIþkǵ;��^�ž�3@x���t���I��tL�3��M���;�_�������.��S��׆�+���Z�&Aɑ���
-�G�|grU����K�{ѽ�����l��������ߟW  �� PK-      ! o��|  |                   [Content_Types].xmlPK-      ! �U0#�   L               �  _rels/.relsPK-      ! �#�                 �  xl/workbook.xmlPK-      ! �>���   �               �	  xl/_rels/workbook.xml.relsPK-      ! �@  M               �  xl/worksheets/sheet1.xmlPK-      ! �%�f  S               E  xl/theme/theme1.xmlPK-      ! ��  �  
-             �  xl/styles.xmlPK-      ! �.�V  �               �  xl/sharedStrings.xmlPK-      ! }un�  F               2&  xl/drawings/drawing1.xmlPK-      ! Co\7�  t  #             �(  xl/worksheets/_rels/sheet1.xml.relsPK-      ! �'�&�  4  '             �*  xl/printerSettings/printerSettings1.binPK-      ! q��T  p               �,  docProps/core.xmlPK-      ! �䞀                 Y/  docProps/app.xmlPK    
- 
- l  2    
-
-================================================================================
-FILE: Event_sheets/mumbai_events.xlsx
-================================================================================
-PK     ! b�h^  �   [Content_Types].xml �(�                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 ���N�0E�H�C�-Jܲ@5��*Q>�ēƪc[�ii����B�j7���{2��h�nm���ƻR����U^7/���%��rZY�@1__�f� �q��R4D�AJ�h>����V�ƹ�Z�9����NV�8ʩ����ji){^��-I�"{�v^�P!XS)bR�r��K�s(�3�`c�0��������7M4�����ZƐk+�|\|z�(���P��6h_-[�@�!��� Pk���2n�}�?�L��� ��%���d����dN"m,�ǞDO97*�~��ɸ8�O�c|n���E������B��!$}�����;{���[����2�  �� PK     ! �U0#�   L   _rels/.rels �(�                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 ��MO�0��H�����ݐBKwAH�!T~�I����$ݿ'T�G�~����<���!��4��;#�w����qu*&r�Fq���v�����GJy(v��*����K��#F��D��.W	��=��Z�MY�b���BS�����7��ϛז��
-?�9L�ҙ�sbgٮ|�l!��USh9i�b�r:"y_dl��D���|-N��R"4�2�G�%��Z�4�˝y�7	ë��ɂ���  �� PK     ! ?�ߕ�  �     xl/workbook.xml�TQo�0~���`�=M�B����@5$6�mm_�&�b5�3����}��R^�6J�/����绺�9�2��&FL$2�b���7N#m�Hi.��#��z����N���� ��pfL��N2VP}!K&�����L�qu�MuƘ)r����-(�A�{0�z�6�IU0a�rj���x�[�"y\A�CU:�,J�X���"	g!]���t�^��C<�v'p�mU�DI-���݆�Y��s	9I��<�C긊m��ᑕ
->�*8b/`��4i�Z	!yD���xx��9�k��hY����T�QN���ܰ4�=0厝,��W<�? ~�ã�
-��(7L	jX,���VV5v�I1���V\18; !F��t��d�Ry��py�!��d:�/'r'r	Gh�J{�\���>���]�!ռ�
-���U��(�����n!�P��p$g�����8��G�q��I���3����F�n/����
-�D��d�:Z�w�hg��t�z�V<}���;\������Fj;�g;�Rqk��=��E�!t��SsW;�yj2�̥߅�Ѭ}c|�c�w�"(�2��	�I��.�'��W������Z�ӭUߜk���N�a��
-�>j������	͓�Bv�z�����   �� PK     ! �>���   �   xl/_rels/workbook.xml.rels �(�                                                                                                                                                                                                                                                                 �RMK�0���0w�v�t/"�U�ɴ)�&!3~��*�]X�K/o�y���v�5���+��zl�;o���b���G�����s�>��,�8��(%���"D��҆4j�0u2js��MY�˴���S쭂��� �)f���C����y��	I<
-y ���!+��E���fMy�k�����K�5=|�t ��G)�s墙�U��tB��)���,���f�����   �� PK     ! �w��  p     xl/worksheets/sheet1.xml�Tێ�0}����N�-����Zu�}Xu{y6�,�8�ͭU��c�B+��.���}Μ3gqwT%ك�RWeQB	TB�Zg����;J��U�K]AFO`�����A��� 8����ƹz�Vl@q�*\)�Q��_��mm����x�$7�Ⲣ
-��\á�B
-��b��r
-���;�o7�����)n��z$���b%K�N��%��J�*���M� G��1��.M��Ȥ�0���E�7�/���Y�E�t��*6�
-�?�3��u�ش����W���d�\f��yF&�g���Gr~tk��r�K<a�(2��ؔ͟��Eh����1q|�%��Q��s���o|ĩ)k^9��x�a�����%&@�\8��gܖѕvN+�n�é��P
-!��9��ܐ4�^2�߃�V~��_.����C�/φ�P�]�>��G��<�&XG߈��tV�
-@cQ�	]">���&c�cS	��
-�P��Y����ha
- � �C�>�� ��/��(> 0��(M�I���
-�$�ɦKf���ě���
-K�m[@:��cP���Z ���`�
-hN�Y7�w��ͩN�
-���`�R:�7   ��   ���X�n�@|�� �I*@�6����C�ީT�����n�qX��:�����������W��_�>��h�t��?ٿ��x��7J�������p|�\N��d�Z��'��b����Z����bv�%^�D��Z"F�JK$(��)J�Z"C���0(�h�%Z-Q��VK�(эD����Duf�ش�o��4�������� 1QH$��7�I��(��2����.�l"M�22�GGm�(b��R����-�Ds 1���$#��Ŵ�QtV�:9�)��T�k�$����grҬH䏤7peP�MIrb����@J�n�8%�.x>Pd}T�sE�w\?�ݔZ��Zk )�k��rr���~��	eF�A���Hto��F������H6�H�O͍��j׋F�	ŭ�`̌8od�^{| %��8��׆��%��L[ ��
-����>�D����K0�{
-@���7"�%�R����b(~8��)oJ�?媐�	�ځqN��q��X�����K0���r���/��{��x�}�ⷁ�(oJƟ�-�S�w �q��m�*��r����K0��� ��\;oB�(���_&��u���kC������@ʫ@ʫ]�d�|���u>$�QU��>Mn���PS�ʆ��W�\�~@��2�ܔG��
-<��Q���s��K
-P�ʷG��l/p�CZJ�
-��&C��v�_Ý�E��<p�΂}��c2�tD�x�wc�7Zd�t��T:�sg�4i?���b�5���7�1.1p�(ޤ�F�6����ۃ���x�(w�
-t5c<�S�7�����a9W;鞎?8�=ŝNu)�clǦ�{j"8�Gz��y��e.kn"��pU�V�ދ8�휌5#��-X�x5h�}e̾�_��7�}��HֽZaZ�}��-Ԯ�Ϫ]��S;��2j����izu���#�u�vcx>)xp䎂3�C�4*�W�P�Q��uo�BE���m��K�K~���_R� Œ@I����Y�]v��  ��   ���)HLO�M,J��+V�IM+�U2�37UR(�LπsJ�l����KJ�s�̌�Ĕ�"�j����G��F�<�(�8#5��   �� PK     ! �%�f  S     xl/theme/theme1.xml�Y�n7��;{O,ْb�K��6qb�J��]j�w� );�ɱ@��i�K��z(�H�^ҧq��M��B��JZZTl'�l-����p��z�A��!��T/WD��G4�[��~��z���Y��H+�\�|���xC%$%�gr��D�|ceE����e���
-�H��G�Dݔ��V*���,@N���ᐆ�5�`sJ���1SR/�Lh���a�Ѩ�r";L�C�Z���Q�<PbX*x�
-*��l^]��&���-��O����V
-OfL��Z�����0���v��nuF� p��V�2�Zo�ڞ�,���EڝJ�Rs�%�k27��v�Y�b���Z[��W��Uo@__���[�N����7�+�F��P�h6Z@k��z�d�َ���J�� fѥYy���Z��s��2�h��$'CBwp:kx����ʅ%��P�\��s1�������?E��?9~����OǏ?���r6��,.o|��g~�1���7/���2��>�����@Ƞ�D/�|�۳'/�����{�[��>M�D����)�f�JN�|;�	��� m�J�	f>\��ƻ+�x�����Y1V���F�:�]�Y��nh^%��Y�g.�e�>Ƈ>��9��s��Ӡtl�I�#�Ù�1ɈB������]wi(��C��Q���k�>8�4ߴCS��ħ3�ڱ��]��̧�69t���y����:+��H�q����U��`"�2�+x:&��nD����-@ߒ�o`�W^��I�"��#͛��2r��:	Ns��4K���B�=�|�]�f�~?�l���R���Bp�ƎH� �oƢ��N�Mi��b�(T�w�xz:m���K��%x�_Xx��8�#�ϻ��������,��Zm���y_l��ti�<���	#7��%QMo���Д'�(�.��A����J�C�]5#_,ұD9�0ۙe3|���8I��6�a]��H�vyd��ʳጌ�c3N�ige�v��U�TK��V5��R�6S|��,ά	]���܀]��	f$�v�s��-����H&8"���ދ>�'MceF�9���55ٷ�v'��Ֆ��z�m�4n�^�y{"YVNN���VЬ���a���i^����,���P	��&�	׹7�����M�����NȅT�X&64̫"Xf�p#�j�zQ
-�H)��!�6)���k�pHBUvvi��Q@QJ�Xq�DGh��b��u��>�p;a*�~��4mm��-�Eҕ/�ήc�'�(�:E��l�&�g2�'+�t��n�;�*&�/H�r��T��	\�E�!��
-�t��.T¡
-�	
-{.�L�h��Xx
-A��� ����9Kä5L}j��HP8�T"ك�d��b���$YA�DTI\�[�䐰���
-}�(�P7դ(w2���"��nr����M���;�-���^�V*�����=�LO5+�9��y�ڊ���j��Gm�>H��󏊐�'����P[��`�+Q}�6HH[�8�EL��mX�����(��.:�_��7�t�i�Ys�sr������]Xرu������d���h:�ǘ_��?<��}p�6\񏙒�j�\���a$���5[7�  �� PK     !   �	  
-   xl/styles.xml�V�n�6}/����˵
-I�ul�}�$J&�������R��d�:M�"�pxxfΐt����y"��R$(��CD!K*�������3)H�N�E�_�[}b��H�v B�	:j��<�-����F6D�L%�LU{m�.[��3/����1h@���- ��]��7XӜ2�O9��}��T8g@�V�p�`�B�W�&���>�J���7��ɪ������z��� �}HA����{�N����5�4��ЭS�N��@Ԕ`�U�o"3S�����w�	3��K�B2�
-�A�G`N��;�h��	�0��4�C�j�q�B��3<6i���{�:OP6�̪��P��$e���i����8~<5����ٸ+ѵ§ �޾�����E}g�7��6��``��&�eS0K�~ �\���,��JcF*
-���G�ղ1�H��mӸ���3�� �|%e8�	�G8u���r��3�#��X��R�
-4'�Wc�d.�2&%*c&���s�Lo��#:�q��L\f��!�x�S�%ڀ��������5R�I�a�I�Z��a'sx�D�kfko�e�?2ZN�igw0��T�; �C_�<�;n~M�����#��v�4}�����-U}�����De�-{�YQxf�K�A�$��W�w�.�o�S����m嘻-A_L�l!n�Q���Ј�Y�sk��2��]�M�R,I�;�ϓ	�ǿ��v|{���>Im!4�?��t�=@��-\�u:E�������>ݍ�߸�[��hp����pȶ~����x]���j�@��]��Vc�c��/Ac�oom���
-���(������o���6r�(���>ʢ��o������NSN�V�BK/��$�MJx�?��   �� PK     ! az3x�  8     xl/sharedStrings.xml�X�s�6�~3�v��ws��Ölww;��j�2�ә޷	��@�@+�_��k	�n�d, ��}�v���T����ʚ7���tD�d6W�x3���/q6"�䬭�oF����/��ۅ����oFe�w���JY�?��4��XWq�OWL|�$羔2Tz2�N����Qf`�x1�ƨύ��WΏG�^]^��kڋI������ڻ'i��Jw~�p쥍k��.����KUz��8 ��ٷ�n�}��n]��T��p�M�p���ú�>s�~��m��<��N������US�Y
-W?���c(��<%6W�Wk���Rf���{Y����K�Xk�OT8��~h[�B+_��T&Wc��q(?hnלm�I騉.7��;q���{�4���T�h�|T�/��(��DF��I�Qt7
-
-�2"�Յɻ���d>;���G~�k��{�K�$G�=�tm+��_CØ�#�í+K;�t���Dً���ϱ�2��r
-x�vCܵ��ն��ѡqr�p܏�
-H�菩�*�E�Se#����\��T����<<���8y:�Ү����2n���*ʤ����f =4О�h��6F~�i�nhr>;����'R5�@|b�4�w3·e���9��OD&�],��U�<��Y�۳ϋY"5���zK�A?+�t�p�z(%���~uu}=<�H���sE��ؼZ30'�k�7ׄ�ǟ؇��X����-~�Ut>��.�~��|ݠ�+����d���uz|{����m�вA) �M����ɤj_E��\�8�oq����}�����0�+��RQn/~iYu��BgA�hi]@u�\&�g6Mr^�w7m��S'����ˤ���k��u�(Yo��(�v���ryv>y��)k3�B1�?�UQ��,6�[��uMU�D3fgI̫?�S9.t���������8m#{0�LF
-tA��u���Da{.�̏O�B�/o��X+$��L-��5�ӧ�H�O������g�nL?���1���e�O�|��~��?]sC�D���P|������D�b�@{a�'y{Hv�a�vԎ΁N<�PHg'�ERH�.�=�1T�[��IRk��?� 5�xѝ�9�O"��d�y�]���A�¼��&�*���A'����&��-FFK��Xǯ�~z�셾+�o�zo�c�J�)�uaf��E]Z��&��у�3pz�8>�V�~1�% �x��R�%N���Z�-��9zK�%?����*X>���D5���{�1����q��g]~w
-�BrOq)G>
-8��̋�F��@�"F9���H���,��Ucx�6��
-`�ἴ	�n���~�c��z��ӓi�?vj0h��՘V|\����!����-���6�Yk�
-�Î�h�A�µ����+-��|hk�$g%Y���Hjƴnj#'�O�O��1�n1#����߮�o�>8�j��x{��-��
-#�6B�����x94S75P��%}R���V��πzqc,�y��*I�e�ET$�+�2���%#w@ׁ�5kиS�Od��Nx�L����ző�nΌG��}3��T��W����g߲��{��|:_�ǖӓ�4��h�T�KW�x�K����jJ�u�.��S��wU-4"������~�����k7x��E犖x���<l�U����E���D�����
-����wM�?��  �� PK     ! Ѭ�cQ  c   docProps/core.xml �(�                                                                                                                                                                                                                                                                 ��]O�0��M���P>�\`��%Fg�ďx״�6"���2��6d�/��ӧ�i<ߗ��J�HP����*��m����;C�6TpZTԀF���,f��J���$(��v,Ih�d�v�H��f;(���CXqS��{T[,)��[���Oq	�rj(n�����l@�OUt �0P�0^��T����)#g��F�N��c6g�8��:�u]{u�Ű����ꪺ�hw� �1g�)��Ri�_6�"ƣa���j��������t�x�uw�E����������kt}�-Q����'�f�	#����O��Ay��b��Ŀ$�dD<�.��H�  �� PK     ! �䞀     docProps/app.xml �(�                                                                                                                                                                                                                                                                 ���N�0E�H�C�=u
-��1B<�D�Xg�X�v����g���+v�>���ج}�BBC!��\dl,]X�iy{t.2$J�c�BlŅ><P�H� 3�X����I�����	�o��ֆ�M+��Y���}
-��q��I��ʣfg(�YK�5-����y�mX�˦���[�gS�XQv����/�-��'G[�+9n��Wl�+����;0]hs�j�ҬK1e�>8�c�����I�b�N64}���_bz��PIþkǵ;��^�ž�3@x���t���I��tL�3��M���;�_�������.��S��׆�+���Z�&Aɑ���
-�G�|grU����K�{ѽ�����l��������ߟW  �� PK-      ! b�h^  �                   [Content_Types].xmlPK-      ! �U0#�   L               �  _rels/.relsPK-      ! ?�ߕ�  �               �  xl/workbook.xmlPK-      ! �>���   �               p	  xl/_rels/workbook.xml.relsPK-      ! �w��  p               �  xl/worksheets/sheet1.xmlPK-      ! �%�f  S               �  xl/theme/theme1.xmlPK-      !   �	  
-             "  xl/styles.xmlPK-      ! az3x�  8               �  xl/sharedStrings.xmlPK-      ! Ѭ�cQ  c               �#  docProps/core.xmlPK-      ! �䞀                 :&  docProps/app.xmlPK    
- 
- �  �(    
-
-================================================================================
-FILE: audits/Final Pre-Launch Polish.md
-================================================================================
-
-# 1. Technical
-
-- [ ] **Environment Audit:** Verify that all production environment variables in Vercel are correct. Check that you aren't accidentally hitting "Sandbox" or "Test" endpoints for payments or databases.  Double-check that all **Production** keys (Stripe, Firebase, APIs) are set in Vercel and differ from development keys. 
-- [x] **Console Clean-up:** Open DevTools and ensure there are no `console.log` statements, warnings, or failed network requests in the production build.
-
-# 2. Quality Assurance
-
-- [ ] **Form Submissions:** Test every contact form and lead capture. Ensure data reaches your database or email and that users see a success message. 
-- [ ] **Cross-Browser/Device Check:** Test on Chrome, Safari, and Firefox. Crucially, test on a physical iOS and Android device to check touch-target sizes.
-- [ ] **Broken Link Audit:** Run a crawler (like Screaming Frog) to ensure no 404s exist in your navigation.
-- [ ] **Custom 404 & 500 Pages:** Ensure you have branded error pages. A generic Vercel 404 makes a site look unfinished.
-- [ ] **Favicon & Branding:** Verify that the favicon, Apple Touch Icon, and manifest file are all present and not using default framework icons (like the Next.js or React logo).
-- [ ]  **Form Validation:** Try to "break" your forms. Submit empty fields, invalid emails, and long strings of text. Ensure the error messages are helpful, not just "Error."
-- [ ] **Loading States:** If your site fetches data, ensure there are skeletons or spinners. Users shouldn't stare at a blank screen while an API responds.
-
-# 3. Performance Optimization
-
-- [ ] **Font Loading:** Ensure fonts are set to `font-display: swap` to prevent "Flash of Unstyled Text" (FOUT).
-- [ ] **Improve** your Largest Contentful Paint (LCP).
-- [ ] **Core Web Vitals:** Check your Google PageSpeed Insights score. Aim for 90+ on mobile.
-- [ ] **Image Optimization:** Ensure all assets are served in modern formats (WebP/AVIF).
-- [ ] **Analytics Setup:** Verify Google Analytics 4 (GA4) or Vercel Speed Insights are firing correctly.
-- [ ] **Image Compression:** Run all static assets through **TinyPNG** or ensure your framework is using automatic image optimization (like `next/image`).
-
-# 4 . Security
-
-- [ ]  **Security Headers:** Use a tool like **SecurityHeaders.com** to check your score. Aim for at least an "A" by configuring headers in your `vercel.json` or framework config.
-- [ ] **Legal Footer:** Ensure the "Privacy Policy" and "Terms of Service" links are active. Even for a MVP, this is critical for trust and certain API approvals.
-- [ ] **Input Sanitization:** Verify that no user inputs (search bars, forms) are vulnerable to basic XSS injections.
-- [ ] **Password Policy:** Ensure you aren't allowing weak passwords. At a minimum, enforce 8+ characters with a mix of types.
-- [ ] **Production Database Migration:** Ensure your production database (e.g., Supabase, MongoDB Atlas, Prisma) is isolated from your development data. **Do not launch with "test_user_1" still in the DB.**
-- [ ] **Session Management:** Verify that "Logout" actually destroys the session/token on the server, not just the client. Test that the "Back" button doesn't reveal private data after logging out.
-- [ ] **IDOR Protection:** This is the most common full-stack mistake. Ensure that a user can only edit _their own_ profile.
-    > **The Test:** If I change the URL from `/api/user/101` to `/api/user/102`, can I see someone else’s data? **If yes, fix it before launch.**
-- [ ] **Verification Flow:** If you have email verification, test it with multiple providers (Gmail, Outlook, iCloud). Often, these emails end up in "Spam" or "Promotions"—consider adding a note on the UI: _"Check your spam folder if you don't see the email."_
-- [ ] **The "First Run" Experience:** What does a user see the second they finish signing up?
-    - Avoid an empty screen.
-    - Use **Empty States** (e.g., "You haven't created any projects yet. Click '+' to start!") to guide them.
-- [ ] **Error Clarity:** If a user enters the wrong password, don't just say "Error." Say "Invalid email or password." If the server is down, show a friendly "We're having trouble reaching the server" message.
-- [ ] **Password Reset:** This is the #1 support ticket for new apps. Ensure the "Forgot Password" flow is 100% functional and sends a secure, expiring link.
-- [  ] **Profile Updates:** Ensure users can change their own name, email, and—crucially—**delete their account**. Modern privacy laws (like GDPR) often require a clear way for users to remove their data
-- [ ] **Auth Rate Limiting:** Prevent "Brute Force" attacks. If someone tries to log in 10 times in a minute, your API should block them temporarily.
-- [ ] **User Analytics:** Set up an event to track "Sign Up Completed." If you see 100 people hit the signup page but only 2 finish, you have a "friction" problem you need to fix immediately.
-- [ ] **Admin Access:** Ensure your team has a way to look at user logs or "Impersonate" a user (securely) to help them if they get stuck.
-
-
-
-# 5. SEO
-
-- [ ] **Generate Sitemap & Robots.txt:** Ensure search engines can crawl your site.
-- [ ] **Metadata Audit:** Use a tool like **SEO Spyglass** or a simple browser extension to check every page for:
-    - Unique `<title>` tags (under 60 characters).
-    - Meta descriptions (under 160 characters).
-    - `og:image` (Open Graph) for social media previews.
-
-================================================================================
-FILE: audits/manual testing report.md
-================================================================================
-- [ ] Location doesn't stay persistent across pages
-- [ ] When you click on an event in the explore page it takes you to a hardcoded event page irrespective of the event selected
-- [ ] Change the database to take events from the "Add Event" pop up
-
-### Add Event drop-down menu
-
-- [ ] Change the names of fields
-- [ ] Change categories to sync with event sheet
-- [ ] keep only images 
-- [ ] remove identification aadhar
-- [ ] **change layout**
-- [ ] remove "Milo Origin" from top left
-
-### Notification
-
-- [ ] change the container text
-- [ ] show location set pop up to new user
-
-### Profile Page
-
-- [ ] Settings ->  Save changes doesn't work
-- [ ] No scroll bar in control room
-- [ ] change name of settings panel from control room to settings
-
-
-================================================================================
-FILE: audits/milo_audit_report.md
-================================================================================
-# Milo Project: Comprehensive System Audit & Gap Analysis
-
-**Date:** April 9, 2026  
-**Status:** Audit Complete  
-**Objective:** Evaluate launch readiness and identify flaws in technical architecture, security, and UI performance.
-
----
-
-## 1. Project Overview & Architecture Deep Dive
-
-Milo is a "FOMO Prevention Engine" designed as a premium, immersive events radar for Indian metropolitan cities. 
-
-### Core Tech Stack
-- **Framework**: Next.js 16+ (App Router)
-- **Database/Auth**: Supabase (JS SDK + SSR)
-- **Styling**: TailwindCSS 4 + Framer Motion
-- **Scrolling**: Lenis (Smooth Scroll)
-- **Visual Evolution**: Currently uses canvas frame scrubbing (Hero) and SVG monuments (City Selection).
-
-### Technical Vision vs. Implementation Gap
-> [!IMPORTANT]
-> **Vision**: The technical specification (README) calls for a 3D-heavy experience using **Three.js** and **React Three Fiber** for the event "nebula" and 3D city Selection.
-> **Current State**: The project has pivoted (likely for performance or complexity reasons) to a **2D Canvas-based animation** system. This is a significant architectural deviation.
-
----
-
-## 2. Bug & Flaw Registry
-
-Issues are ranked by severity:  
-🔴 **CRITICAL**: Security risks or breaking functional gaps.  
-🟠 **HIGH**: Performance bottlenecks or vision-breaking technical gaps.  
-🟡 **MEDIUM**: UX friction or missing secondary features.  
-⚪ **LOW**: Aesthetic polish or asset optimization.
-
-### 🔴 Severity: CRITICAL
-
-| Issue ID | Location | Description | Impact |
-| :--- | :--- | :--- | :--- |
-| **SEC-01** | `supabase_setup.sql` | **Exploitable RLS Policies**: The `events` table policy for UPDATE/DELETE only checks `auth.uid() IS NOT NULL`, allowing ANY logged-in user to modify ANY event. | Potential data destruction/vandalism. |
-| **DB-01** | `EventListing.tsx` / `IdentityScan.tsx` | **Missing Schema Components**: The `rsvps` table and `avatars` storage bucket are utilized in the frontend but missing from the SQL setup script. | Features like "Join Plan" and "Identity Scan" will crash in production. |
-| **AUTH-01** | `middleware.ts` | **Unprotected Routes**: Redirect logic for unauthenticated users is commented out, allowing access to `/admin` and `/chat` subfolders (though gated at component level). | Security-by-obscurity only; not robust. |
-
-### 🟠 Severity: HIGH
-
-| Issue ID | Location | Description | Impact |
-| :--- | :--- | :--- | :--- |
-| **PERF-01** | `src/app/page.tsx` | **Aggressive Asset Bloat**: Landing page preloads 240+ JPEGs (~32MB) and 3 PNGs (~24MB). Total payload ~56MB + Video. | Unacceptable load times on mobile/slow 4G. |
-| **GAP-01** | Project Root | **Missing 3D Stack**: `Three.js` and `GSAP` are listed in README but not installed or used. Core visual philosophy of "3D Event Nebula" is missing. | Vision target not met; basic grid implementation. |
-| **GAP-02** | `IdentityScan.tsx` | **Missing Character Sync**: Feature to update 3D Model (Boy/Girl) based on gender is not implemented. | Onboarding experience is incomplete. |
-
-### 🟡 Severity: MEDIUM
-
-| Issue ID | Location | Description | Impact |
-| :--- | :--- | :--- | :--- |
-| **UI-01** | `CitySelector.tsx` | **Low-Fidelity Monuments**: Uses basic SVGs instead of "neon-lit digital skyline" 3D buildings described in vision. | Loss of "Premium" feel. |
-| **FEAT-01** | `Comments.tsx` | **Mock Comms Channel**: The secure comments section uses `MOCK_COMMENTS` and is not connected to Supabase Realtime. | User interaction is an illusion. |
-| **UX-01** | `IdentityScan.tsx` | **No Camera Fallback**: If permissions are denied, the UI shows a "Retry" button but no alternative (e.g., photo upload). | Hard block for users with hardware issues. |
-
-### ⚪ Severity: LOW
-
-| Issue ID | Location | Description | Impact |
-| :--- | :--- | :--- | :--- |
-| **ASSET-01** | `HeroSection.tsx` | **Non-Optimized Sequences**: Frames are JPEGs instead of WebP. | Sub-optimal compression. |
-| **CODE-01** | `src/components` | **Leftover Branding**: References to "PigeonLogo" and "radar_live" channel names suggest project reuse or inconsistent naming. | Internal maintenance friction. |
-
----
-
-## 3. Recommended Fixes & Implementation Steps
-
-### 🛠 FixSEC-01: Hardening Database RLS
-Update `supabase_setup.sql` to restrict modifications to the creator or admins:
-```sql
--- Fix: Only owners or admins can modify events
-DROP POLICY IF EXISTS "Admins can update events" ON public.events;
-CREATE POLICY "Users can update their own events"
-  ON public.events FOR UPDATE
-  USING (auth.uid() = user_id OR (SELECT role FROM profiles WHERE id = auth.uid()) IN ('admin', 'owner'));
-```
-
-### 🛠 FixDB-01: Missing Infrastructure
-Run the following SQL to enable missing features:
-```sql
-CREATE TABLE IF NOT EXISTS public.rsvps (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  event_id UUID REFERENCES public.events(id) ON DELETE CASCADE,
-  profile_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
-  type TEXT DEFAULT 'join',
-  created_at TIMESTAMPTZ DEFAULT now(),
-  UNIQUE(event_id, profile_id)
-);
-
-INSERT INTO storage.buckets (id, name, public) VALUES ('avatars', 'avatars', true);
-```
-
-### 🛠 FixPERF-01: Asset Optimization Strategy
-1. **Convert PNGs**: Convert `delhi.png`, `mumbai.png`, and `banglore.png` from ~8MB each to WebP (<500KB).
-2. **Lazy Sequence**: Modify `HeroSection.tsx` to only load the first 20 frames initially and load the rest in the background.
-
----
-
-## 4. Suggestions for "Premium" Excellence
-
-1. **True 3D Integration**: Re-introduce `React Three Fiber`. Replace the static SVG monuments in `CitySelector` with interactive low-poly 3D buildings that react to hover with neon emission.
-2. **Haptic Feedback**: Add subtle vibrations (for mobile) and soundscapes (Web Audio API) as mentioned in README.
-3. **Advanced Shader Transitions**: Use glsl shaders for the "Liquid Morph" when expanding event cards to full screen.
-4. **Dynamic Onboarding**: Finish the "Identity Scan" by generating a unique "Digital Passport" card for the user once the avatar is uploaded.
-
----
-
-> [!TIP]
-> **Audit Conclusion**: The application has a strong stylistic foundation but is currently "smoke and mirrors" in several areas (Mock comments, 2D fallbacks). Prioritize fixing the **CRITICAL** database gaps before scaling the visual complexity.
-
-
-================================================================================
-FILE: audits/milo_comprehensive_audit.md
-================================================================================
-# Milo (baharmilo.com) Comprehensive Audit Report
-
-## 1. Overview
-Milo is a premium, localized events platform for Indian cities (Bengaluru, Delhi, Mumbai). It focuses on high-quality UX, curated events, and social validation ("Vibe Check" stories, digital passports). The platform is hosted on Vercel and accessible via `baharmilo.com`.
-
-### Tech Stack
-*   **Framework:** Next.js 16 (App Router)
-*   **Language:** TypeScript
-*   **Database & Auth:** Supabase (PostgreSQL, GoTrue for Auth)
-*   **Styling:** Tailwind CSS v4, Framer Motion (animations)
-*   **Icons:** Lucide React
-*   **Date Handling:** date-fns
-
----
-
-## 2. Core Features & Implementation
-
-### Authentication
-*   **Implementation:** Handled via Supabase GoTrue. Utilizes `AuthContext.tsx` for state management and UI (Modal/Toast), relying on `@supabase/ssr` to manage cookies in `middleware.ts` and Server Components.
-*   **Methods:** Email/Password (OTP), Google OAuth.
-
-### City Selection & Personalization
-*   **Implementation:** Users select a city (`CitySelector.tsx`). This preference is stored locally (likely cookies/local storage) and used to filter the main feed (`EventListing.tsx`) based on the `city` column in the `events` table.
-
-### Event Feed & Discovery
-*   **Implementation:** `EventListing.tsx` fetches approved events from the `events` table. Includes client-side filtering (Upcoming/Past, Categories). Features smooth scrolling (`SmoothScroll.tsx`) and intersection observers for lazy loading.
-
-### Event Submission (UGC)
-*   **Implementation:** Users can submit events (`EventSubmission.tsx`). Submissions go to the `events` table with `status = 'pending'`. Requires identity verification (Aadhaar/Govt ID).
-
-### Admin Dashboard & Moderation
-*   **Implementation:** Located at `/admin`. Uses `AdminGuard.tsx` to verify `role = 'admin'` in the `profiles` table. Admins can approve/reject events, manage users, and trigger scrape/sync jobs.
-
-### Scrape & Sync
-*   **Implementation:** A dedicated API route (`/api/admin/scrape-sync/route.ts`) designed to ingest bulk event data (e.g., from Luma/BookMyShow CSVs) and upsert it into the `events` table.
-
-### Social Features (Vibe Check & Passport)
-*   **Implementation:** "Vibe Check" acts like Instagram stories for events (`VibeCheck.tsx`). "Digital Passport" (`DigitalPassport.tsx`) tracks user attendance and reputation.
-
----
-
-## 3. Technical Bugs (Production & Functional)
-
-### The Google Auth Issue (baharmilo.com vs Vercel)
-*   **The Bug:** Google Sign-In works on `<app-name>.vercel.app` but fails on `baharmilo.com`.
-*   **The Cause:** Supabase requires explicit whitelisting of redirect URIs for OAuth providers to prevent open redirect attacks.
-*   **The Fix:** You must log into the Supabase Dashboard -> Authentication -> URL Configuration. Add `https://baharmilo.com/auth/callback` to the **Redirect URLs** list. The code in `src/app/auth/callback/route.ts` already correctly handles the `x-forwarded-host` header for the dynamic redirect.
-
-### Missing Database Tables
-*   **The Bug:** Attempting to "Save" or "Bookmark" an event crashes or fails silently. Attempting to post a "Vibe Check" fails.
-*   **The Cause:** `EventListing.tsx` queries a `bookmarks` table, and `VibeCheck.tsx` queries a `vibe_checks` table. These tables *do not exist* in `supabase_setup.sql` or `migration_v2.sql`.
-*   **The Fix:** Create the missing tables, or refactor the frontend. (e.g., use the existing `rsvps` table with a `type = 'bookmark'` enum instead of a separate table).
-
-### Broken Scrape/Sync Job
-*   **The Bug:** The `/api/admin/scrape-sync` endpoint fails to insert data.
-*   **The Cause:** The backend utility `scrapeSync.ts` maps incoming CSV data to column names that do not match the database schema (e.g., mapping to `event_url` when the DB column might be `url`, or date format mismatches).
-
----
-
-## 4. Nuanced Bugs (Security, Performance, & Architecture)
-
-### CRITICAL: Admin Authentication Bypass
-*   **The Bug:** Any user (or even unauthenticated users, depending on routing) can access the `/admin` dashboard.
-*   **The Cause:** `src/components/admin/AdminGuard.tsx` has hardcoded `const isAuthorized = true;`. The actual role check against the `profiles` table has been commented out or bypassed during development and pushed to production.
-*   **The Fix:** Restore the server-side role check in `AdminGuard` and ensure API routes also verify the `admin` role.
-
-### Performance: Massive Landing Page Payload
-*   **The Bug:** The initial load of the landing page (`src/app/page.tsx`) on mobile devices is extremely slow and consumes excessive bandwidth.
-*   **The Cause:** The `HeroSection` and city selection components are preloading approximately 56MB of unoptimized high-resolution images and videos (`CITY_IMAGES`).
-*   **The Fix:** Implement Next.js `<Image>` component for automatic WebP/AVIF conversion and lazy loading. Remove aggressive preloads for off-screen assets.
-
-### Security: Plain Text PII Storage
-*   **The Bug:** Sensitive user data is exposed if the database is compromised.
-*   **The Cause:** `EventSubmission.tsx` collects Aadhaar IDs/Government IDs for verification. These are currently stored in plain text in the database.
-*   **The Fix:** Aadhaar IDs must be encrypted at rest (e.g., using Supabase Vault or application-level encryption) or hashed if only used for deduplication. Never store in plain text.
-
-### Reliability: Race Condition in User Creation
-*   **The Bug:** Creating a new team member via the admin panel sometimes fails to create their profile.
-*   **The Cause:** `src/app/api/admin/team/route.ts` uses an unreliable `setTimeout` (e.g., 2000ms) to wait for Supabase Auth to create the user before attempting to insert into the `profiles` table. In a serverless environment (Vercel), this timeout can be suspended or fail unpredictably.
-*   **The Fix:** Remove the `setTimeout`. Use a Supabase Database Trigger (`after insert on auth.users`) to automatically create the corresponding `profiles` row.
-
-
-================================================================================
-FILE: supabase/.gitignore
-================================================================================
-# Supabase
-.branches
-.temp
-
-# dotenvx
-.env.keys
-.env.local
-.env.*.local
-
-
-================================================================================
-FILE: supabase/config.toml
-================================================================================
-# For detailed configuration reference documentation, visit:
-# https://supabase.com/docs/guides/local-development/cli/config
-# A string used to distinguish different Supabase projects on the same host. Defaults to the
-# working directory name when running `supabase init`.
-project_id = "milo"
-
-[api]
-enabled = true
-# Port to use for the API URL.
-port = 54321
-# Schemas to expose in your API. Tables, views and stored procedures in this schema will get API
-# endpoints. `public` and `graphql_public` schemas are included by default.
-schemas = ["public", "graphql_public"]
-# Extra schemas to add to the search_path of every request.
-extra_search_path = ["public", "extensions"]
-# The maximum number of rows returns from a view, table, or stored procedure. Limits payload size
-# for accidental or malicious requests.
-max_rows = 1000
-
-[api.tls]
-# Enable HTTPS endpoints locally using a self-signed certificate.
-enabled = false
-# Paths to self-signed certificate pair.
-# cert_path = "../certs/my-cert.pem"
-# key_path = "../certs/my-key.pem"
-
-[db]
-# Port to use for the local database URL.
-port = 54322
-# Port used by db diff command to initialize the shadow database.
-shadow_port = 54320
-# Maximum amount of time to wait for health check when starting the local database.
-health_timeout = "2m"
-# The database major version to use. This has to be the same as your remote database's. Run `SHOW
-# server_version;` on the remote database to check.
-major_version = 17
-
-[db.pooler]
-enabled = false
-# Port to use for the local connection pooler.
-port = 54329
-# Specifies when a server connection can be reused by other clients.
-# Configure one of the supported pooler modes: `transaction`, `session`.
-pool_mode = "transaction"
-# How many server connections to allow per user/database pair.
-default_pool_size = 20
-# Maximum number of client connections allowed.
-max_client_conn = 100
-
-# [db.vault]
-# secret_key = "env(SECRET_VALUE)"
-
-[db.migrations]
-# If disabled, migrations will be skipped during a db push or reset.
-enabled = true
-# Specifies an ordered list of schema files that describe your database.
-# Supports glob patterns relative to supabase directory: "./schemas/*.sql"
-schema_paths = []
-
-[db.seed]
-# If enabled, seeds the database after migrations during a db reset.
-enabled = true
-# Specifies an ordered list of seed files to load during db reset.
-# Supports glob patterns relative to supabase directory: "./seeds/*.sql"
-sql_paths = ["./seed.sql"]
-
-[db.network_restrictions]
-# Enable management of network restrictions.
-enabled = false
-# List of IPv4 CIDR blocks allowed to connect to the database.
-# Defaults to allow all IPv4 connections. Set empty array to block all IPs.
-allowed_cidrs = ["0.0.0.0/0"]
-# List of IPv6 CIDR blocks allowed to connect to the database.
-# Defaults to allow all IPv6 connections. Set empty array to block all IPs.
-allowed_cidrs_v6 = ["::/0"]
-
-# Uncomment to reject non-secure connections to the database.
-# [db.ssl_enforcement]
-# enabled = true
-
-[realtime]
-enabled = true
-# Bind realtime via either IPv4 or IPv6. (default: IPv4)
-# ip_version = "IPv6"
-# The maximum length in bytes of HTTP request headers. (default: 4096)
-# max_header_length = 4096
-
-[studio]
-enabled = true
-# Port to use for Supabase Studio.
-port = 54323
-# External URL of the API server that frontend connects to.
-api_url = "http://127.0.0.1"
-# OpenAI API Key to use for Supabase AI in the Supabase Studio.
-openai_api_key = "env(OPENAI_API_KEY)"
-
-# Email testing server. Emails sent with the local dev setup are not actually sent - rather, they
-# are monitored, and you can view the emails that would have been sent from the web interface.
-[inbucket]
-enabled = true
-# Port to use for the email testing server web interface.
-port = 54324
-# Uncomment to expose additional ports for testing user applications that send emails.
-# smtp_port = 54325
-# pop3_port = 54326
-# admin_email = "admin@email.com"
-# sender_name = "Admin"
-
-[storage]
-enabled = true
-# The maximum file size allowed (e.g. "5MB", "500KB").
-file_size_limit = "50MiB"
-
-# Uncomment to configure local storage buckets
-# [storage.buckets.images]
-# public = false
-# file_size_limit = "50MiB"
-# allowed_mime_types = ["image/png", "image/jpeg"]
-# objects_path = "./images"
-
-# Allow connections via S3 compatible clients
-[storage.s3_protocol]
-enabled = true
-
-# Image transformation API is available to Supabase Pro plan.
-# [storage.image_transformation]
-# enabled = true
-
-# Store analytical data in S3 for running ETL jobs over Iceberg Catalog
-# This feature is only available on the hosted platform.
-[storage.analytics]
-enabled = false
-max_namespaces = 5
-max_tables = 10
-max_catalogs = 2
-
-# Analytics Buckets is available to Supabase Pro plan.
-# [storage.analytics.buckets.my-warehouse]
-
-# Store vector embeddings in S3 for large and durable datasets
-# This feature is only available on the hosted platform.
-[storage.vector]
-enabled = false
-max_buckets = 10
-max_indexes = 5
-
-# Vector Buckets is available to Supabase Pro plan.
-# [storage.vector.buckets.documents-openai]
-
-[auth]
-enabled = true
-# The base URL of your website. Used as an allow-list for redirects and for constructing URLs used
-# in emails.
-site_url = "http://127.0.0.1:3000"
-# A list of *exact* URLs that auth providers are permitted to redirect to post authentication.
-additional_redirect_urls = ["https://127.0.0.1:3000"]
-# How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 (1 week).
-jwt_expiry = 3600
-# JWT issuer URL. If not set, defaults to the local API URL (http://127.0.0.1:<port>/auth/v1).
-# jwt_issuer = ""
-# Path to JWT signing key. DO NOT commit your signing keys file to git.
-# signing_keys_path = "./signing_keys.json"
-# If disabled, the refresh token will never expire.
-enable_refresh_token_rotation = true
-# Allows refresh tokens to be reused after expiry, up to the specified interval in seconds.
-# Requires enable_refresh_token_rotation = true.
-refresh_token_reuse_interval = 10
-# Allow/disallow new user signups to your project.
-enable_signup = true
-# Allow/disallow anonymous sign-ins to your project.
-enable_anonymous_sign_ins = false
-# Allow/disallow testing manual linking of accounts
-enable_manual_linking = false
-# Passwords shorter than this value will be rejected as weak. Minimum 6, recommended 8 or more.
-minimum_password_length = 6
-# Passwords that do not meet the following requirements will be rejected as weak. Supported values
-# are: `letters_digits`, `lower_upper_letters_digits`, `lower_upper_letters_digits_symbols`
-password_requirements = ""
-
-# Configure passkey sign-ins.
-# [auth.passkey]
-# enabled = false
-# rp_display_name = "Supabase"
-# rp_id = "localhost"
-# rp_origins = ["http://127.0.0.1:3000"]
-
-[auth.rate_limit]
-# Number of emails that can be sent per hour. Requires auth.email.smtp to be enabled.
-email_sent = 2
-# Number of SMS messages that can be sent per hour. Requires auth.sms to be enabled.
-sms_sent = 30
-# Number of anonymous sign-ins that can be made per hour per IP address. Requires enable_anonymous_sign_ins = true.
-anonymous_users = 30
-# Number of sessions that can be refreshed in a 5 minute interval per IP address.
-token_refresh = 150
-# Number of sign up and sign-in requests that can be made in a 5 minute interval per IP address (excludes anonymous users).
-sign_in_sign_ups = 30
-# Number of OTP / Magic link verifications that can be made in a 5 minute interval per IP address.
-token_verifications = 30
-# Number of Web3 logins that can be made in a 5 minute interval per IP address.
-web3 = 30
-
-# Configure one of the supported captcha providers: `hcaptcha`, `turnstile`.
-# [auth.captcha]
-# enabled = true
-# provider = "hcaptcha"
-# secret = ""
-
-[auth.email]
-# Allow/disallow new user signups via email to your project.
-enable_signup = true
-# If enabled, a user will be required to confirm any email change on both the old, and new email
-# addresses. If disabled, only the new email is required to confirm.
-double_confirm_changes = true
-# If enabled, users need to confirm their email address before signing in.
-enable_confirmations = false
-# If enabled, users will need to reauthenticate or have logged in recently to change their password.
-secure_password_change = false
-# Controls the minimum amount of time that must pass before sending another signup confirmation or password reset email.
-max_frequency = "1s"
-# Number of characters used in the email OTP.
-otp_length = 6
-# Number of seconds before the email OTP expires (defaults to 1 hour).
-otp_expiry = 3600
-
-# Use a production-ready SMTP server
-# [auth.email.smtp]
-# enabled = true
-# host = "smtp.sendgrid.net"
-# port = 587
-# user = "apikey"
-# pass = "env(SENDGRID_API_KEY)"
-# admin_email = "admin@email.com"
-# sender_name = "Admin"
-
-# Uncomment to customize email template
-# [auth.email.template.invite]
-# subject = "You have been invited"
-# content_path = "./supabase/templates/invite.html"
-
-# Uncomment to customize notification email template
-# [auth.email.notification.password_changed]
-# enabled = true
-# subject = "Your password has been changed"
-# content_path = "./templates/password_changed_notification.html"
-
-[auth.sms]
-# Allow/disallow new user signups via SMS to your project.
-enable_signup = false
-# If enabled, users need to confirm their phone number before signing in.
-enable_confirmations = false
-# Template for sending OTP to users
-template = "Your code is {{ .Code }}"
-# Controls the minimum amount of time that must pass before sending another sms otp.
-max_frequency = "5s"
-
-# Use pre-defined map of phone number to OTP for testing.
-# [auth.sms.test_otp]
-# 4152127777 = "123456"
-
-# Configure logged in session timeouts.
-# [auth.sessions]
-# Force log out after the specified duration.
-# timebox = "24h"
-# Force log out if the user has been inactive longer than the specified duration.
-# inactivity_timeout = "8h"
-
-# This hook runs before a new user is created and allows developers to reject the request based on the incoming user object.
-# [auth.hook.before_user_created]
-# enabled = true
-# uri = "pg-functions://postgres/auth/before-user-created-hook"
-
-# This hook runs before a token is issued and allows you to add additional claims based on the authentication method used.
-# [auth.hook.custom_access_token]
-# enabled = true
-# uri = "pg-functions://<database>/<schema>/<hook_name>"
-
-# Configure one of the supported SMS providers: `twilio`, `twilio_verify`, `messagebird`, `textlocal`, `vonage`.
-[auth.sms.twilio]
-enabled = false
-account_sid = ""
-message_service_sid = ""
-# DO NOT commit your Twilio auth token to git. Use environment variable substitution instead:
-auth_token = "env(SUPABASE_AUTH_SMS_TWILIO_AUTH_TOKEN)"
-
-# Multi-factor-authentication is available to Supabase Pro plan.
-[auth.mfa]
-# Control how many MFA factors can be enrolled at once per user.
-max_enrolled_factors = 10
-
-# Control MFA via App Authenticator (TOTP)
-[auth.mfa.totp]
-enroll_enabled = false
-verify_enabled = false
-
-# Configure MFA via Phone Messaging
-[auth.mfa.phone]
-enroll_enabled = false
-verify_enabled = false
-otp_length = 6
-template = "Your code is {{ .Code }}"
-max_frequency = "5s"
-
-# Configure MFA via WebAuthn
-# [auth.mfa.web_authn]
-# enroll_enabled = true
-# verify_enabled = true
-
-# Use an external OAuth provider. The full list of providers are: `apple`, `azure`, `bitbucket`,
-# `discord`, `facebook`, `github`, `gitlab`, `google`, `keycloak`, `linkedin_oidc`, `notion`, `twitch`,
-# `twitter`, `x`, `slack`, `spotify`, `workos`, `zoom`.
-[auth.external.apple]
-enabled = false
-client_id = ""
-# DO NOT commit your OAuth provider secret to git. Use environment variable substitution instead:
-secret = "env(SUPABASE_AUTH_EXTERNAL_APPLE_SECRET)"
-# Overrides the default auth redirectUrl.
-redirect_uri = ""
-# Overrides the default auth provider URL. Used to support self-hosted gitlab, single-tenant Azure,
-# or any other third-party OIDC providers.
-url = ""
-# If enabled, the nonce check will be skipped. Required for local sign in with Google auth.
-skip_nonce_check = false
-# If enabled, it will allow the user to successfully authenticate when the provider does not return an email address.
-email_optional = false
-
-# Allow Solana wallet holders to sign in to your project via the Sign in with Solana (SIWS, EIP-4361) standard.
-# You can configure "web3" rate limit in the [auth.rate_limit] section and set up [auth.captcha] if self-hosting.
-[auth.web3.solana]
-enabled = false
-
-# Use Firebase Auth as a third-party provider alongside Supabase Auth.
-[auth.third_party.firebase]
-enabled = false
-# project_id = "my-firebase-project"
-
-# Use Auth0 as a third-party provider alongside Supabase Auth.
-[auth.third_party.auth0]
-enabled = false
-# tenant = "my-auth0-tenant"
-# tenant_region = "us"
-
-# Use AWS Cognito (Amplify) as a third-party provider alongside Supabase Auth.
-[auth.third_party.aws_cognito]
-enabled = false
-# user_pool_id = "my-user-pool-id"
-# user_pool_region = "us-east-1"
-
-# Use Clerk as a third-party provider alongside Supabase Auth.
-[auth.third_party.clerk]
-enabled = false
-# Obtain from https://clerk.com/setup/supabase
-# domain = "example.clerk.accounts.dev"
-
-# OAuth server configuration
-[auth.oauth_server]
-# Enable OAuth server functionality
-enabled = false
-# Path for OAuth consent flow UI
-authorization_url_path = "/oauth/consent"
-# Allow dynamic client registration
-allow_dynamic_registration = false
-
-[edge_runtime]
-enabled = true
-# Supported request policies: `oneshot`, `per_worker`.
-# `per_worker` (default) — enables hot reload during local development.
-# `oneshot` — fallback mode if hot reload causes issues (e.g. in large repos or with symlinks).
-policy = "per_worker"
-# Port to attach the Chrome inspector for debugging edge functions.
-inspector_port = 8083
-# The Deno major version to use.
-deno_version = 2
-
-# [edge_runtime.secrets]
-# secret_key = "env(SECRET_VALUE)"
-
-[analytics]
-enabled = true
-port = 54327
-# Configure one of the supported backends: `postgres`, `bigquery`.
-backend = "postgres"
-
-# Experimental features may be deprecated any time
-[experimental]
-# Configures Postgres storage engine to use OrioleDB (S3)
-orioledb_version = ""
-# Configures S3 bucket URL, eg. <bucket_name>.s3-<region>.amazonaws.com
-s3_host = "env(S3_HOST)"
-# Configures S3 bucket region, eg. us-east-1
-s3_region = "env(S3_REGION)"
-# Configures AWS_ACCESS_KEY_ID for S3 bucket
-s3_access_key = "env(S3_ACCESS_KEY)"
-# Configures AWS_SECRET_ACCESS_KEY for S3 bucket
-s3_secret_key = "env(S3_SECRET_KEY)"
-
-# [experimental.pgdelta]
-# When enabled, pg-delta becomes the active engine for supported schema flows.
-# enabled = false
-# Directory under `supabase/` where declarative files are written.
-# declarative_schema_path = "./declarative"
-# JSON string passed through to pg-delta SQL formatting.
-# format_options = "{\"keywordCase\":\"upper\",\"indent\":2,\"maxWidth\":80,\"commaStyle\":\"trailing\"}"
-
-
-================================================================================
-FILE: scripts/import_sheet_events.mjs
-================================================================================
-import { createClient } from '@supabase/supabase-js';
-import xlsx from 'xlsx';
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Read env vars manually
-const envPath = path.resolve(__dirname, '../.env.local');
-const envFile = fs.readFileSync(envPath, 'utf8');
-const envVars = {};
-envFile.split('\n').forEach(line => {
-  const match = line.match(/^([^=]+)=(.*)$/);
-  if (match) {
-    envVars[match[1].trim()] = match[2].trim();
-  }
-});
-
-const SUPABASE_URL = envVars.NEXT_PUBLIC_SUPABASE_URL;
-const SUPABASE_SERVICE_KEY = envVars.SUPABASE_SERVICE_ROLE_KEY;
-
-if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
-  console.error("Missing Supabase credentials in .env.local");
-  process.exit(1);
-}
-
-const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
-
-const FALLBACK_IMAGE = "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&q=80&w=1200";
-
-function parseSheet(filePath, defaultCityId) {
-  const absolutePath = path.resolve(__dirname, filePath);
-  if (!fs.existsSync(absolutePath)) {
-    console.warn(`File not found: ${absolutePath}`);
-    return [];
-  }
-  
-  const workbook = xlsx.readFile(absolutePath);
-  const sheetName = workbook.SheetNames[0];
-  const sheet = workbook.Sheets[sheetName];
-  const data = xlsx.utils.sheet_to_json(sheet);
-
-  return data.map((row) => {
-    // Determine cityId
-    let cityId = defaultCityId;
-    if (row['City']) {
-      const cityLower = String(row['City']).toLowerCase().trim();
-      if (cityLower.includes('delhi') || cityLower.includes('gurugram') || cityLower.includes('noida') || cityLower.includes('ncr') || cityLower.includes('noid')) {
-        cityId = 'delhi';
-      } else if (cityLower.includes('mumbai') || cityLower.includes('navi mumbai')) {
-        cityId = 'mumbai';
-      } else if (cityLower.includes('bangalore') || cityLower.includes('bengaluru')) {
-        cityId = 'bengaluru';
-      }
-    }
-
-    const title = row['Event Name'] ? String(row['Event Name']).trim() : 'Unknown Event';
-    const description = row['Event Description'] ? String(row['Event Description']).trim() : '';
-    const dateStr = row['Date'] ? String(row['Date']).trim() : '';
-    const timeStr = row['Time'] ? String(row['Time']).trim() : '';
-    const date = dateStr + (timeStr ? ` ${timeStr}` : '');
-    
-    let location = row['Location'] ? String(row['Location']).trim() : (row['City'] ? String(row['City']).trim() : 'Unknown');
-    let category = row['Category'] ? String(row['Category']).trim().toLowerCase() : 'culture';
-    category = category.charAt(0).toUpperCase() + category.slice(1);
-    let price = row['Price'] ? String(row['Price']).trim() : 'TBA';
-    // let source_url = row['Booking URL'] ? String(row['Booking URL']).trim() : ''; // skipped
-    let image = row['Images (Links)'] ? String(row['Images (Links)']).trim() : FALLBACK_IMAGE;
-
-    // Handle ticket links - skipped because the column is missing in the DB
-
-    return {
-      title,
-      description,
-      location,
-      cityId,
-      date: date || null,
-      price,
-      category,
-      image,
-      // venue_address,
-      // ticket_links,
-      // source_url,
-      is_verified: true,
-      featured: false,
-    };
-  }).filter(e => e.title && e.title !== 'Unknown Event');
-}
-
-async function run() {
-  console.log("Parsing sheets...");
-  const events = [
-    ...parseSheet('../Event_sheets/delhi_events.csv', 'delhi'),
-    ...parseSheet('../Event_sheets/bangalore_events.xlsx', 'bengaluru'),
-    ...parseSheet('../Event_sheets/mumbai_events.xlsx', 'mumbai'),
-  ];
-
-  console.log(`Found ${events.length} events to insert.`);
-
-  if (events.length === 0) {
-    console.log("No events to insert.");
-    return;
-  }
-
-  // Get admin user to associate events with
-  const { data: adminUsers } = await supabase
-    .from('profiles')
-    .select('id')
-    .in('role', ['owner', 'admin'])
-    .limit(1);
-    
-  const userId = adminUsers && adminUsers.length > 0 ? adminUsers[0].id : null;
-
-  let successCount = 0;
-  for (const event of events) {
-    const payload = { ...event };
-    if (userId) payload.user_id = userId;
-
-    const { error } = await supabase.from('events').insert(payload);
-
-    if (error) {
-      console.error(`✗ Failed to insert "${event.title}": ${error.message}`);
-    } else {
-      console.log(`✓ Inserted "${event.title}"`);
-      successCount++;
-    }
-  }
-
-  console.log(`\nDone! Successfully inserted ${successCount}/${events.length} events.`);
-  process.exit(0);
-}
-
-run();
-
-
-================================================================================
-FILE: scripts/live_scraper.mjs
-================================================================================
-import puppeteer from 'puppeteer-core';
-import { createClient } from '@supabase/supabase-js';
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Read env vars manually
-const envPath = path.resolve(__dirname, '../.env.local');
-const envFile = fs.readFileSync(envPath, 'utf8');
-const envVars = {};
-envFile.split('\n').forEach(line => {
-  const match = line.match(/^([^=]+)=(.*)$/);
-  if (match) envVars[match[1].trim()] = match[2].trim();
-});
-
-const SUPABASE_URL = envVars.NEXT_PUBLIC_SUPABASE_URL;
-const SUPABASE_SERVICE_KEY = envVars.SUPABASE_SERVICE_ROLE_KEY;
-
-if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
-  console.error("Missing Supabase credentials in .env.local");
-  process.exit(1);
-}
-
-const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
-
-const CITIES = [
-  { id: 'delhi', name: 'Delhi', url: 'https://insider.in/delhi/all-events' },
-  { id: 'bengaluru', name: 'Bengaluru', url: 'https://insider.in/bangalore/all-events' },
-  { id: 'mumbai', name: 'Mumbai', url: 'https://insider.in/mumbai/all-events' }
-];
-
-async function run() {
-  console.log("Launching Chrome...");
-  const browser = await puppeteer.launch({
-    executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-    headless: "new",
-    args: ['--no-sandbox', '--disable-setuid-sandbox']
-  });
-
-  const page = await browser.newPage();
-  await page.setUserAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36");
-  await page.setViewport({ width: 1280, height: 800 });
-
-  const { data: adminUser } = await supabase.from('profiles').select('id').in('role', ['owner', 'admin']).limit(1).single();
-  const userId = adminUser ? adminUser.id : null;
-
-  for (const city of CITIES) {
-    console.log(`\nScraping ${city.name} events from Insider...`);
-    try {
-      await page.goto(city.url, { waitUntil: 'networkidle2', timeout: 30000 });
-      
-      // Wait for page hydration
-      await new Promise(r => setTimeout(r, 4000));
-      
-      const events = await page.evaluate((cityId) => {
-        const results = [];
-        // Find links that look like event detail pages
-        const cardLinks = Array.from(document.querySelectorAll('a[href*="/event/"]')).slice(0, 30);
-        const seenUrls = new Set();
-        
-        for (const a of cardLinks) {
-          let url = a.href;
-          if (seenUrls.has(url)) continue;
-          
-          // Filter out generic navigation links
-          if (url.includes('/all-events') || url.split('/').length < 4) continue;
-          seenUrls.add(url);
-
-          // Get image
-          const img = a.querySelector('img');
-          let imageUrl = img ? img.src : null;
-          if (img && (!imageUrl || !imageUrl.startsWith('http'))) {
-            imageUrl = img.getAttribute('data-src');
-          }
-          if (!imageUrl || !imageUrl.startsWith('http')) {
-             imageUrl = "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?auto=format&fit=crop&q=80&w=800";
-          }
-
-          // Extract text context for title
-          const textContent = a.innerText.split('\n').map(t => t.trim()).filter(t => t.length > 0 && t !== 'BUY NOW' && t !== 'RSVP');
-          if (textContent.length === 0) continue;
-          
-          let title = textContent[0];
-          // Heuristic: If first text is too short (like "Sat, 24 May"), take the next line
-          if (title.length < 15 && textContent.length > 1) {
-            title = textContent[1];
-          }
-
-          // Generate a fake future date to ensure it shows up as upcoming
-          let date = new Date();
-          date.setDate(date.getDate() + Math.floor(Math.random() * 20) + 1);
-          
-          results.push({
-            title: title.substring(0, 100),
-            description: `Exciting live event! Book your official tickets here: ${url}`,
-            location: cityId.charAt(0).toUpperCase() + cityId.slice(1),
-            cityId: cityId,
-            date: date.toISOString().split('T')[0],
-            price: '₹' + (Math.floor(Math.random() * 20) + 5) * 100,
-            category: 'Music',
-            image: imageUrl,
-            source_url: url, // Bookings link
-            is_verified: true,
-            featured: Math.random() > 0.6
-          });
-          
-          if (results.length >= 6) break; // Collect 6 real events per city
-        }
-        return results;
-      }, city.id);
-
-      console.log(`Found ${events.length} real events for ${city.name}. Inserting to DB...`);
-      
-      for (const ev of events) {
-        if (userId) ev.user_id = userId;
-        const { error } = await supabase.from('events').insert(ev);
-        if (error) {
-          console.error(`✗ Error inserting ${ev.title}:`, error.message);
-        } else {
-          console.log(`✓ Inserted: ${ev.title}`);
-        }
-      }
-      
-    } catch (e) {
-      console.error(`Failed to scrape ${city.name}: ${e.message}`);
-    }
-  }
-
-  console.log("\nLive Scraping and Database Seeding Complete!");
-  await browser.close();
-  process.exit(0);
-}
-
-run();
-
-
-================================================================================
-FILE: scripts/seed_events.mjs
-================================================================================
-import { createClient } from '@supabase/supabase-js';
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Read env vars manually
-const envPath = path.resolve(__dirname, '../.env.local');
-const envFile = fs.readFileSync(envPath, 'utf8');
-const envVars = {};
-envFile.split('\n').forEach(line => {
-  const match = line.match(/^([^=]+)=(.*)$/);
-  if (match) {
-    envVars[match[1].trim()] = match[2].trim();
-  }
-});
-
-const SUPABASE_URL = envVars.NEXT_PUBLIC_SUPABASE_URL;
-const SUPABASE_SERVICE_KEY = envVars.SUPABASE_SERVICE_ROLE_KEY;
-
-if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
-  console.error("Missing Supabase credentials in .env.local");
-  process.exit(1);
-}
-
-const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
-
-const EVENTS = [
-  // ═══════════════════ DELHI (5 events) ═══════════════════
-  {
-    title: "Sufi Nights at Qutub",
-    description: "Experience a magical evening of Sufi music under the stars, featuring renowned artists from across the country. Book via BookMyShow or Insider.",
-    location: "Delhi",
-    cityId: "delhi",
-    date: "2026-05-15",
-    price: "₹1,500",
-    category: "Music",
-    image: "https://images.unsplash.com/photo-1501612780327-45045538702b?auto=format&fit=crop&q=80&w=1200",
-    is_verified: true,
-    featured: true
-  },
-  {
-    title: "Delhi Food Truck Festival 2026",
-    description: "The biggest culinary gathering of the year! Over 50 food trucks bringing you the best street food from around the world. Entry passes on Zomato Live.",
-    location: "Delhi",
-    cityId: "delhi",
-    date: "2026-05-22",
-    price: "₹299",
-    category: "Food",
-    image: "https://images.unsplash.com/photo-1565123409695-7b5ef63a2efb?auto=format&fit=crop&q=80&w=1200",
-    is_verified: true,
-    featured: false
-  },
-  {
-    title: "Tech Startup Mixer NCR",
-    description: "Connect with founders, VCs, and developers. An evening of networking, pitching, and shaping the future of Indian tech. Free registration on Luma.",
-    location: "Delhi",
-    cityId: "delhi",
-    date: "2026-06-05",
-    price: "Free",
-    category: "Networking",
-    image: "https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?auto=format&fit=crop&q=80&w=1200",
-    is_verified: true,
-    featured: false
-  },
-  {
-    title: "Midnight Techno Rave",
-    description: "An underground techno experience featuring international DJs and cutting-edge visual mapping. 21+ only. Tickets on Insider.",
-    location: "Delhi",
-    cityId: "delhi",
-    date: "2026-06-12",
-    price: "₹2,500",
-    category: "Nightlife",
-    image: "https://images.unsplash.com/photo-1574169208507-84376144848b?auto=format&fit=crop&q=80&w=1200",
-    is_verified: true,
-    featured: true
-  },
-  {
-    title: "Pottery & Wine Workshop",
-    description: "Unwind on a Sunday afternoon. Learn hand-building pottery techniques while sipping on fine wine. Limited seats — book on BookMyShow.",
-    location: "Delhi",
-    cityId: "delhi",
-    date: "2026-05-30",
-    price: "₹1,800",
-    category: "Workshops",
-    image: "https://images.unsplash.com/photo-1610701596007-11502861dcfa?auto=format&fit=crop&q=80&w=1200",
-    is_verified: true,
-    featured: false
-  },
-
-  // ═══════════════════ BENGALURU (5 events) ═══════════════════
-  {
-    title: "Namma Ooru Indie Fest",
-    description: "Celebrating the best of independent music. 10 bands, 2 stages, unlimited energy. Grab passes on Insider.",
-    location: "Bengaluru",
-    cityId: "bengaluru",
-    date: "2026-05-18",
-    price: "₹999",
-    category: "Music",
-    image: "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?auto=format&fit=crop&q=80&w=1200",
-    is_verified: true,
-    featured: true
-  },
-  {
-    title: "AI Hackathon Bangalore '26",
-    description: "48 hours to build the next big thing in AI. Huge prizes, free food, and mentorship from industry leaders. Register on Devfolio.",
-    location: "Bengaluru",
-    cityId: "bengaluru",
-    date: "2026-06-02",
-    price: "Free",
-    category: "Technology",
-    image: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&q=80&w=1200",
-    is_verified: true,
-    featured: true
-  },
-  {
-    title: "Koramangala Pub Crawl",
-    description: "Join 100+ partygoers as we hit 4 of the best pubs in Koramangala. First drink on us at every stop! RSVP on Insider.",
-    location: "Bengaluru",
-    cityId: "bengaluru",
-    date: "2026-05-24",
-    price: "₹1,200",
-    category: "Nightlife",
-    image: "https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&q=80&w=1200",
-    is_verified: true,
-    featured: false
-  },
-  {
-    title: "Standup Comedy Open Mic",
-    description: "Watch seasoned comics try out new material and first-timers take the stage. Walk-ins welcome, advance booking on BookMyShow.",
-    location: "Bengaluru",
-    cityId: "bengaluru",
-    date: "2026-05-20",
-    price: "₹199",
-    category: "Comedy",
-    image: "https://images.unsplash.com/photo-1585699324551-f6c309eedeca?auto=format&fit=crop&q=80&w=1200",
-    is_verified: true,
-    featured: false
-  },
-  {
-    title: "Cubbon Park Weekend Run",
-    description: "A community 5K and 10K run through the lungs of the city. Open to all fitness levels. Register on Townscript.",
-    location: "Bengaluru",
-    cityId: "bengaluru",
-    date: "2026-06-15",
-    price: "₹499",
-    category: "Sports",
-    image: "https://images.unsplash.com/photo-1552674605-15c3705be331?auto=format&fit=crop&q=80&w=1200",
-    is_verified: true,
-    featured: false
-  },
-
-  // ═══════════════════ MUMBAI (5 events) ═══════════════════
-  {
-    title: "Lollapalooza India 2026 Preview",
-    description: "The official pre-party for Lollapalooza. Special surprise performances and an unmatched vibe. Tickets on BookMyShow.",
-    location: "Mumbai",
-    cityId: "mumbai",
-    date: "2026-06-20",
-    price: "₹3,999",
-    category: "Music",
-    image: "https://images.unsplash.com/photo-1470229722913-7c090be5c560?auto=format&fit=crop&q=80&w=1200",
-    is_verified: true,
-    featured: true
-  },
-  {
-    title: "Bandra Pop-up Flea Market",
-    description: "Shop from 80+ local brands, enjoy live acoustic sets, and eat from Mumbai's finest artisanal food stalls. Free entry.",
-    location: "Mumbai",
-    cityId: "mumbai",
-    date: "2026-05-29",
-    price: "Free",
-    category: "Culture",
-    image: "https://images.unsplash.com/photo-1533900298318-6b8da08a523e?auto=format&fit=crop&q=80&w=1200",
-    is_verified: true,
-    featured: false
-  },
-  {
-    title: "Bollywood Night Extravaganza",
-    description: "Dance the night away to the biggest Bollywood hits with DJ Chetas. VIP tables available — book on Insider.",
-    location: "Mumbai",
-    cityId: "mumbai",
-    date: "2026-06-06",
-    price: "₹2,000",
-    category: "Nightlife",
-    image: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&q=80&w=1200",
-    is_verified: true,
-    featured: true
-  },
-  {
-    title: "Sunset Yacht Party",
-    description: "A luxury yacht experience sailing past the Gateway of India. Premium drinks and deep house. Limited spots — DM or book on Insider.",
-    location: "Mumbai",
-    cityId: "mumbai",
-    date: "2026-05-23",
-    price: "₹5,500",
-    category: "Nightlife",
-    image: "https://images.unsplash.com/photo-1513689408018-8fecaf94ce2d?auto=format&fit=crop&q=80&w=1200",
-    is_verified: true,
-    featured: false
-  },
-  {
-    title: "Acting Workshop by Neeraj Kabi",
-    description: "An intensive 2-day acting workshop focusing on method and theatrical performance. Register on BookMyShow.",
-    location: "Mumbai",
-    cityId: "mumbai",
-    date: "2026-06-10",
-    price: "₹4,000",
-    category: "Workshops",
-    image: "https://images.unsplash.com/photo-1503095396549-807759245b35?auto=format&fit=crop&q=80&w=1200",
-    is_verified: true,
-    featured: false
-  }
-];
-
-async function seed() {
-  console.log("Starting to seed " + EVENTS.length + " events...");
-
-  const { data: adminUsers } = await supabase
-    .from('profiles')
-    .select('id')
-    .in('role', ['owner', 'admin'])
-    .limit(1);
-    
-  const userId = adminUsers && adminUsers.length > 0 ? adminUsers[0].id : null;
-
-  let successCount = 0;
-  for (const event of EVENTS) {
-    const payload = { ...event };
-    if (userId) payload.user_id = userId;
-
-    const { error } = await supabase.from('events').insert(payload);
-
-    if (error) {
-      console.error("✗ " + event.title + ": " + error.message);
-    } else {
-      console.log("✓ " + event.title);
-      successCount++;
-    }
-  }
-
-  console.log("\nDone! " + successCount + "/" + EVENTS.length + " events seeded successfully.");
-  process.exit(0);
-}
-
-seed();
-
-
-================================================================================
-FILE: scripts/stealth_scraper.mjs
-================================================================================
-import puppeteer from 'puppeteer-extra';
-import StealthPlugin from 'puppeteer-extra-plugin-stealth';
-import { createClient } from '@supabase/supabase-js';
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-puppeteer.use(StealthPlugin());
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const envPath = path.resolve(__dirname, '../.env.local');
-const envFile = fs.readFileSync(envPath, 'utf8');
-const envVars = {};
-envFile.split('\n').forEach(line => {
-  const match = line.match(/^([^=]+)=(.*)$/);
-  if (match) envVars[match[1].trim()] = match[2].trim();
-});
-
-const SUPABASE_URL = envVars.NEXT_PUBLIC_SUPABASE_URL;
-const SUPABASE_SERVICE_KEY = envVars.SUPABASE_SERVICE_ROLE_KEY;
-const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
-
-const CITIES = [
-  { id: 'delhi', name: 'Delhi', url: 'https://insider.in/delhi/all-events' },
-  { id: 'bengaluru', name: 'Bengaluru', url: 'https://insider.in/bangalore/all-events' },
-  { id: 'mumbai', name: 'Mumbai', url: 'https://insider.in/mumbai/all-events' }
-];
-
-async function run() {
-  console.log("Launching Stealth Chrome...");
-  const browser = await puppeteer.launch({
-    headless: "new",
-    args: ['--no-sandbox', '--disable-setuid-sandbox']
-  });
-
-  const page = await browser.newPage();
-  const { data: adminUser } = await supabase.from('profiles').select('id').in('role', ['owner', 'admin']).limit(1).single();
-  const userId = adminUser ? adminUser.id : null;
-
-  for (const city of CITIES) {
-    console.log(`\nScraping ${city.name} events from Insider...`);
-    try {
-      await page.goto(city.url, { waitUntil: 'networkidle2', timeout: 60000 });
-      await new Promise(r => setTimeout(r, 4000));
-      
-      const events = await page.evaluate((cityId) => {
-        const results = [];
-        const cardLinks = Array.from(document.querySelectorAll('a[href*="/event/"]')).slice(0, 30);
-        const seenUrls = new Set();
-        
-        for (const a of cardLinks) {
-          let url = a.href;
-          if (seenUrls.has(url)) continue;
-          if (url.includes('/all-events') || url.split('/').length < 4) continue;
-          seenUrls.add(url);
-
-          const img = a.querySelector('img');
-          let imageUrl = img ? img.src : null;
-          if (img && (!imageUrl || !imageUrl.startsWith('http'))) {
-            imageUrl = img.getAttribute('data-src');
-          }
-          if (!imageUrl || !imageUrl.startsWith('http')) continue;
-
-          const textContent = a.innerText.split('\n').map(t => t.trim()).filter(t => t.length > 0 && !t.includes('BUY') && !t.includes('RSVP'));
-          if (textContent.length === 0) continue;
-          
-          let title = textContent[0];
-          if (title.length < 15 && textContent.length > 1) {
-            title = textContent[1];
-          }
-
-          let date = new Date();
-          date.setDate(date.getDate() + Math.floor(Math.random() * 20) + 1);
-          
-          results.push({
-            title: title.substring(0, 100),
-            description: `Live event in ${cityId}. Book your tickets directly: ${url}`,
-            location: cityId.charAt(0).toUpperCase() + cityId.slice(1),
-            cityId: cityId,
-            date: date.toISOString().split('T')[0],
-            price: '₹' + (Math.floor(Math.random() * 20) + 5) * 100,
-            category: 'Events',
-            image: imageUrl,
-            source_url: url,
-            is_verified: true,
-            featured: Math.random() > 0.6
-          });
-          
-          if (results.length >= 6) break;
-        }
-        return results;
-      }, city.id);
-
-      console.log(`Found ${events.length} real events for ${city.name}. Inserting...`);
-      
-      for (const ev of events) {
-        if (userId) ev.user_id = userId;
-        const { error } = await supabase.from('events').insert(ev);
-        if (error) {
-          console.error(`✗ Error inserting ${ev.title}:`, error.message);
-        } else {
-          console.log(`✓ Inserted: ${ev.title}`);
-        }
-      }
-      
-    } catch (e) {
-      console.error(`Failed to scrape ${city.name}: ${e.message}`);
-    }
-  }
-
-  console.log("\nLive Scraping Complete!");
-  await browser.close();
-  process.exit(0);
-}
-
-run();
 
 
 ================================================================================
@@ -4741,29 +1454,6 @@ nav, header {
 .page-in {
   animation: page-in .7s cubic-bezier(.25, 1, .5, 1) forwards;
 }
-
-================================================================================
-FILE: src/app/icon.svg
-================================================================================
-<svg width="32" height="32" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-  {/* Minimalist 'm' Brand Mark for Milo */}
-  <text 
-    x="50%" 
-    y="55%" 
-    text-anchor="middle" 
-    dominant-baseline="middle" 
-    fill="white" 
-    font-family="Lexend, sans-serif" 
-    font-size="60" 
-    font-weight="900" 
-    letter-spacing="-0.05em"
-  >
-    m
-  </text>
-  {/* Subtle Orbit Ring for Brand Consistency */}
-  <circle cx="50" cy="50" r="46" stroke="white" strokeWidth="2" opacity="0.1" />
-</svg>
-
 
 ================================================================================
 FILE: src/app/layout.tsx
@@ -8650,53 +5340,6 @@ export function getSupabaseAdmin(): SupabaseClient {
     }
   }
   return _supabaseAdmin;
-}
-
-
-================================================================================
-FILE: src/utils/supabase/client.ts
-================================================================================
-import { createBrowserClient } from '@supabase/ssr'
-
-export function createClient() {
-  return createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  )
-}
-
-
-================================================================================
-FILE: src/utils/supabase/server.ts
-================================================================================
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
-
-export async function createClient() {
-  const cookieStore = await cookies()
-
-  return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll()
-        },
-        setAll(cookiesToSet) {
-          try {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
-            )
-          } catch {
-            // The `setAll` method was called from a Server Component.
-            // This can be ignored if you have middleware refreshing
-            // user sessions.
-          }
-        },
-      },
-    }
-  )
 }
 
 

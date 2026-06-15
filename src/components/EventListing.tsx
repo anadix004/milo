@@ -167,6 +167,7 @@ export default function EventListing({
   const { addNotification } = useNotifications();
   const [events, setEvents] = useState<EventData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [fetchError, setFetchError] = useState(false);
   const [expandedEvent, setExpandedEvent] = useState<EventData | null>(null);
   const [selectedCat, setSelectedCat] = useState("All");
   const [sortOrder, setSortOrder] = useState<SortOrder>("featured");
@@ -195,6 +196,7 @@ export default function EventListing({
 
   const fetchEvents = async () => {
     setIsLoading(true);
+    setFetchError(false);
     try {
       const { data, error } = await supabase
         .from("events")
@@ -208,6 +210,7 @@ export default function EventListing({
     } catch (err: any) {
       addNotification("system", `Failed to load events: ${err.message}`);
       setEvents([]);
+      setFetchError(true);
     } finally {
       setIsLoading(false);
     }
@@ -518,6 +521,18 @@ export default function EventListing({
             ))}
           </div>
         </div>
+      ) : fetchError ? (
+        <div className="max-w-[1440px] mx-auto px-6 py-20 text-center">
+          <p className="text-white/50 font-mono text-xs uppercase tracking-widest mb-6">
+            Could not load events. Check your connection.
+          </p>
+          <button
+            onClick={fetchEvents}
+            className="px-8 py-3 border border-white/20 rounded-full text-white font-black text-xs uppercase tracking-widest hover:bg-white/5 transition-all"
+          >
+            Retry
+          </button>
+        </div>
       ) : homepageSections ? (
         <div className="space-y-24 py-12">
           {homepageSections.map((section, idx) => section.events.length > 0 && (
@@ -538,11 +553,32 @@ export default function EventListing({
         </div>
       ) : filteredEvents.length === 0 ? (
         <div className="max-w-[1440px] mx-auto px-6 py-32 flex flex-col items-center justify-center text-center">
-          <div className="w-20 h-20 rounded-full bg-white/[0.03] border border-white/10 flex items-center justify-center mb-8">
-            <Search size={32} className="text-white/15" />
+          <div className="w-20 h-20 rounded-full bg-white/[0.06] border border-white/20 flex items-center justify-center mb-8">
+            <Search size={32} className="text-white/50" />
           </div>
-          <h3 className="font-[family-name:var(--font-lexend)] text-xl md:text-3xl font-black text-white/20 uppercase tracking-tight mb-4">No Events Found</h3>
-          <p className="text-white/30 font-mono text-[10px] md:text-xs uppercase tracking-[0.3em] max-w-sm mb-8">Be the first to put your city on the radar.</p>
+          <h3 className="font-[family-name:var(--font-lexend)] text-xl md:text-3xl font-black text-white/70 uppercase tracking-tight mb-4">
+            {hasActiveFilters ? "No events match your filters" : "No events here yet"}
+          </h3>
+          <p className="text-white/50 font-mono text-xs uppercase tracking-[0.2em] max-w-sm mb-3">
+            {hasActiveFilters
+              ? "Try clearing your filters or selecting a different city."
+              : "Events are added daily. Check back soon or be the first to list one."}
+          </p>
+          {hasActiveFilters && (
+            <button
+              onClick={() => {
+                setSelectedCat("All");
+                setTimeFilter("All");
+                setPriceFilter("All");
+                setBudgetFilter("All");
+                setSearchQuery("");
+                setSortOrder("featured");
+              }}
+              className="mb-4 px-6 py-2.5 border border-white/20 rounded-full text-white/60 font-mono text-[10px] uppercase tracking-widest hover:bg-white/5 transition-colors"
+            >
+              Clear all filters
+            </button>
+          )}
           <button onClick={() => onAuthRequired()} className="px-10 py-4 bg-white text-black rounded-full font-black uppercase tracking-widest text-[10px] hover:scale-105 active:scale-95 transition-all shadow-[0_0_30px_rgba(255,255,255,0.1)]">
             Submit an Event
           </button>

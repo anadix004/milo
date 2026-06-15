@@ -141,7 +141,7 @@ export default function ProfileSidebar({ isOpen, onClose, onAuthClick }: Profile
         >
           <div className={clsx(
             "w-32 h-32 rounded-full transition-all duration-500 border-2 overflow-hidden flex items-center justify-center bg-white/[0.02] relative",
-            isGhostMode ? "bg-emerald-500/10 shadow-[0_0_30px_rgba(16,185,129,0.3)] border-emerald-400" : "border-white/5 hover:border-white/20"
+            isGhostMode ? "bg-emerald-500/10 shadow-[0_0_30px_#10b9814d] border-emerald-400" : "border-white/5 hover:border-white/20"
           )}>
             {user?.avatar_url ? (
               <Image src={user.avatar_url} alt="Profile" fill className="object-cover" sizes="128px" />
@@ -312,7 +312,7 @@ export default function ProfileSidebar({ isOpen, onClose, onAuthClick }: Profile
                 className={clsx(
                   "w-full p-5 rounded-[1.5rem] border flex items-center justify-between transition-all duration-500",
                   isGhostMode 
-                    ? "bg-emerald-400 border-emerald-400 text-black shadow-[0_0_20px_rgba(16,185,129,0.2)]" 
+                    ? "bg-emerald-400 border-emerald-400 text-black shadow-[0_0_20px_#10b98133]" 
                     : "bg-white/5 border-white/10 hover:border-white/20 text-white"
                 )}
               >
@@ -392,7 +392,7 @@ export default function ProfileSidebar({ isOpen, onClose, onAuthClick }: Profile
   transition={SPRING_CONFIG}
   className={clsx(
     "fixed inset-y-0 left-0 w-full max-w-sm max-h-full bg-black/40 backdrop-blur-3xl border-r border-white/10 z-[120] flex flex-col font-[family-name:var(--font-lexend)] transition-shadow duration-500",
-    isGhostMode && "shadow-[inset_0_0_50px_rgba(16,185,129,0.1)] border-emerald-500/30"
+    isGhostMode && "shadow-[inset_0_0_50px_#10b9811a] border-emerald-500/30"
   )}
 >
   <div className="flex-1 overflow-y-auto p-8 no-scrollbar overscroll-contain touch-pan-y">

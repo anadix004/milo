@@ -14,8 +14,7 @@ export default function SmoothScroll({ children }: { children: ReactNode }) {
         duration: 1.425, 
         smoothWheel: true 
     }}>
-      {/* @ts-ignore - Version mismatch between React 19 and Lenis peer types */}
-      {children}
+      {children as any}
     </ReactLenis>
   );
 }

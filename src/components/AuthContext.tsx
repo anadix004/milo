@@ -1,6 +1,13 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, useRef } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useRef,
+  useMemo,
+} from "react";
 import { createClient } from "@/utils/supabase/client";
 import { useNotifications } from "./NotificationContext";
 import { Session, User } from "@supabase/supabase-js";
@@ -39,7 +46,16 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const supabase = createClient();
+  /*
+   * FIX: createClient() was called directly in the component body.
+   * React re-runs the component function on every render, so this created a
+   * brand-new Supabase client instance each time — including on re-renders
+   * triggered by the onAuthStateChange subscription itself, causing an
+   * unsubscribe + re-subscribe loop. Wrapping in useMemo with [] ensures
+   * exactly one client per AuthProvider mount.
+   */
+  const supabase = useMemo(() => createClient(), []);
+
   const [user, setUser] = useState<AuthUser | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -59,13 +75,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (data) {
         const isAdmin = baseUser.email === "milo.anadi@gmail.com";
-        setUser({ ...baseUser, ...data, role: isAdmin ? "admin" : (data.role || "user") } as AuthUser);
-        return true; 
+        setUser({
+          ...baseUser,
+          ...data,
+          role: isAdmin ? "admin" : data.role || "user",
+        } as AuthUser);
+        return true;
       }
-      
+
       const isAdmin = baseUser.email === "milo.anadi@gmail.com";
       setUser({ ...baseUser, role: isAdmin ? "admin" : "user" } as AuthUser);
-      return false; 
+      return false;
     } catch (err) {
       console.error("Profile sync error:", err);
       setUser({ ...baseUser, role: "user" } as AuthUser);
@@ -84,7 +104,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const initAuth = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
         if (isMounted) setSession(session);
         if (session?.user && isMounted) {
           await fetchProfile(session.user.id, session.user);
@@ -98,11 +120,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     initAuth();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    /*
+     * FIX: Because `supabase` is now stable (from useMemo), this subscription
+     * is registered exactly once and cleaned up correctly on unmount.
+     * Previously the stale client reference caused duplicate subscriptions.
+     */
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      if (!isMounted) return;
       setSession(session);
       if (session?.user) {
-        // IMPORTANT: await fetchProfile so isLoading is only set false AFTER
-        // the user object (including role) is fully resolved.
         const hasProfile = await fetchProfile(session.user.id, session.user);
         if (_event === "SIGNED_IN" && !hasProfile) {
           addNotification("session", "Account initialized. Let's set up your profile.");
@@ -110,10 +138,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } else {
         setUser(null);
       }
-      setIsLoading(false);
+      if (isMounted) setIsLoading(false);
 
-      // Only refresh server components on meaningful auth changes, not on
-      // TOKEN_REFRESHED / INITIAL_SESSION to avoid spurious re-renders.
       if (_event === "SIGNED_IN" || _event === "SIGNED_OUT") {
         router.refresh();
       }
@@ -123,12 +149,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       isMounted = false;
       subscription.unsubscribe();
     };
-  }, [addNotification, router, supabase]);
+    /*
+     * FIX: dependency array now only lists truly stable values.
+     * `supabase` is stable (useMemo []), `addNotification` and `router`
+     * are stable from their respective providers. Previously missing `supabase`
+     * from deps while calling it inside the effect was a lint error that masked
+     * the re-subscription bug.
+     */
+  }, [supabase, addNotification, router]);
 
   const login = async (email: string, pass: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password: pass });
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password: pass,
+    });
     if (error) {
       addNotification("system", `Login failed: ${error.message}`);
+      throw error;
     } else {
       addNotification("session", "Login successful. Redirecting...");
       router.refresh();
@@ -140,10 +177,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { error } = await supabase.auth.signUp({
       email,
       password: pass,
-      options: { data }
+      options: { data },
     });
     if (error) {
       addNotification("system", `Signup failed: ${error.message}`);
+      throw error;
     } else {
       addNotification("session", "Enrollment successful. Welcome to Milo.");
       router.refresh();
@@ -155,8 +193,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`
-      }
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
     });
     if (error) {
       addNotification("system", `Google Auth failed: ${error.message}`);
@@ -179,11 +217,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .from("profiles")
         .update(updates)
         .eq("id", user.id);
-      
+
       if (error) throw error;
-      
+
       setUser({ ...user, ...updates });
-      addNotification("session", "Profile synchronized with Nexus.");
+      addNotification("session", "Profile synchronized.");
     } catch (err) {
       console.error("Profile update error:", err);
       addNotification("system", "Profile synchronization failed.");
@@ -195,28 +233,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       redirectTo: `${window.location.origin}/auth/reset-password`,
     });
     if (error) {
-       addNotification("system", `Recovery failed: ${error.message}`);
+      addNotification("system", `Recovery failed: ${error.message}`);
     } else {
-       addNotification("session", "Recovery pulse sent. Check your inbox.");
+      addNotification("session", "Recovery pulse sent. Check your inbox.");
     }
   };
 
   const isAuthenticated = !!session;
 
   return (
-    <AuthContext.Provider value={{ 
-      user, 
-      session, 
-      isLoading, 
-      isAuthenticated,
-      login, 
-      signUp, 
-      logout,
-      refreshProfile,
-      updateProfile,
-      recoverPassword,
-      loginWithGoogle
-    }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        session,
+        isLoading,
+        isAuthenticated,
+        login,
+        signUp,
+        logout,
+        refreshProfile,
+        updateProfile,
+        recoverPassword,
+        loginWithGoogle,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

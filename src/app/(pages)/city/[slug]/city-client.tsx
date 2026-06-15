@@ -103,8 +103,8 @@ export default function CityClient({ slug, events }: { slug: string; events: any
       <section className="px-5 md:px-10 mb-12">
         <div className="max-w-[1400px] mx-auto grid grid-cols-2 md:grid-cols-4 gap-3">
           {cfg.hoods.map((h, i) => (
-            <div key={h.code} className="glass rounded-2xl p-5 text-center"
-              style={{ animationDelay: `${i * 0.08}s` }}>
+            <div key={h.code} className="glass rounded-2xl p-5 text-center sr"
+              style={{ transitionDelay: `${i * 0.08}s` }}>
               <div className="font-d text-[clamp(20px,2.5vw,34px)] font-black leading-none mb-1"
                 style={{ color: cfg.accent }}>
                 {h.code}

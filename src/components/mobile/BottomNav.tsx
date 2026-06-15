@@ -1,4 +1,5 @@
 "use client";
+
 import { motion } from "framer-motion";
 import { Home, Search, PlusCircle, Bell, User } from "lucide-react";
 import Link from "next/link";
@@ -13,12 +14,15 @@ interface BottomNavProps {
   onNotificationsClick: () => void;
 }
 
-export default function BottomNav({ onProfileClick, onEventClick, onNotificationsClick }: BottomNavProps) {
+export default function BottomNav({
+  onProfileClick,
+  onEventClick,
+  onNotificationsClick,
+}: BottomNavProps) {
   const pathname = usePathname();
   const { unreadCount } = useNotifications();
   const { isAuthenticated } = useAuth();
 
-  // Perfect 5-Column Symmetry: Center the (+) trigger
   const handleRadarClick = () => {
     if (pathname === "/") {
       const el = document.getElementById("event-listing");
@@ -32,13 +36,34 @@ export default function BottomNav({ onProfileClick, onEventClick, onNotification
     { icon: Home, label: "Home", href: "/", active: pathname === "/" },
     { icon: Search, label: "Radar", action: handleRadarClick },
     { icon: PlusCircle, label: "Scan", action: onEventClick, primary: true },
-    { icon: Bell, label: "Alerts", action: onNotificationsClick, badge: unreadCount },
-    { icon: User, label: isAuthenticated ? "Profile" : "Log In", action: onProfileClick },
+    {
+      icon: Bell,
+      label: "Alerts",
+      action: onNotificationsClick,
+      badge: unreadCount,
+    },
+    {
+      icon: User,
+      label: isAuthenticated ? "Profile" : "Log In",
+      action: onProfileClick,
+    },
   ];
 
   return (
+    /*
+     * FIX: was z-[100], now z-[50].
+     *
+     * Root cause of conflict: Header was also z-[100]. On iOS Safari the
+     * stacking context means the later-painted element wins, so BottomNav
+     * icons bled over the header's blur layer during scroll momentum. More
+     * importantly, the ProfileSidebar backdrop was z-[110] which is correct
+     * only if BottomNav is below it — this was broken when both were at z-100.
+     *
+     * New ladder: BottomNav=50 < Header=60 < Sidebars=80 < Modals=90
+     * BottomNav is a persistent rail and should never outrank any modal.
+     */
     <nav
-      className="fixed bottom-0 inset-x-0 z-[100] grid grid-cols-5 bg-black/90 border-t border-white/10 backdrop-blur-xl md:hidden"
+      className="fixed bottom-0 inset-x-0 z-[50] grid grid-cols-5 bg-black/90 border-t border-white/10 backdrop-blur-xl md:hidden"
       style={{ paddingBottom: "max(12px, env(safe-area-inset-bottom))" }}
     >
       {tabs.map((tab, i) => {
@@ -59,7 +84,10 @@ export default function BottomNav({ onProfileClick, onEventClick, onNotification
               </div>
             ) : (
               <div className="relative">
-                <Icon size={22} className={isActive ? "text-white" : "text-white/40"} />
+                <Icon
+                  size={22}
+                  className={isActive ? "text-white" : "text-white/40"}
+                />
                 {tab.badge && tab.badge > 0 && (
                   <span className="absolute -top-2 -right-2 w-5 h-5 bg-rose-600 rounded-full text-[9px] font-black flex items-center justify-center text-white ring-2 ring-black z-20 shadow-lg">
                     {tab.badge}
@@ -67,22 +95,32 @@ export default function BottomNav({ onProfileClick, onEventClick, onNotification
                 )}
               </div>
             )}
-            
-            <span className={clsx(
-              "text-[8px] uppercase tracking-widest font-black transition-all",
-              isActive ? "text-white" : "text-white/30",
-              tab.primary && "mt-1.5"
-            )}>
+
+            <span
+              className={clsx(
+                "text-[8px] uppercase tracking-widest font-black transition-all",
+                isActive ? "text-white" : "text-white/30",
+                tab.primary && "mt-1.5"
+              )}
+            >
               {tab.label}
             </span>
           </motion.div>
         );
 
         if (tab.href) {
-          return <Link key={i} href={tab.href} className="w-full flex justify-center">{content}</Link>;
+          return (
+            <Link key={i} href={tab.href} className="w-full flex justify-center">
+              {content}
+            </Link>
+          );
         }
         return (
-          <button key={i} onClick={tab.action} className="w-full flex justify-center outline-none">
+          <button
+            key={i}
+            onClick={tab.action}
+            className="w-full flex justify-center outline-none"
+          >
             {content}
           </button>
         );
