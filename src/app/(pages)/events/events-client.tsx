@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { createClient } from '@/utils/supabase/client'
+import EmptyState from "@/components/EmptyState";
 import Link from 'next/link'
 import Image from 'next/image'
 
@@ -106,11 +107,22 @@ export default function EventsClient() {
             ))}
           </div>
         ) : events.length === 0 ? (
-          <div className="text-center py-20">
-            <p className="font-d text-[18px]" style={{ color: 'rgba(232,238,248,.3)' }}>
-              No events found. Try a different filter.
-            </p>
-          </div>
+          <EmptyState
+            icon="📡"
+            heading="Nothing here yet"
+            subtext="Try a different filter or check back soon — events drop daily."
+            secondaryLabel={
+              activeFilter !== 'All' || activeCity !== 'All Cities'
+                ? 'Clear filters'
+                : undefined
+            }
+            onSecondary={
+              activeFilter !== 'All' || activeCity !== 'All Cities'
+                ? () => { setActiveFilter('All'); setActiveCity('All Cities'); }
+                : undefined
+            }
+            variant="marketing"
+          />
         ) : (
           <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {events.map((e, idx) => (

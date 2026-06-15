@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
+import EmptyState from "@/components/EmptyState";
 
 // Three city colour schemes as decided:
 // Delhi   → Nocturnal Aura   (deep indigo-blue)
@@ -136,10 +137,13 @@ export default function CityClient({ slug, events }: { slug: string; events: any
           </div>
 
           {events.length === 0 ? (
-            <div className="text-center py-16 glass rounded-2xl">
-              <p className="font-d text-[16px]" style={{ color: 'rgba(232,238,248,.3)' }}>
-                Events dropping soon in {cfg.name}
-              </p>
+            <div className="glass rounded-2xl overflow-hidden">
+              <EmptyState
+                icon="📍"
+                heading={`Events dropping soon in ${cfg.name}`}
+                subtext="Our curators are sourcing the best events. Check back or join the WhatsApp group for real-time updates."
+                variant="marketing"
+              />
             </div>
           ) : (
             <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">

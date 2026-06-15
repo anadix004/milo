@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import CursorBlob from "@/components/CursorBlob";
+import CityDefaultBanner from "@/components/CityDefaultBanner";
 import HeroSection from "@/components/HeroSection";
 import Preloader from "@/components/Preloader";
 import { useAuth } from "@/components/AuthContext";
@@ -76,6 +78,11 @@ export default function Home() {
       />
 
       <div className="flex-1 flex flex-col">
+        {/* PHASE 3 FIX: non-blocking city picker when no city is set.
+            On the homepage navigateOnSelect=false so users stay on /
+            and just update the context — HeroSection will then route
+            to the correct city when they click Explore. */}
+        <CityDefaultBanner navigateOnSelect={false} />
         <HeroSection />
         <MarqueeBar />
       </div>

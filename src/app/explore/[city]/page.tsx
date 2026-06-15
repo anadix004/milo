@@ -8,6 +8,7 @@ import EventListing from "@/components/EventListing";
 import { useAuth } from "@/components/AuthContext";
 import { useLocation } from "@/components/LocationContext";
 import AuthModal from "@/components/AuthModal";
+import CityDefaultBanner from "@/components/CityDefaultBanner";
 import EventSubmission from "@/components/EventSubmission";
 import { useState } from "react";
 
@@ -75,6 +76,9 @@ function ExploreContent() {
         onNotificationsClick={() => {}}
         isSidebarOpen={false}
       />
+
+      {/* PHASE 3 FIX: Show banner when no city has been selected yet */}
+      <CityDefaultBanner navigateOnSelect={true} />
 
       <BottomNav
         onProfileClick={handleProfileClick}
