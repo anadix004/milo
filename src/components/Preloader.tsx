@@ -3,7 +3,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
 import BrandLogo from "./BrandLogo";
-import Image from "next/image";
 
 interface PreloaderProps {
   progress: number;
@@ -31,13 +30,7 @@ export default function Preloader({ progress, isReady }: PreloaderProps) {
         >
           {/* Cinematic Background: Desaturated Crowd Atmos */}
           <div className="absolute inset-0 z-0">
-             <Image 
-               src="/assets/preloader_bg.png" 
-               alt="Crowd Atmosphere" 
-               fill
-               priority
-               className="object-cover grayscale opacity-30 scale-110"
-             />
+             {/* Missing Image Replaced by Gradient glow */}
              {/* Deepening Gradient Overlay */}
              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/60" />
           </div>

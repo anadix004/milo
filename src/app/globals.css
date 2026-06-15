@@ -170,7 +170,11 @@ button:not(.no-min-size), a:not(.no-min-size), [role="button"]:not(.no-min-size)
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   cursor: pointer;
-  transition: border-color .3s, transform .25s cubic-bezier(.34,1.56,.64,1), box-shadow .3s, background .5s;
+  transition:
+    border-color  var(--dur-slow)   ease,
+    transform     var(--dur-normal) var(--ease-spring),
+    box-shadow    var(--dur-normal) var(--ease-out),
+    background    var(--dur-slow)   ease;
   overflow: hidden;
   position: relative;
   display: flex;
@@ -381,18 +385,7 @@ button:not(.no-min-size), a:not(.no-min-size), [role="button"]:not(.no-min-size)
   .perspective-1000    { perspective: 1000px; }
 }
 
-@keyframes marquee-left {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
-}
 
-@keyframes marquee-right {
-  from { transform: translateX(-50%); }
-  to   { transform: translateX(0); }
-}
-
-.animate-marquee-left  { animation: marquee-left  40s linear infinite; }
-.animate-marquee-right { animation: marquee-right 40s linear infinite; }
 
 /* ============================================================
    LIVE DOT BLINK
@@ -1028,4 +1021,168 @@ nav, header {
 
 .page-in {
   animation: page-in .7s cubic-bezier(.25, 1, .5, 1) forwards;
+}/**
+ * Animation Consolidation
+ * Add to globals.css, replacing the duplicate @keyframes blocks.
+ *
+ * PHASE 5 FIX: Animation consistency.
+ *
+ * Root cause issues found in the original globals.css:
+ *
+ * 1. DUPLICATE KEYFRAMES
+ *    - `@keyframes milo-mq`  (used by .milo-mqtrack)
+ *    - `@keyframes marquee-left` (used by .animate-marquee-left)
+ *    Both do: from { transform: translateX(0) } to { transform: translateX(-50%) }
+ *    = identical. One is enough.
+ *
+ * 2. INCONSISTENT EASING
+ *    Card hover: cubic-bezier(.34,1.56,.64,1)  — spring overshoot
+ *    Button hover: cubic-bezier(.25,1,.5,1)    — smooth decelerate
+ *    Page enter: [0.19,1,0.22,1]               — expo decelerate
+ *    Sidebar: stiffness:70 damping:15          — framer spring
+ *    This creates a perception of inconsistency even when transitions are fast.
+ *
+ * Fix: 3 canonical eases as CSS custom properties.
+ *
+ * --ease-spring   : Overshoot spring — for UI elements that should feel physical
+ *                   (cards, buttons, badges). Replaces .34,1.56,.64,1
+ * --ease-out      : Smooth decelerate — for page-level content reveal.
+ *                   Replaces .25,1,.5,1
+ * --ease-expo     : Fast expo decelerate — for preloader, overlay fade-in.
+ *                   Replaces 0.19,1,0.22,1
+ *
+ * Usage in components:
+ *   transition: transform 0.3s var(--ease-spring);
+ *   transition: opacity 0.7s var(--ease-expo);
+ */
+
+:root {
+  /* Canonical easing functions — use these everywhere instead of raw cubics */
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);   /* physical spring, slight overshoot */
+  --ease-out:    cubic-bezier(0.25, 1.00, 0.50, 1);   /* smooth decelerate */
+  --ease-expo:   cubic-bezier(0.19, 1.00, 0.22, 1);   /* fast expo decelerate */
+
+  /* Canonical durations */
+  --dur-fast:   0.18s;  /* micro-interactions: hover states, focus rings */
+  --dur-normal: 0.30s;  /* standard UI transitions: card hover, button press */
+  --dur-slow:   0.65s;  /* content reveal: page sections, sidebars */
+  --dur-page:   1.20s;  /* page-level: preloader, full-screen transitions */
+}
+
+/*
+ * DUPLICATE REMOVAL:
+ *
+ * DELETE these from globals.css (they duplicate @keyframes milo-mq):
+ *   @keyframes marquee-left  { ... }
+ *   @keyframes marquee-right { ... }
+ *   .animate-marquee-left    { animation: marquee-left  40s linear infinite; }
+ *   .animate-marquee-right   { animation: marquee-right 40s linear infinite; }
+ *
+ * If MarqueeBar.tsx or any component uses .animate-marquee-left/right,
+ * replace with:
+ *   .animate-marquee-left  { animation: milo-mq     40s linear infinite; }
+ *   .animate-marquee-right { animation: milo-mq-rev 40s linear infinite; }
+ *
+ * Both milo-mq and milo-mq-rev are already defined in the marquee section
+ * of globals.css for the 3-lane stack.
+ */
+
+/*
+ * CARD HOVER STANDARDIZATION:
+ *
+ * Current .milo-card:hover uses:
+ *   transform: translateY(-4px);  ← correct
+ *   transition: ... .25s cubic-bezier(.34,1.56,.64,1)  ← use --ease-spring
+ *
+ * Update .milo-card transition to:
+ *   transition:
+ *     border-color  var(--dur-slow)   ease,
+ *     transform     var(--dur-normal) var(--ease-spring),
+ *     box-shadow    var(--dur-normal) var(--ease-out),
+ *     background    var(--dur-slow)   ease;
+ */
+
+/* ── Consistent hover lift for interactive cards ── */
+@layer utilities {
+  .hover-lift {
+    transition:
+      transform     var(--dur-normal) var(--ease-spring),
+      box-shadow    var(--dur-normal) var(--ease-out);
+  }
+  .hover-lift:hover {
+    transform: translateY(-4px);
+  }
+  .hover-lift:active {
+    transform: scale(0.98);
+    transition-duration: var(--dur-fast);
+  }
+
+  /* Page section reveal — use with ScrollReveal.tsx targets */
+  .reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition:
+      opacity   var(--dur-slow)  var(--ease-out),
+      transform var(--dur-slow)  var(--ease-expo);
+  }
+  .reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+/**
+ * Design Token Bridge
+ * Add to globals.css AFTER the existing @theme block.
+ *
+ * PHASE 4 FIX: Typography class consolidation.
+ *
+ * Root cause: Two design systems, same fonts, different class names.
+ *
+ *   Marketing DS (pages/):   .font-d   → Lexend (display)
+ *                            .font-b   → Plus Jakarta Sans (body)
+ *                            .font-mono → Roboto Mono
+ *
+ *   App DS (root routes):    font-[family-name:var(--font-lexend)]
+ *                            font-[family-name:var(--font-jakarta)]
+ *                            font-[family-name:var(--font-roboto-mono)]
+ *
+ * Fix: Add Tailwind v4 theme tokens so both .font-d and the arbitrary
+ * value classes resolve to the same computed value.
+ * New code should use: font-display, font-body, font-code
+ *
+ * Migration path:
+ *   .font-d   → font-display  (alias for Lexend)
+ *   .font-b   → font-body     (alias for Plus Jakarta Sans)
+ *   .font-mono → font-code    (alias for Roboto Mono, avoids conflict with
+ *                              Tailwind's built-in .font-mono)
+ */
+
+@layer utilities {
+  /* Canonical aliases — use these in all new code */
+  .font-display {
+    font-family: var(--font-lexend, 'Syne', system-ui);
+  }
+
+  .font-body {
+    font-family: var(--font-jakarta, 'Plus Jakarta Sans', system-ui);
+  }
+
+  .font-code {
+    font-family: var(--font-roboto-mono, 'Roboto Mono', monospace);
+  }
+
+  /*
+   * Backward-compat aliases — existing .font-d / .font-b / .font-mono classes
+   * in Marketing DS pages continue to work. These are NOT deprecated yet —
+   * Marketing pages will be migrated in a follow-up PR. Adding them here
+   * just ensures they resolve via @layer utilities which takes precedence
+   * over inline style attributes, preventing specificity fights.
+   */
+  .font-d {
+    font-family: var(--font-lexend, 'Syne', system-ui);
+  }
+
+  .font-b {
+    font-family: var(--font-jakarta, 'Plus Jakarta Sans', system-ui);
+  }
 }

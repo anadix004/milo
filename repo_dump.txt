@@ -10,10 +10,6 @@ REPOSITORY STRUCTURE (CODE ONLY)
     📄 package.json
     📄 postcss.config.mjs
     📄 tsconfig.json
-    📁 fixes/
-        📄 CityDefaultBanner.tsx
-        📄 EmptyState.tsx
-        📄 RetryBanner.tsx
     📁 src/
         📁 app/
             📄 globals.css
@@ -26,7 +22,6 @@ REPOSITORY STRUCTURE (CODE ONLY)
             📁 (pages)/
                 📄 layout.tsx
                 📁 contact/
-                    📄 contact-form 2.tsx
                     📄 contact-form.tsx
                     📄 page.tsx
                 📁 city/
@@ -60,7 +55,6 @@ REPOSITORY STRUCTURE (CODE ONLY)
                 📄 layout.tsx
                 📄 page.tsx
             📁 explore/
-                📄 page 2.tsx
                 📄 page.tsx
                 📁 [city]/
                     📄 page.tsx
@@ -93,9 +87,11 @@ REPOSITORY STRUCTURE (CODE ONLY)
             📄 AuthContext.tsx
             📄 AuthModal.tsx
             📄 BrandLogo.tsx
+            📄 CityDefaultBanner.tsx
             📄 CitySelector.tsx
             📄 CookieConsent.tsx
             📄 CursorBlob.tsx
+            📄 EmptyState.tsx
             📄 EventListing.tsx
             📄 EventSubmission.tsx
             📄 FiltersPanel.tsx
@@ -113,6 +109,7 @@ REPOSITORY STRUCTURE (CODE ONLY)
             📄 PigeonLogo.tsx
             📄 Preloader.tsx
             📄 ProfileSidebar.tsx
+            📄 RetryBanner.tsx
             📄 ScrollReveal.tsx
             📄 SiteFooter.tsx
             📄 SiteNav.tsx
@@ -121,6 +118,7 @@ REPOSITORY STRUCTURE (CODE ONLY)
             📄 SocialToast.tsx
             📄 SortByPanel.tsx
             📄 TiltCard.tsx
+            📄 UnifiedEventCard.tsx
             📄 VibeCheck.tsx
             📄 demo.tsx
             📁 ui/
@@ -152,7 +150,6 @@ REPOSITORY STRUCTURE (CODE ONLY)
             📄 aura.ts
             📄 supabase-server.ts
             📄 utils.ts
-            📄 zIndex 2.ts
             📄 zIndex.ts
 
 
@@ -433,468 +430,6 @@ FILE: tsconfig.json
 
 
 ================================================================================
-FILE: fixes/CityDefaultBanner.tsx
-================================================================================
-"use client";
-
-import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
-import { useLocation } from "@/components/LocationContext";
-import { useRouter, usePathname } from "next/navigation";
-import { MapPin, X } from "lucide-react";
-
-/**
- * PHASE 3 FIX — CityDefaultBanner
- *
- * Root cause of old bug:
- *   HeroSection.tsx:  `const city = selectedCity ?? "del"` — silent Delhi default
- *   ExploreIndexPage: `const city = selectedCity ? (cityMap[selectedCity] ?? "delhi") : "delhi"` — same
- *
- * Users who have never picked a city see Delhi events with zero indication
- * that this is a default, not their actual city. If they're in Mumbai or
- * Bangalore they get irrelevant content and think the app is wrong.
- *
- * Fix: Show a non-blocking, dismissible banner strip at the top of the
- * content area (below Header) whenever selectedCity is null.
- * - Explains what's happening ("Showing Delhi by default")
- * - Offers 3 city pills to pick right there
- * - Has a dismiss (X) that also writes "del" to localStorage so it doesn't
- *   reappear on the same session
- * - Animates out smoothly on dismiss or on city selection
- *
- * Usage: render inside the explore page and home page layouts, above the
- * content but below the Header spacer.
- */
-
-const CITIES = [
-  { code: "del", label: "Delhi", slug: "delhi" },
-  { code: "mum", label: "Mumbai", slug: "mumbai" },
-  { code: "blr", label: "Bengaluru", slug: "bengaluru" },
-] as const;
-
-interface CityDefaultBannerProps {
-  /** If true, clicking a city pill navigates to /explore/[city].
-   *  If false (homepage), just sets the location context. */
-  navigateOnSelect?: boolean;
-}
-
-export default function CityDefaultBanner({
-  navigateOnSelect = false,
-}: CityDefaultBannerProps) {
-  const { selectedCity, setSelectedCity } = useLocation();
-  const router = useRouter();
-  const pathname = usePathname();
-  const [dismissed, setDismissed] = useState(false);
-
-  // Only show when no city has been chosen AND banner hasn't been dismissed
-  if (selectedCity || dismissed) return null;
-
-  const handleSelect = (code: string, slug: string) => {
-    setSelectedCity(code);
-    if (navigateOnSelect || pathname?.startsWith("/explore")) {
-      router.push(`/explore/${slug}`);
-    }
-    // Banner auto-hides because selectedCity is now set
-  };
-
-  const handleDismiss = () => {
-    // Silently commit Delhi so the banner never shows again this session
-    setSelectedCity("del");
-    setDismissed(true);
-  };
-
-  return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0, y: -8 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -8 }}
-        transition={{ duration: 0.35, ease: [0.25, 1, 0.5, 1] }}
-        className="w-full"
-        style={{
-          background: "rgba(74,127,212,.07)",
-          borderBottom: "0.5px solid var(--br, rgba(74,127,212,.14))",
-        }}
-      >
-        <div className="max-w-[1440px] mx-auto px-4 md:px-6 py-2.5 flex items-center gap-3 flex-wrap">
-          {/* Icon + label */}
-          <div className="flex items-center gap-2 flex-shrink-0">
-            <MapPin
-              size={13}
-              style={{ color: "var(--ac, #4A7FD4)", opacity: 0.7 }}
-            />
-            <span
-              className="font-[family-name:var(--font-roboto-mono,monospace)] text-[10px] uppercase tracking-[.12em]"
-              style={{ color: "rgba(232,238,248,.45)" }}
-            >
-              Showing Delhi by default — pick your city:
-            </span>
-          </div>
-
-          {/* City pills */}
-          <div className="flex items-center gap-2">
-            {CITIES.map((c) => (
-              <button
-                key={c.code}
-                onClick={() => handleSelect(c.code, c.slug)}
-                className="font-[family-name:var(--font-roboto-mono,monospace)] text-[9px] uppercase tracking-[.1em] px-3 py-1 rounded-full border transition-all hover:opacity-100"
-                style={{
-                  borderColor: "var(--br, rgba(74,127,212,.18))",
-                  color: "var(--ac, #4A7FD4)",
-                  background: "var(--acg, rgba(74,127,212,.08))",
-                  opacity: 0.8,
-                }}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLElement).style.opacity = "1";
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.opacity = "0.8";
-                }}
-              >
-                {c.label}
-              </button>
-            ))}
-          </div>
-
-          {/* Dismiss */}
-          <button
-            onClick={handleDismiss}
-            className="ml-auto flex-shrink-0 p-1 rounded-full transition-colors hover:bg-white/[.06]"
-            aria-label="Dismiss city banner"
-            title="Keep Delhi and dismiss"
-          >
-            <X size={13} style={{ color: "rgba(232,238,248,.3)" }} />
-          </button>
-        </div>
-      </motion.div>
-    </AnimatePresence>
-  );
-}
-
-
-================================================================================
-FILE: fixes/EmptyState.tsx
-================================================================================
-"use client";
-
-import { ReactNode } from "react";
-import clsx from "clsx";
-
-/**
- * PHASE 3 FIX — Unified EmptyState
- *
- * Root cause of old bug: every page rolled its own empty state with
- * `text-white/20 font-mono text-[10px]` — essentially invisible at 10px
- * opacity-20 on a black background. Users thought the page was broken or
- * still loading.
- *
- * This component is the single source of truth for all empty states in Milo.
- * It follows the App DS (city accent system, --ac variable) and is used by:
- *   - EventListing.tsx  (no events / no filter results)
- *   - events-client.tsx (Marketing DS /events page)
- *   - city-client.tsx   (/city/[slug] no events)
- *
- * Design decisions:
- *   - Icon at 48px, not a tiny dot
- *   - Heading at 18–24px, weight 700, white/70 — clearly readable
- *   - Sub-text at 13px, white/45
- *   - Optional primary CTA (accent button) + optional secondary CTA
- *   - Consistent padding: py-20 container
- */
-
-interface EmptyStateProps {
-  /** Large icon or emoji passed as JSX */
-  icon?: ReactNode;
-  /** Main heading — what happened */
-  heading: string;
-  /** Supporting explanation — what to do */
-  subtext?: string;
-  /** Primary action button label */
-  ctaLabel?: string;
-  /** Primary action handler */
-  onCta?: () => void;
-  /** Secondary action label (e.g. "Clear filters") */
-  secondaryLabel?: string;
-  /** Secondary action handler */
-  onSecondary?: () => void;
-  className?: string;
-  /** Use Marketing DS gold accent instead of App DS --ac */
-  variant?: "app" | "marketing";
-}
-
-export default function EmptyState({
-  icon,
-  heading,
-  subtext,
-  ctaLabel,
-  onCta,
-  secondaryLabel,
-  onSecondary,
-  className,
-  variant = "app",
-}: EmptyStateProps) {
-  return (
-    <div
-      className={clsx(
-        "flex flex-col items-center justify-center text-center py-20 px-6",
-        className
-      )}
-    >
-      {/* Icon container */}
-      {icon && (
-        <div
-          className="w-16 h-16 rounded-full flex items-center justify-center mb-6 border"
-          style={{
-            background:
-              variant === "marketing"
-                ? "rgba(201,168,76,.06)"
-                : "rgba(255,255,255,.04)",
-            borderColor:
-              variant === "marketing"
-                ? "rgba(201,168,76,.18)"
-                : "rgba(255,255,255,.08)",
-          }}
-        >
-          <span
-            className="text-2xl"
-            style={{
-              color:
-                variant === "marketing" ? "#C9A84C" : "var(--ac, #4A7FD4)",
-              opacity: 0.7,
-            }}
-          >
-            {icon}
-          </span>
-        </div>
-      )}
-
-      {/* Heading */}
-      <h3
-        className="font-[family-name:var(--font-lexend,system-ui)] text-[18px] md:text-[22px] font-bold tracking-tight mb-3 leading-snug"
-        style={{ color: "rgba(232,238,248,.75)" }}
-      >
-        {heading}
-      </h3>
-
-      {/* Subtext */}
-      {subtext && (
-        <p
-          className="font-[family-name:var(--font-roboto-mono,monospace)] text-[12px] leading-[1.7] max-w-xs mb-8 uppercase tracking-[.06em]"
-          style={{ color: "rgba(232,238,248,.38)" }}
-        >
-          {subtext}
-        </p>
-      )}
-
-      {/* Actions */}
-      {(ctaLabel || secondaryLabel) && (
-        <div className="flex flex-col sm:flex-row gap-3 items-center">
-          {ctaLabel && onCta && (
-            <button
-              onClick={onCta}
-              className="px-8 py-3.5 rounded-full font-[family-name:var(--font-lexend,system-ui)] font-bold text-[11px] uppercase tracking-widest transition-all hover:opacity-90 active:scale-[.98]"
-              style={
-                variant === "marketing"
-                  ? { background: "#C9A84C", color: "#050505" }
-                  : {
-                      background: "var(--ac, #4A7FD4)",
-                      color: "#fff",
-                    }
-              }
-            >
-              {ctaLabel}
-            </button>
-          )}
-          {secondaryLabel && onSecondary && (
-            <button
-              onClick={onSecondary}
-              className="px-8 py-3.5 rounded-full font-[family-name:var(--font-roboto-mono,monospace)] text-[10px] uppercase tracking-widest border transition-all hover:bg-white/[.04] active:scale-[.98]"
-              style={{
-                borderColor: "rgba(255,255,255,.12)",
-                color: "rgba(232,238,248,.45)",
-              }}
-            >
-              {secondaryLabel}
-            </button>
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
-
-
-================================================================================
-FILE: fixes/RetryBanner.tsx
-================================================================================
-"use client";
-
-import { useState, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import clsx from "clsx";
-
-/**
- * PHASE 3 FIX — RetryBanner
- *
- * Root cause of old bug: EventListing had a `fetchError` boolean that showed
- * a single "Retry" button inline inside the grid area, but:
- *   1. The button was styled like a ghost border button — easy to miss
- *   2. There was no attempt counter, so users could retry forever with no
- *      feedback that the server is genuinely down
- *   3. No error message was shown — users didn't know WHY it failed
- *   4. The supabase.channel() realtime subscription was never cleaned up
- *      on error, causing duplicate subscriptions on retry
- *
- * This component:
- *   - Shows a clear error banner with the error message (truncated)
- *   - Tracks retry attempts (max 3 before showing "try later" message)
- *   - Adds a 1s delay before calling onRetry to prevent rapid hammering
- *   - Exposes `attempt` count so parent can log / throttle
- *   - Works in both App DS and Marketing DS via `variant` prop
- */
-
-interface RetryBannerProps {
-  /** Human-readable error message from the catch block */
-  errorMessage?: string;
-  /** Called when user clicks Retry — parent re-runs fetchEvents */
-  onRetry: () => void;
-  /** How many retries have already been attempted */
-  attempt?: number;
-  /** Max retries before switching to "check back later" mode */
-  maxAttempts?: number;
-  className?: string;
-  variant?: "app" | "marketing";
-}
-
-export default function RetryBanner({
-  errorMessage,
-  onRetry,
-  attempt = 0,
-  maxAttempts = 3,
-  className,
-  variant = "app",
-}: RetryBannerProps) {
-  const [isRetrying, setIsRetrying] = useState(false);
-  const exhausted = attempt >= maxAttempts;
-
-  const handleRetry = useCallback(async () => {
-    if (isRetrying || exhausted) return;
-    setIsRetrying(true);
-    // Small delay — prevents immediate double-fire and gives visual feedback
-    await new Promise((r) => setTimeout(r, 800));
-    onRetry();
-    setIsRetrying(false);
-  }, [isRetrying, exhausted, onRetry]);
-
-  const accentColor =
-    variant === "marketing" ? "#C9A84C" : "var(--ac, #4A7FD4)";
-  const accentBg =
-    variant === "marketing"
-      ? "rgba(201,168,76,.06)"
-      : "var(--acg, rgba(74,127,212,.06))";
-  const accentBorder =
-    variant === "marketing"
-      ? "rgba(201,168,76,.18)"
-      : "var(--br, rgba(74,127,212,.14))";
-
-  return (
-    <div
-      className={clsx(
-        "flex flex-col items-center justify-center py-16 px-6 text-center",
-        className
-      )}
-    >
-      {/* Pulse warning icon */}
-      <motion.div
-        initial={{ scale: 0.8, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        className="w-14 h-14 rounded-full flex items-center justify-center mb-5 border"
-        style={{ background: accentBg, borderColor: accentBorder }}
-      >
-        <span className="text-xl" style={{ color: accentColor }}>
-          {exhausted ? "🌙" : "⚡"}
-        </span>
-      </motion.div>
-
-      {/* Heading */}
-      <h3
-        className="font-[family-name:var(--font-lexend,system-ui)] text-[17px] font-bold tracking-tight mb-2"
-        style={{ color: "rgba(232,238,248,.75)" }}
-      >
-        {exhausted ? "Having trouble connecting" : "Couldn't load events"}
-      </h3>
-
-      {/* Error detail */}
-      {errorMessage && !exhausted && (
-        <p
-          className="font-[family-name:var(--font-roboto-mono,monospace)] text-[10px] uppercase tracking-[.06em] mb-1 max-w-xs"
-          style={{ color: "rgba(232,238,248,.28)" }}
-        >
-          {errorMessage.length > 80
-            ? errorMessage.slice(0, 80) + "…"
-            : errorMessage}
-        </p>
-      )}
-
-      {/* Sub text */}
-      <p
-        className="font-[family-name:var(--font-roboto-mono,monospace)] text-[11px] uppercase tracking-[.06em] mb-7 max-w-xs leading-[1.7]"
-        style={{ color: "rgba(232,238,248,.35)" }}
-      >
-        {exhausted
-          ? "The radar is resting. Check back in a few minutes."
-          : `Attempt ${attempt + 1} of ${maxAttempts}. Check your connection and try again.`}
-      </p>
-
-      {/* Action */}
-      {!exhausted ? (
-        <button
-          onClick={handleRetry}
-          disabled={isRetrying}
-          className="px-8 py-3.5 rounded-full font-[family-name:var(--font-lexend,system-ui)] font-bold text-[11px] uppercase tracking-widest transition-all active:scale-[.97] disabled:opacity-50"
-          style={{ background: accentColor, color: "#fff" }}
-        >
-          <AnimatePresence mode="wait">
-            {isRetrying ? (
-              <motion.span
-                key="loading"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="flex items-center gap-2"
-              >
-                <span
-                  className="inline-block w-3 h-3 rounded-full border-2 border-white/40 border-t-white animate-spin"
-                  style={{ borderColor: "rgba(255,255,255,.3)", borderTopColor: "#fff" }}
-                />
-                Retrying…
-              </motion.span>
-            ) : (
-              <motion.span
-                key="idle"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-              >
-                Try Again
-              </motion.span>
-            )}
-          </AnimatePresence>
-        </button>
-      ) : (
-        <p
-          className="font-[family-name:var(--font-roboto-mono,monospace)] text-[10px] uppercase tracking-widest"
-          style={{ color: accentColor, opacity: 0.6 }}
-        >
-          ● Radar back soon
-        </p>
-      )}
-    </div>
-  );
-}
-
-
-================================================================================
 FILE: src/app/globals.css
 ================================================================================
 @import "tailwindcss";
@@ -1069,7 +604,11 @@ button:not(.no-min-size), a:not(.no-min-size), [role="button"]:not(.no-min-size)
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   cursor: pointer;
-  transition: border-color .3s, transform .25s cubic-bezier(.34,1.56,.64,1), box-shadow .3s, background .5s;
+  transition:
+    border-color  var(--dur-slow)   ease,
+    transform     var(--dur-normal) var(--ease-spring),
+    box-shadow    var(--dur-normal) var(--ease-out),
+    background    var(--dur-slow)   ease;
   overflow: hidden;
   position: relative;
   display: flex;
@@ -1280,18 +819,7 @@ button:not(.no-min-size), a:not(.no-min-size), [role="button"]:not(.no-min-size)
   .perspective-1000    { perspective: 1000px; }
 }
 
-@keyframes marquee-left {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
-}
 
-@keyframes marquee-right {
-  from { transform: translateX(-50%); }
-  to   { transform: translateX(0); }
-}
-
-.animate-marquee-left  { animation: marquee-left  40s linear infinite; }
-.animate-marquee-right { animation: marquee-right 40s linear infinite; }
 
 /* ============================================================
    LIVE DOT BLINK
@@ -1927,7 +1455,172 @@ nav, header {
 
 .page-in {
   animation: page-in .7s cubic-bezier(.25, 1, .5, 1) forwards;
+}/**
+ * Animation Consolidation
+ * Add to globals.css, replacing the duplicate @keyframes blocks.
+ *
+ * PHASE 5 FIX: Animation consistency.
+ *
+ * Root cause issues found in the original globals.css:
+ *
+ * 1. DUPLICATE KEYFRAMES
+ *    - `@keyframes milo-mq`  (used by .milo-mqtrack)
+ *    - `@keyframes marquee-left` (used by .animate-marquee-left)
+ *    Both do: from { transform: translateX(0) } to { transform: translateX(-50%) }
+ *    = identical. One is enough.
+ *
+ * 2. INCONSISTENT EASING
+ *    Card hover: cubic-bezier(.34,1.56,.64,1)  — spring overshoot
+ *    Button hover: cubic-bezier(.25,1,.5,1)    — smooth decelerate
+ *    Page enter: [0.19,1,0.22,1]               — expo decelerate
+ *    Sidebar: stiffness:70 damping:15          — framer spring
+ *    This creates a perception of inconsistency even when transitions are fast.
+ *
+ * Fix: 3 canonical eases as CSS custom properties.
+ *
+ * --ease-spring   : Overshoot spring — for UI elements that should feel physical
+ *                   (cards, buttons, badges). Replaces .34,1.56,.64,1
+ * --ease-out      : Smooth decelerate — for page-level content reveal.
+ *                   Replaces .25,1,.5,1
+ * --ease-expo     : Fast expo decelerate — for preloader, overlay fade-in.
+ *                   Replaces 0.19,1,0.22,1
+ *
+ * Usage in components:
+ *   transition: transform 0.3s var(--ease-spring);
+ *   transition: opacity 0.7s var(--ease-expo);
+ */
+
+:root {
+  /* Canonical easing functions — use these everywhere instead of raw cubics */
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);   /* physical spring, slight overshoot */
+  --ease-out:    cubic-bezier(0.25, 1.00, 0.50, 1);   /* smooth decelerate */
+  --ease-expo:   cubic-bezier(0.19, 1.00, 0.22, 1);   /* fast expo decelerate */
+
+  /* Canonical durations */
+  --dur-fast:   0.18s;  /* micro-interactions: hover states, focus rings */
+  --dur-normal: 0.30s;  /* standard UI transitions: card hover, button press */
+  --dur-slow:   0.65s;  /* content reveal: page sections, sidebars */
+  --dur-page:   1.20s;  /* page-level: preloader, full-screen transitions */
 }
+
+/*
+ * DUPLICATE REMOVAL:
+ *
+ * DELETE these from globals.css (they duplicate @keyframes milo-mq):
+ *   @keyframes marquee-left  { ... }
+ *   @keyframes marquee-right { ... }
+ *   .animate-marquee-left    { animation: marquee-left  40s linear infinite; }
+ *   .animate-marquee-right   { animation: marquee-right 40s linear infinite; }
+ *
+ * If MarqueeBar.tsx or any component uses .animate-marquee-left/right,
+ * replace with:
+ *   .animate-marquee-left  { animation: milo-mq     40s linear infinite; }
+ *   .animate-marquee-right { animation: milo-mq-rev 40s linear infinite; }
+ *
+ * Both milo-mq and milo-mq-rev are already defined in the marquee section
+ * of globals.css for the 3-lane stack.
+ */
+
+/*
+ * CARD HOVER STANDARDIZATION:
+ *
+ * Current .milo-card:hover uses:
+ *   transform: translateY(-4px);  ← correct
+ *   transition: ... .25s cubic-bezier(.34,1.56,.64,1)  ← use --ease-spring
+ *
+ * Update .milo-card transition to:
+ *   transition:
+ *     border-color  var(--dur-slow)   ease,
+ *     transform     var(--dur-normal) var(--ease-spring),
+ *     box-shadow    var(--dur-normal) var(--ease-out),
+ *     background    var(--dur-slow)   ease;
+ */
+
+/* ── Consistent hover lift for interactive cards ── */
+@layer utilities {
+  .hover-lift {
+    transition:
+      transform     var(--dur-normal) var(--ease-spring),
+      box-shadow    var(--dur-normal) var(--ease-out);
+  }
+  .hover-lift:hover {
+    transform: translateY(-4px);
+  }
+  .hover-lift:active {
+    transform: scale(0.98);
+    transition-duration: var(--dur-fast);
+  }
+
+  /* Page section reveal — use with ScrollReveal.tsx targets */
+  .reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition:
+      opacity   var(--dur-slow)  var(--ease-out),
+      transform var(--dur-slow)  var(--ease-expo);
+  }
+  .reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+/**
+ * Design Token Bridge
+ * Add to globals.css AFTER the existing @theme block.
+ *
+ * PHASE 4 FIX: Typography class consolidation.
+ *
+ * Root cause: Two design systems, same fonts, different class names.
+ *
+ *   Marketing DS (pages/):   .font-d   → Lexend (display)
+ *                            .font-b   → Plus Jakarta Sans (body)
+ *                            .font-mono → Roboto Mono
+ *
+ *   App DS (root routes):    font-[family-name:var(--font-lexend)]
+ *                            font-[family-name:var(--font-jakarta)]
+ *                            font-[family-name:var(--font-roboto-mono)]
+ *
+ * Fix: Add Tailwind v4 theme tokens so both .font-d and the arbitrary
+ * value classes resolve to the same computed value.
+ * New code should use: font-display, font-body, font-code
+ *
+ * Migration path:
+ *   .font-d   → font-display  (alias for Lexend)
+ *   .font-b   → font-body     (alias for Plus Jakarta Sans)
+ *   .font-mono → font-code    (alias for Roboto Mono, avoids conflict with
+ *                              Tailwind's built-in .font-mono)
+ */
+
+@layer utilities {
+  /* Canonical aliases — use these in all new code */
+  .font-display {
+    font-family: var(--font-lexend, 'Syne', system-ui);
+  }
+
+  .font-body {
+    font-family: var(--font-jakarta, 'Plus Jakarta Sans', system-ui);
+  }
+
+  .font-code {
+    font-family: var(--font-roboto-mono, 'Roboto Mono', monospace);
+  }
+
+  /*
+   * Backward-compat aliases — existing .font-d / .font-b / .font-mono classes
+   * in Marketing DS pages continue to work. These are NOT deprecated yet —
+   * Marketing pages will be migrated in a follow-up PR. Adding them here
+   * just ensures they resolve via @layer utilities which takes precedence
+   * over inline style attributes, preventing specificity fights.
+   */
+  .font-d {
+    font-family: var(--font-lexend, 'Syne', system-ui);
+  }
+
+  .font-b {
+    font-family: var(--font-jakarta, 'Plus Jakarta Sans', system-ui);
+  }
+}
+
 
 ================================================================================
 FILE: src/app/layout.tsx
@@ -2139,6 +1832,8 @@ FILE: src/app/page.tsx
 "use client";
 
 import { useState, useEffect } from "react";
+import CursorBlob from "@/components/CursorBlob";
+import CityDefaultBanner from "@/components/CityDefaultBanner";
 import HeroSection from "@/components/HeroSection";
 import Preloader from "@/components/Preloader";
 import { useAuth } from "@/components/AuthContext";
@@ -2214,6 +1909,11 @@ export default function Home() {
       />
 
       <div className="flex-1 flex flex-col">
+        {/* PHASE 3 FIX: non-blocking city picker when no city is set.
+            On the homepage navigateOnSelect=false so users stay on /
+            and just update the context — HeroSection will then route
+            to the correct city when they click Explore. */}
+        <CityDefaultBanner navigateOnSelect={false} />
         <HeroSection />
         <MarqueeBar />
       </div>
@@ -2310,125 +2010,6 @@ export default function PagesLayout({ children }: { children: React.ReactNode })
       <SiteFooter />
     </>
   )
-}
-
-
-================================================================================
-FILE: src/app/(pages)/contact/contact-form 2.tsx
-================================================================================
-"use client";
-
-import { useState } from "react";
-
-export default function ContactForm() {
-  const [submitted, setSubmitted] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setIsLoading(true);
-    const form = e.currentTarget;
-    const data = new FormData(form);
-    
-    const { createClient } = await import('@/utils/supabase/client');
-    const supabase = createClient();
-    
-    // collect checkboxes
-    const checkboxes = form.querySelectorAll('input[type="checkbox"]:checked');
-    const interests = Array.from(checkboxes).map(cb => cb.parentElement?.textContent?.trim() || "");
-
-    await supabase.from('waitlist').insert({
-      name: data.get('name'),
-      email: data.get('email'),
-      city: data.get('city'),
-      interests: interests,
-    });
-    
-    setIsLoading(false);
-    setSubmitted(true);
-  };
-
-  if (submitted) {
-    return (
-      <div className="glass noise rounded-2xl p-8 md:p-10 text-center space-y-4">
-        <div className="text-4xl">🎉</div>
-        <h3 className="font-d text-xl font-bold" style={{ color: '#E8EEF8' }}>
-          You're on the list!
-        </h3>
-        <p className="font-b text-sm" style={{ color: 'rgba(232,238,248,.5)' }}>
-          We'll reach out when Milo drops in your city.
-        </p>
-      </div>
-    );
-  }
-
-  return (
-    <form onSubmit={handleSubmit} className="glass noise rounded-2xl p-8 md:p-10 space-y-5">
-      {[
-        { id: 'name',  label: 'Full Name',  type: 'text',  placeholder: 'Your name'     },
-        { id: 'email', label: 'Email',       type: 'email', placeholder: 'you@email.com' },
-      ].map(f => (
-        <div key={f.id}>
-          <label htmlFor={f.id} className="font-mono text-[9px] tracking-[.14em] uppercase block mb-2"
-            style={{ color: 'rgba(232,238,248,.35)' }}>
-            {f.label}
-          </label>
-          <input id={f.id} name={f.id} type={f.type} required placeholder={f.placeholder}
-            className="w-full rounded-xl px-4 py-3 font-b text-[14px] outline-none transition-colors duration-300"
-            style={{
-              background: 'rgba(255,255,255,.03)',
-              border: '0.5px solid rgba(255,255,255,.08)',
-              color: '#E8EEF8',
-            }}
-          />
-        </div>
-      ))}
-
-      <div>
-        <label htmlFor="city" className="font-mono text-[9px] tracking-[.14em] uppercase block mb-2"
-          style={{ color: 'rgba(232,238,248,.35)' }}>
-          City
-        </label>
-        <select id="city" name="city" required defaultValue=""
-          className="w-full rounded-xl px-4 py-3 font-b text-[14px] outline-none transition-colors duration-300 appearance-none"
-          style={{ background: 'rgba(255,255,255,.03)', border: '0.5px solid rgba(255,255,255,.08)', color: '#E8EEF8' }}>
-          <option value="" disabled>Select your city</option>
-          <option value="delhi">Delhi</option>
-          <option value="mumbai">Mumbai</option>
-          <option value="bangalore">Bangalore</option>
-          <option value="other">Other</option>
-        </select>
-      </div>
-
-      <div>
-        <label className="font-mono text-[9px] tracking-[.14em] uppercase block mb-3"
-          style={{ color: 'rgba(232,238,248,.35)' }}>
-          What are you into?
-        </label>
-        <div className="flex flex-wrap gap-2">
-          {['Techno', 'Comedy', 'Art', 'Food Walks', 'Meetups', 'Rooftops'].map(tag => (
-            <label key={tag} className="cursor-pointer">
-              <input type="checkbox" name="interests" value={tag} className="sr-only peer" />
-              <span className="font-mono text-[9px] tracking-[.08em] uppercase px-3 py-2 rounded-full border block transition-all duration-200 peer-checked:bg-goldDim peer-checked:border-goldBdr peer-checked:text-gold"
-                style={{ borderColor: 'rgba(255,255,255,.08)', color: 'rgba(232,238,248,.35)' }}>
-                {tag}
-              </span>
-            </label>
-          ))}
-        </div>
-      </div>
-
-      <button type="submit" disabled={isLoading}
-        className="w-full font-mono text-[11px] font-bold tracking-[.12em] uppercase py-4 rounded-full transition-all hover:opacity-90 mt-2 disabled:opacity-50"
-        style={{ background: '#C9A84C', color: '#050505' }}>
-        {isLoading ? 'Joining...' : 'Join Waitlist'}
-      </button>
-      <p className="font-mono text-[9px] text-center tracking-[.06em]"
-        style={{ color: 'rgba(232,238,248,.2)' }}>
-        Zero spam. Unsubscribe anytime.
-      </p>
-    </form>
-  );
 }
 
 
@@ -2619,6 +2200,7 @@ FILE: src/app/(pages)/city/[slug]/city-client.tsx
 
 import Link from 'next/link'
 import Image from 'next/image'
+import EmptyState from "@/components/EmptyState";
 
 // Three city colour schemes as decided:
 // Delhi   → Nocturnal Aura   (deep indigo-blue)
@@ -2753,10 +2335,13 @@ export default function CityClient({ slug, events }: { slug: string; events: any
           </div>
 
           {events.length === 0 ? (
-            <div className="text-center py-16 glass rounded-2xl">
-              <p className="font-d text-[16px]" style={{ color: 'rgba(232,238,248,.3)' }}>
-                Events dropping soon in {cfg.name}
-              </p>
+            <div className="glass rounded-2xl overflow-hidden">
+              <EmptyState
+                icon="📍"
+                heading={`Events dropping soon in ${cfg.name}`}
+                subtext="Our curators are sourcing the best events. Check back or join the WhatsApp group for real-time updates."
+                variant="marketing"
+              />
             </div>
           ) : (
             <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -3512,6 +3097,7 @@ FILE: src/app/(pages)/events/events-client.tsx
 
 import { useState, useEffect } from 'react'
 import { createClient } from '@/utils/supabase/client'
+import EmptyState from "@/components/EmptyState";
 import Link from 'next/link'
 import Image from 'next/image'
 
@@ -3616,11 +3202,22 @@ export default function EventsClient() {
             ))}
           </div>
         ) : events.length === 0 ? (
-          <div className="text-center py-20">
-            <p className="font-d text-[18px]" style={{ color: 'rgba(232,238,248,.3)' }}>
-              No events found. Try a different filter.
-            </p>
-          </div>
+          <EmptyState
+            icon="📡"
+            heading="Nothing here yet"
+            subtext="Try a different filter or check back soon — events drop daily."
+            secondaryLabel={
+              activeFilter !== 'All' || activeCity !== 'All Cities'
+                ? 'Clear filters'
+                : undefined
+            }
+            onSecondary={
+              activeFilter !== 'All' || activeCity !== 'All Cities'
+                ? () => { setActiveFilter('All'); setActiveCity('All Cities'); }
+                : undefined
+            }
+            variant="marketing"
+          />
         ) : (
           <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {events.map((e, idx) => (
@@ -4314,59 +3911,6 @@ export default function AdminDashboard() {
 
 
 ================================================================================
-FILE: src/app/explore/page 2.tsx
-================================================================================
-"use client";
-
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useLocation } from "@/components/LocationContext";
-
-/**
- * FIX: /explore had no index page.
- * Plus button on ExplorePage called router.push("/explore") which 404'd.
- * This page immediately redirects to the correct city explore page.
- */
-export default function ExploreIndexPage() {
-  const router = useRouter();
-  const { selectedCity } = useLocation();
-
-  useEffect(() => {
-    const cityMap: Record<string, string> = {
-      del: "delhi",
-      mum: "mumbai",
-      blr: "bengaluru",
-    };
-    const city = selectedCity ? (cityMap[selectedCity] ?? "delhi") : "delhi";
-    router.replace(`/explore/${city}`);
-  }, [selectedCity, router]);
-
-  return (
-    <div className="min-h-screen bg-black flex items-center justify-center">
-      <div className="flex items-end gap-1.5 h-10">
-        {[0, 1, 2, 3, 4].map((i) => (
-          <div
-            key={i}
-            className="w-1 rounded-full"
-            style={{
-              background: "linear-gradient(to top, #4A7FD4, #b48cff)",
-              animation: `bar-bounce 1.1s ease-in-out ${i * 0.1}s infinite`,
-            }}
-          />
-        ))}
-      </div>
-      <style>{`
-        @keyframes bar-bounce {
-          0%, 100% { height: 8px; opacity: .35; }
-          50% { height: 40px; opacity: 1; }
-        }
-      `}</style>
-    </div>
-  );
-}
-
-
-================================================================================
 FILE: src/app/explore/page.tsx
 ================================================================================
 "use client";
@@ -4432,6 +3976,7 @@ import EventListing from "@/components/EventListing";
 import { useAuth } from "@/components/AuthContext";
 import { useLocation } from "@/components/LocationContext";
 import AuthModal from "@/components/AuthModal";
+import CityDefaultBanner from "@/components/CityDefaultBanner";
 import EventSubmission from "@/components/EventSubmission";
 import { useState } from "react";
 
@@ -4499,6 +4044,9 @@ function ExploreContent() {
         onNotificationsClick={() => {}}
         isSidebarOpen={false}
       />
+
+      {/* PHASE 3 FIX: Show banner when no city has been selected yet */}
+      <CityDefaultBanner navigateOnSelect={true} />
 
       <BottomNav
         onProfileClick={handleProfileClick}
@@ -6108,12 +5656,32 @@ export function normalizeCategory(text: string): string {
 ================================================================================
 FILE: src/utils/supabase.ts
 ================================================================================
-import { createClient } from '@supabase/supabase-js';
+/**
+ * @/utils/supabase.ts
+ *
+ * PHASE 4 FIX: Legacy module-level export — kept for backward compatibility.
+ *
+ * Files that import { supabase } from '@/utils/supabase':
+ *   - src/app/sitemap.ts         (server-side, just needs data access)
+ *   - src/app/(pages)/city/[slug]/page.tsx (server component)
+ *
+ * The original version used createClient() from @supabase/supabase-js directly.
+ * This works but bypasses cookie-based auth (no session on server renders).
+ * For sitemap.ts and city pages this is acceptable since they only read public
+ * event data (no auth required). We keep the legacy export but switch the
+ * underlying client to use the same env vars as the ssr clients.
+ *
+ * Long-term: migrate these callers to the server client from @/utils/supabase/server.
+ */
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder';
+import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co'
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder'
+
+// Module-level singleton — safe for server-side public data reads.
+// Do NOT use this in Client Components. Use @/utils/supabase/client instead.
+export const supabase = createSupabaseClient(supabaseUrl, supabaseAnonKey)
 
 
 ================================================================================
@@ -6915,6 +6483,146 @@ export default function BrandLogo({ className, size = "md" }: BrandLogoProps) {
 
 
 ================================================================================
+FILE: src/components/CityDefaultBanner.tsx
+================================================================================
+"use client";
+
+import { motion, AnimatePresence } from "framer-motion";
+import { useState } from "react";
+import { useLocation } from "@/components/LocationContext";
+import { useRouter, usePathname } from "next/navigation";
+import { MapPin, X } from "lucide-react";
+
+/**
+ * PHASE 3 FIX — CityDefaultBanner
+ *
+ * Root cause of old bug:
+ *   HeroSection.tsx:  `const city = selectedCity ?? "del"` — silent Delhi default
+ *   ExploreIndexPage: `const city = selectedCity ? (cityMap[selectedCity] ?? "delhi") : "delhi"` — same
+ *
+ * Users who have never picked a city see Delhi events with zero indication
+ * that this is a default, not their actual city. If they're in Mumbai or
+ * Bangalore they get irrelevant content and think the app is wrong.
+ *
+ * Fix: Show a non-blocking, dismissible banner strip at the top of the
+ * content area (below Header) whenever selectedCity is null.
+ * - Explains what's happening ("Showing Delhi by default")
+ * - Offers 3 city pills to pick right there
+ * - Has a dismiss (X) that also writes "del" to localStorage so it doesn't
+ *   reappear on the same session
+ * - Animates out smoothly on dismiss or on city selection
+ *
+ * Usage: render inside the explore page and home page layouts, above the
+ * content but below the Header spacer.
+ */
+
+const CITIES = [
+  { code: "del", label: "Delhi", slug: "delhi" },
+  { code: "mum", label: "Mumbai", slug: "mumbai" },
+  { code: "blr", label: "Bengaluru", slug: "bengaluru" },
+] as const;
+
+interface CityDefaultBannerProps {
+  /** If true, clicking a city pill navigates to /explore/[city].
+   *  If false (homepage), just sets the location context. */
+  navigateOnSelect?: boolean;
+}
+
+export default function CityDefaultBanner({
+  navigateOnSelect = false,
+}: CityDefaultBannerProps) {
+  const { selectedCity, setSelectedCity } = useLocation();
+  const router = useRouter();
+  const pathname = usePathname();
+  const [dismissed, setDismissed] = useState(false);
+
+  // Only show when no city has been chosen AND banner hasn't been dismissed
+  if (selectedCity || dismissed) return null;
+
+  const handleSelect = (code: string, slug: string) => {
+    setSelectedCity(code);
+    if (navigateOnSelect || pathname?.startsWith("/explore")) {
+      router.push(`/explore/${slug}`);
+    }
+    // Banner auto-hides because selectedCity is now set
+  };
+
+  const handleDismiss = () => {
+    // Silently commit Delhi so the banner never shows again this session
+    setSelectedCity("del");
+    setDismissed(true);
+  };
+
+  return (
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0, y: -8 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -8 }}
+        transition={{ duration: 0.35, ease: [0.25, 1, 0.5, 1] }}
+        className="w-full"
+        style={{
+          background: "rgba(74,127,212,.07)",
+          borderBottom: "0.5px solid var(--br, rgba(74,127,212,.14))",
+        }}
+      >
+        <div className="max-w-[1440px] mx-auto px-4 md:px-6 py-2.5 flex items-center gap-3 flex-wrap">
+          {/* Icon + label */}
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <MapPin
+              size={13}
+              style={{ color: "var(--ac, #4A7FD4)", opacity: 0.7 }}
+            />
+            <span
+              className="font-[family-name:var(--font-roboto-mono,monospace)] text-[10px] uppercase tracking-[.12em]"
+              style={{ color: "rgba(232,238,248,.45)" }}
+            >
+              Showing Delhi by default — pick your city:
+            </span>
+          </div>
+
+          {/* City pills */}
+          <div className="flex items-center gap-2">
+            {CITIES.map((c) => (
+              <button
+                key={c.code}
+                onClick={() => handleSelect(c.code, c.slug)}
+                className="font-[family-name:var(--font-roboto-mono,monospace)] text-[9px] uppercase tracking-[.1em] px-3 py-1 rounded-full border transition-all hover:opacity-100"
+                style={{
+                  borderColor: "var(--br, rgba(74,127,212,.18))",
+                  color: "var(--ac, #4A7FD4)",
+                  background: "var(--acg, rgba(74,127,212,.08))",
+                  opacity: 0.8,
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLElement).style.opacity = "1";
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLElement).style.opacity = "0.8";
+                }}
+              >
+                {c.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Dismiss */}
+          <button
+            onClick={handleDismiss}
+            className="ml-auto flex-shrink-0 p-1 rounded-full transition-colors hover:bg-white/[.06]"
+            aria-label="Dismiss city banner"
+            title="Keep Delhi and dismiss"
+          >
+            <X size={13} style={{ color: "rgba(232,238,248,.3)" }} />
+          </button>
+        </div>
+      </motion.div>
+    </AnimatePresence>
+  );
+}
+
+
+================================================================================
 FILE: src/components/CitySelector.tsx
 ================================================================================
 "use client";
@@ -7311,6 +7019,158 @@ export default function CursorBlob() {
 
 
 ================================================================================
+FILE: src/components/EmptyState.tsx
+================================================================================
+"use client";
+
+import { ReactNode } from "react";
+import clsx from "clsx";
+
+/**
+ * PHASE 3 FIX — Unified EmptyState
+ *
+ * Root cause of old bug: every page rolled its own empty state with
+ * `text-white/20 font-mono text-[10px]` — essentially invisible at 10px
+ * opacity-20 on a black background. Users thought the page was broken or
+ * still loading.
+ *
+ * This component is the single source of truth for all empty states in Milo.
+ * It follows the App DS (city accent system, --ac variable) and is used by:
+ *   - EventListing.tsx  (no events / no filter results)
+ *   - events-client.tsx (Marketing DS /events page)
+ *   - city-client.tsx   (/city/[slug] no events)
+ *
+ * Design decisions:
+ *   - Icon at 48px, not a tiny dot
+ *   - Heading at 18–24px, weight 700, white/70 — clearly readable
+ *   - Sub-text at 13px, white/45
+ *   - Optional primary CTA (accent button) + optional secondary CTA
+ *   - Consistent padding: py-20 container
+ */
+
+interface EmptyStateProps {
+  /** Large icon or emoji passed as JSX */
+  icon?: ReactNode;
+  /** Main heading — what happened */
+  heading: string;
+  /** Supporting explanation — what to do */
+  subtext?: string;
+  /** Primary action button label */
+  ctaLabel?: string;
+  /** Primary action handler */
+  onCta?: () => void;
+  /** Secondary action label (e.g. "Clear filters") */
+  secondaryLabel?: string;
+  /** Secondary action handler */
+  onSecondary?: () => void;
+  className?: string;
+  /** Use Marketing DS gold accent instead of App DS --ac */
+  variant?: "app" | "marketing";
+}
+
+export default function EmptyState({
+  icon,
+  heading,
+  subtext,
+  ctaLabel,
+  onCta,
+  secondaryLabel,
+  onSecondary,
+  className,
+  variant = "app",
+}: EmptyStateProps) {
+  return (
+    <div
+      className={clsx(
+        "flex flex-col items-center justify-center text-center py-20 px-6",
+        className
+      )}
+    >
+      {/* Icon container */}
+      {icon && (
+        <div
+          className="w-16 h-16 rounded-full flex items-center justify-center mb-6 border"
+          style={{
+            background:
+              variant === "marketing"
+                ? "rgba(201,168,76,.06)"
+                : "rgba(255,255,255,.04)",
+            borderColor:
+              variant === "marketing"
+                ? "rgba(201,168,76,.18)"
+                : "rgba(255,255,255,.08)",
+          }}
+        >
+          <span
+            className="text-2xl"
+            style={{
+              color:
+                variant === "marketing" ? "#C9A84C" : "var(--ac, #4A7FD4)",
+              opacity: 0.7,
+            }}
+          >
+            {icon}
+          </span>
+        </div>
+      )}
+
+      {/* Heading */}
+      <h3
+        className="font-[family-name:var(--font-lexend,system-ui)] text-[18px] md:text-[22px] font-bold tracking-tight mb-3 leading-snug"
+        style={{ color: "rgba(232,238,248,.75)" }}
+      >
+        {heading}
+      </h3>
+
+      {/* Subtext */}
+      {subtext && (
+        <p
+          className="font-[family-name:var(--font-roboto-mono,monospace)] text-[12px] leading-[1.7] max-w-xs mb-8 uppercase tracking-[.06em]"
+          style={{ color: "rgba(232,238,248,.38)" }}
+        >
+          {subtext}
+        </p>
+      )}
+
+      {/* Actions */}
+      {(ctaLabel || secondaryLabel) && (
+        <div className="flex flex-col sm:flex-row gap-3 items-center">
+          {ctaLabel && onCta && (
+            <button
+              onClick={onCta}
+              className="px-8 py-3.5 rounded-full font-[family-name:var(--font-lexend,system-ui)] font-bold text-[11px] uppercase tracking-widest transition-all hover:opacity-90 active:scale-[.98]"
+              style={
+                variant === "marketing"
+                  ? { background: "#C9A84C", color: "#050505" }
+                  : {
+                      background: "var(--ac, #4A7FD4)",
+                      color: "#fff",
+                    }
+              }
+            >
+              {ctaLabel}
+            </button>
+          )}
+          {secondaryLabel && onSecondary && (
+            <button
+              onClick={onSecondary}
+              className="px-8 py-3.5 rounded-full font-[family-name:var(--font-roboto-mono,monospace)] text-[10px] uppercase tracking-widest border transition-all hover:bg-white/[.04] active:scale-[.98]"
+              style={{
+                borderColor: "rgba(255,255,255,.12)",
+                color: "rgba(232,238,248,.45)",
+              }}
+            >
+              {secondaryLabel}
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+
+================================================================================
 FILE: src/components/EventListing.tsx
 ================================================================================
 "use client";
@@ -7323,6 +7183,9 @@ import clsx from "clsx";
 import { createClient } from "@/utils/supabase/client";
 import { useNotifications } from "./NotificationContext";
 import { useAuth } from "./AuthContext";
+import { useLocation } from "./LocationContext";
+import EmptyState from "@/components/EmptyState";
+import RetryBanner from "@/components/RetryBanner";
 import { parsePrice } from "@/utils/price";
 import { METRO_CITIES, getCityName } from "@/constants/cities";
 
@@ -7483,6 +7346,8 @@ export default function EventListing({
   const [events, setEvents] = useState<EventData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [fetchError, setFetchError] = useState(false);
+  const [fetchErrorMessage, setFetchErrorMessage] = useState<string>("");
+  const [retryAttempt, setRetryAttempt] = useState(0);
   const [expandedEvent, setExpandedEvent] = useState<EventData | null>(null);
   const [selectedCat, setSelectedCat] = useState("All");
   const [sortOrder, setSortOrder] = useState<SortOrder>("featured");
@@ -7509,6 +7374,13 @@ export default function EventListing({
     didApplyInitialFilters.current = true;
   }, [initialTimeFilter, initialPriceFilter, initialSearchQuery]);
 
+  const handleRetry = () => {
+    setFetchError(false);
+    setFetchErrorMessage("");
+    setRetryAttempt((prev) => prev + 1);
+    fetchEvents();
+  };
+
   const fetchEvents = async () => {
     setIsLoading(true);
     setFetchError(false);
@@ -7526,6 +7398,7 @@ export default function EventListing({
       addNotification("system", `Failed to load events: ${err.message}`);
       setEvents([]);
       setFetchError(true);
+      setFetchErrorMessage(err.message ?? "Unknown error");
     } finally {
       setIsLoading(false);
     }
@@ -7837,16 +7710,14 @@ export default function EventListing({
           </div>
         </div>
       ) : fetchError ? (
-        <div className="max-w-[1440px] mx-auto px-6 py-20 text-center">
-          <p className="text-white/50 font-mono text-xs uppercase tracking-widest mb-6">
-            Could not load events. Check your connection.
-          </p>
-          <button
-            onClick={fetchEvents}
-            className="px-8 py-3 border border-white/20 rounded-full text-white font-black text-xs uppercase tracking-widest hover:bg-white/5 transition-all"
-          >
-            Retry
-          </button>
+        <div className="max-w-[1440px] mx-auto px-6">
+          <RetryBanner
+            errorMessage={fetchErrorMessage}
+            onRetry={handleRetry}
+            attempt={retryAttempt}
+            maxAttempts={3}
+            variant="app"
+          />
         </div>
       ) : homepageSections ? (
         <div className="space-y-24 py-12">
@@ -7867,36 +7738,36 @@ export default function EventListing({
           ))}
         </div>
       ) : filteredEvents.length === 0 ? (
-        <div className="max-w-[1440px] mx-auto px-6 py-32 flex flex-col items-center justify-center text-center">
-          <div className="w-20 h-20 rounded-full bg-white/[0.06] border border-white/20 flex items-center justify-center mb-8">
-            <Search size={32} className="text-white/50" />
-          </div>
-          <h3 className="font-[family-name:var(--font-lexend)] text-xl md:text-3xl font-black text-white/70 uppercase tracking-tight mb-4">
-            {hasActiveFilters ? "No events match your filters" : "No events here yet"}
-          </h3>
-          <p className="text-white/50 font-mono text-xs uppercase tracking-[0.2em] max-w-sm mb-3">
-            {hasActiveFilters
-              ? "Try clearing your filters or selecting a different city."
-              : "Events are added daily. Check back soon or be the first to list one."}
-          </p>
-          {hasActiveFilters && (
-            <button
-              onClick={() => {
-                setSelectedCat("All");
-                setTimeFilter("All");
-                setPriceFilter("All");
-                setBudgetFilter("All");
-                setSearchQuery("");
-                setSortOrder("featured");
-              }}
-              className="mb-4 px-6 py-2.5 border border-white/20 rounded-full text-white/60 font-mono text-[10px] uppercase tracking-widest hover:bg-white/5 transition-colors"
-            >
-              Clear all filters
-            </button>
-          )}
-          <button onClick={() => onAuthRequired()} className="px-10 py-4 bg-white text-black rounded-full font-black uppercase tracking-widest text-[10px] hover:scale-105 active:scale-95 transition-all shadow-[0_0_30px_rgba(255,255,255,0.1)]">
-            Submit an Event
-          </button>
+        <div className="max-w-[1440px] mx-auto px-6">
+          <EmptyState
+            icon={hasActiveFilters ? "🔍" : "📡"}
+            heading={
+              hasActiveFilters
+                ? "No events match your filters"
+                : "Nothing on the radar yet"
+            }
+            subtext={
+              hasActiveFilters
+                ? "Try clearing your filters or picking a different city."
+                : "Events drop daily. Check back soon or be the first to add one."
+            }
+            ctaLabel={hasActiveFilters ? undefined : "Submit an Event"}
+            onCta={hasActiveFilters ? undefined : () => onAuthRequired()}
+            secondaryLabel={hasActiveFilters ? "Clear all filters" : undefined}
+            onSecondary={
+              hasActiveFilters
+                ? () => {
+                    setSelectedCat("All");
+                    setTimeFilter("All");
+                    setPriceFilter("All");
+                    setBudgetFilter("All");
+                    setSearchQuery("");
+                    setSortOrder("featured");
+                  }
+                : undefined
+            }
+            variant="app"
+          />
         </div>
       ) : (
         <>
@@ -10482,7 +10353,6 @@ FILE: src/components/Preloader.tsx
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
 import BrandLogo from "./BrandLogo";
-import Image from "next/image";
 
 interface PreloaderProps {
   progress: number;
@@ -10510,13 +10380,7 @@ export default function Preloader({ progress, isReady }: PreloaderProps) {
         >
           {/* Cinematic Background: Desaturated Crowd Atmos */}
           <div className="absolute inset-0 z-0">
-             <Image 
-               src="/assets/preloader_bg.png" 
-               alt="Crowd Atmosphere" 
-               fill
-               priority
-               className="object-cover grayscale opacity-30 scale-110"
-             />
+             {/* Missing Image Replaced by Gradient glow */}
              {/* Deepening Gradient Overlay */}
              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/60" />
           </div>
@@ -10955,17 +10819,193 @@ export default function ProfileSidebar({ isOpen, onClose, onAuthClick }: Profile
   animate={{ x: 0, opacity: 1 }}
   exit={{ x: "-100%", opacity: 0 }}
   transition={SPRING_CONFIG}
-  className={clsx(
-    "fixed inset-y-0 left-0 w-full max-w-sm max-h-full bg-black/40 backdrop-blur-3xl border-r border-white/10 z-[120] flex flex-col font-[family-name:var(--font-lexend)] transition-shadow duration-500",
-    isGhostMode && "shadow-[inset_0_0_50px_#10b9811a] border-emerald-500/30"
-  )}
+  className="fixed inset-y-0 left-0 w-full max-w-sm max-h-full bg-black/40 backdrop-blur-3xl border-r z-[80] flex flex-col font-[family-name:var(--font-lexend)] transition-all duration-500"
+  style={{
+    borderColor: isGhostMode
+      ? 'rgba(52,211,153,0.3)'   // emerald-400/30
+      : 'rgba(255,255,255,0.1)', // white/10
+    boxShadow: isGhostMode
+      ? 'inset 0 0 50px rgba(16,185,129,0.12)' // emerald glow
+      : 'none',
+  }}
 >
   <div className="flex-1 overflow-y-auto p-8 no-scrollbar overscroll-contain touch-pan-y">
     {renderContent()}
-  </div></motion.div>
+  </div>
+</motion.div>
         </>
       )}
     </AnimatePresence>
+  );
+}
+
+
+================================================================================
+FILE: src/components/RetryBanner.tsx
+================================================================================
+"use client";
+
+import { useState, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import clsx from "clsx";
+
+/**
+ * PHASE 3 FIX — RetryBanner
+ *
+ * Root cause of old bug: EventListing had a `fetchError` boolean that showed
+ * a single "Retry" button inline inside the grid area, but:
+ *   1. The button was styled like a ghost border button — easy to miss
+ *   2. There was no attempt counter, so users could retry forever with no
+ *      feedback that the server is genuinely down
+ *   3. No error message was shown — users didn't know WHY it failed
+ *   4. The supabase.channel() realtime subscription was never cleaned up
+ *      on error, causing duplicate subscriptions on retry
+ *
+ * This component:
+ *   - Shows a clear error banner with the error message (truncated)
+ *   - Tracks retry attempts (max 3 before showing "try later" message)
+ *   - Adds a 1s delay before calling onRetry to prevent rapid hammering
+ *   - Exposes `attempt` count so parent can log / throttle
+ *   - Works in both App DS and Marketing DS via `variant` prop
+ */
+
+interface RetryBannerProps {
+  /** Human-readable error message from the catch block */
+  errorMessage?: string;
+  /** Called when user clicks Retry — parent re-runs fetchEvents */
+  onRetry: () => void;
+  /** How many retries have already been attempted */
+  attempt?: number;
+  /** Max retries before switching to "check back later" mode */
+  maxAttempts?: number;
+  className?: string;
+  variant?: "app" | "marketing";
+}
+
+export default function RetryBanner({
+  errorMessage,
+  onRetry,
+  attempt = 0,
+  maxAttempts = 3,
+  className,
+  variant = "app",
+}: RetryBannerProps) {
+  const [isRetrying, setIsRetrying] = useState(false);
+  const exhausted = attempt >= maxAttempts;
+
+  const handleRetry = useCallback(async () => {
+    if (isRetrying || exhausted) return;
+    setIsRetrying(true);
+    // Small delay — prevents immediate double-fire and gives visual feedback
+    await new Promise((r) => setTimeout(r, 800));
+    onRetry();
+    setIsRetrying(false);
+  }, [isRetrying, exhausted, onRetry]);
+
+  const accentColor =
+    variant === "marketing" ? "#C9A84C" : "var(--ac, #4A7FD4)";
+  const accentBg =
+    variant === "marketing"
+      ? "rgba(201,168,76,.06)"
+      : "var(--acg, rgba(74,127,212,.06))";
+  const accentBorder =
+    variant === "marketing"
+      ? "rgba(201,168,76,.18)"
+      : "var(--br, rgba(74,127,212,.14))";
+
+  return (
+    <div
+      className={clsx(
+        "flex flex-col items-center justify-center py-16 px-6 text-center",
+        className
+      )}
+    >
+      {/* Pulse warning icon */}
+      <motion.div
+        initial={{ scale: 0.8, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        className="w-14 h-14 rounded-full flex items-center justify-center mb-5 border"
+        style={{ background: accentBg, borderColor: accentBorder }}
+      >
+        <span className="text-xl" style={{ color: accentColor }}>
+          {exhausted ? "🌙" : "⚡"}
+        </span>
+      </motion.div>
+
+      {/* Heading */}
+      <h3
+        className="font-[family-name:var(--font-lexend,system-ui)] text-[17px] font-bold tracking-tight mb-2"
+        style={{ color: "rgba(232,238,248,.75)" }}
+      >
+        {exhausted ? "Having trouble connecting" : "Couldn't load events"}
+      </h3>
+
+      {/* Error detail */}
+      {errorMessage && !exhausted && (
+        <p
+          className="font-[family-name:var(--font-roboto-mono,monospace)] text-[10px] uppercase tracking-[.06em] mb-1 max-w-xs"
+          style={{ color: "rgba(232,238,248,.28)" }}
+        >
+          {errorMessage.length > 80
+            ? errorMessage.slice(0, 80) + "…"
+            : errorMessage}
+        </p>
+      )}
+
+      {/* Sub text */}
+      <p
+        className="font-[family-name:var(--font-roboto-mono,monospace)] text-[11px] uppercase tracking-[.06em] mb-7 max-w-xs leading-[1.7]"
+        style={{ color: "rgba(232,238,248,.35)" }}
+      >
+        {exhausted
+          ? "The radar is resting. Check back in a few minutes."
+          : `Attempt ${attempt + 1} of ${maxAttempts}. Check your connection and try again.`}
+      </p>
+
+      {/* Action */}
+      {!exhausted ? (
+        <button
+          onClick={handleRetry}
+          disabled={isRetrying}
+          className="px-8 py-3.5 rounded-full font-[family-name:var(--font-lexend,system-ui)] font-bold text-[11px] uppercase tracking-widest transition-all active:scale-[.97] disabled:opacity-50"
+          style={{ background: accentColor, color: "#fff" }}
+        >
+          <AnimatePresence mode="wait">
+            {isRetrying ? (
+              <motion.span
+                key="loading"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="flex items-center gap-2"
+              >
+                <span
+                  className="inline-block w-3 h-3 rounded-full border-2 border-white/40 border-t-white animate-spin"
+                  style={{ borderColor: "rgba(255,255,255,.3)", borderTopColor: "#fff" }}
+                />
+                Retrying…
+              </motion.span>
+            ) : (
+              <motion.span
+                key="idle"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
+                Try Again
+              </motion.span>
+            )}
+          </AnimatePresence>
+        </button>
+      ) : (
+        <p
+          className="font-[family-name:var(--font-roboto-mono,monospace)] text-[10px] uppercase tracking-widest"
+          style={{ color: accentColor, opacity: 0.6 }}
+        >
+          ● Radar back soon
+        </p>
+      )}
+    </div>
   );
 }
 
@@ -11373,22 +11413,48 @@ export default function SitePreloader() {
 FILE: src/components/SmoothScroll.tsx
 ================================================================================
 "use client";
+
+/**
+ * PHASE 5 FIX: SmoothScroll.tsx — removes {children as any} cast.
+ *
+ * Root cause: ReactLenis from "lenis/react" has a children prop typed as
+ * React.ReactNode in some versions but the component's internal type
+ * declaration in lenis@1.3.x uses a stricter signature that doesn't match.
+ * The original workaround was `{children as any}` which suppresses all
+ * type checking for the prop.
+ *
+ * Fix: Wrap children in a fragment with explicit typing.
+ * ReactLenis accepts children via its children prop — passing a React.ReactNode
+ * directly works at runtime even if the type declaration is off.
+ * We can also use the options prop to type-check the Lenis config.
+ *
+ * If lenis ever fixes their type declaration, this file needs no changes.
+ */
+
 import { ReactLenis } from "lenis/react";
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 import { useIsMobile } from "@/hooks/useMediaQuery";
 
-export default function SmoothScroll({ children }: { children: ReactNode }) {
+interface SmoothScrollProps {
+  children: ReactNode;
+}
+
+const LENIS_OPTIONS = {
+  lerp: 0.1,
+  duration: 1.425,
+  smoothWheel: true,
+};
+
+export default function SmoothScroll({ children }: SmoothScrollProps) {
   const isMobile = useIsMobile();
 
+  // Disable smooth scroll on mobile — it interferes with native momentum
+  // scrolling and causes issues with iOS bottom sheet gesture recognition.
   if (isMobile) return <>{children}</>;
-  
+
   return (
-    <ReactLenis root options={{ 
-        lerp: 0.1, 
-        duration: 1.425, 
-        smoothWheel: true 
-    }}>
-      {children as any}
+    <ReactLenis root options={LENIS_OPTIONS}>
+      <>{children}</>
     </ReactLenis>
   );
 }
@@ -11658,6 +11724,302 @@ export function TiltCard({
         </div>
       )}
     </div>
+  )
+}
+
+
+================================================================================
+FILE: src/components/UnifiedEventCard.tsx
+================================================================================
+/**
+ * @/components/UnifiedEventCard.tsx
+ *
+ * PHASE 4 FIX: Single source of truth for event cards.
+ *
+ * Root cause of original divergence:
+ *   EventListing.tsx → EventGridCard   (App DS, .milo-card CSS classes)
+ *   events-client.tsx → EventCard      (Marketing DS, .glass CSS classes)
+ *   city-client.tsx   → inline card    (Marketing DS, inline styles)
+ *
+ * All three showed the same data but looked completely different. A user
+ * navigating /events → /explore/delhi experienced visual whiplash.
+ *
+ * Fix: One component, two variants:
+ *   variant="app"       → .milo-card classes, city accent system (--ac)
+ *   variant="marketing" → .glass classes, gold accent (#C9A84C)
+ *
+ * Both variants share:
+ *   - Identical data interface (EventCardData)
+ *   - Same image/video handling
+ *   - Same category pill colors
+ *   - Same price/date formatting
+ *   - Same hover behavior
+ *   - Accessible alt text
+ */
+
+'use client'
+
+import Image from 'next/image'
+import Link from 'next/link'
+import { motion } from 'framer-motion'
+import clsx from 'clsx'
+
+// ── Data shape ────────────────────────────────────────────────────────────────
+export interface EventCardData {
+  id: string
+  title: string
+  description?: string
+  location?: string
+  date?: string
+  time?: string
+  price?: string
+  category?: string
+  image?: string
+  video_url?: string
+  featured?: boolean
+  is_verified?: boolean
+  cityId?: string
+}
+
+// ── Category color system ─────────────────────────────────────────────────────
+const CATEGORY_COLORS: Record<string, string> = {
+  club:        '#f9643c',
+  dj_night:    '#f9643c',
+  house_party: '#e83ca0',
+  comedy:      '#ffc83c',
+  open_mic:    '#b48cff',
+  networking:  '#b48cff',
+  sports:      '#3ce6b4',
+  other:       '#50a0ff',
+  // Legacy labels (from Marketing DS)
+  Techno:          '#b48cff',
+  Social:          '#3ce6b4',
+  Meetups:         '#4A7FD4',
+  'Art & Culture': '#f9643c',
+  'Food & Walk':   '#C9A84C',
+  Comedy:          '#ffc83c',
+  Sports:          '#3DB865',
+}
+
+function getCategoryColor(category?: string): string {
+  if (!category) return '#4A7FD4'
+  return CATEGORY_COLORS[category] || CATEGORY_COLORS[category.toLowerCase()] || '#50a0ff'
+}
+
+// ── Price formatter ───────────────────────────────────────────────────────────
+function formatPrice(price?: string): string {
+  if (!price || price.toLowerCase() === 'free') return 'Free'
+  return price
+}
+
+// ── Date formatter ────────────────────────────────────────────────────────────
+function formatDate(date?: string): string {
+  if (!date) return 'TBA'
+  try {
+    return new Date(date).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })
+  } catch {
+    return date
+  }
+}
+
+// ── Stable attendee count (no Math.random in render) ─────────────────────────
+function stableCount(seed: string, min: number, range: number): number {
+  let h = 0
+  for (let i = 0; i < seed.length; i++) {
+    h = (Math.imul(31, h) + seed.charCodeAt(i)) | 0
+  }
+  return min + (Math.abs(h) % range)
+}
+
+// ── Avatar letters from title ─────────────────────────────────────────────────
+const AVATAR_COLORS = ['#4A7FD4', '#3DB865', '#8B5CF6', '#F97316', '#EC4899', '#14B8A6']
+
+// ── Props ─────────────────────────────────────────────────────────────────────
+interface UnifiedEventCardProps {
+  event: EventCardData
+  variant?: 'app' | 'marketing'
+  /** If provided, clicking the card calls this instead of navigating */
+  onClick?: (event: EventCardData) => void
+  /** href override — defaults to /events/[id] */
+  href?: string
+  className?: string
+  /** Animation delay for staggered grid entry */
+  animationDelay?: number
+}
+
+// ── Component ─────────────────────────────────────────────────────────────────
+export default function UnifiedEventCard({
+  event,
+  variant = 'app',
+  onClick,
+  href,
+  className,
+  animationDelay = 0,
+}: UnifiedEventCardProps) {
+  const accentColor = getCategoryColor(event.category)
+  const goCount = stableCount(event.id, 8, 40)
+  const words = (event.title || '').split(' ').filter(Boolean)
+  const avatarLetters = words.slice(0, 3).map((w, i) => ({
+    letter: w[0]?.toUpperCase() ?? 'M',
+    color: AVATAR_COLORS[i % AVATAR_COLORS.length],
+  }))
+
+  // ── App DS variant (uses .milo-card CSS classes) ──────────────────────────
+  if (variant === 'app') {
+    const inner = (
+      <motion.div
+        className={clsx('milo-card', className)}
+        whileHover={{ y: -4 }}
+        transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+        onClick={onClick ? () => onClick(event) : undefined}
+        style={{ cursor: onClick ? 'pointer' : undefined }}
+      >
+        {/* Image */}
+        <div className="milo-card-img">
+          {event.video_url ? (
+            <video
+              src={event.video_url}
+              autoPlay muted loop playsInline
+              style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'filter .3s, transform .35s' }}
+            />
+          ) : event.image ? (
+            <Image
+              src={event.image}
+              alt={event.title}
+              fill
+              sizes="(max-width:600px) 100vw, (max-width:900px) 50vw, (max-width:1280px) 33vw, 25vw"
+              className="object-cover"
+              style={{ transition: 'filter .3s, transform .35s' }}
+            />
+          ) : (
+            <div
+              className="w-full h-full"
+              style={{ background: `linear-gradient(135deg, ${accentColor}22 0%, rgba(0,0,0,.8) 100%)` }}
+            />
+          )}
+          <div className="milo-card-img-overlay" />
+          <div className="milo-ctime">{event.time || formatDate(event.date)}</div>
+          <div className="milo-ctag-wrap">
+            <span className="milo-ctag milo-ctag--default" style={{ background: `${accentColor}22`, color: accentColor }}>
+              {event.category || 'Event'}
+            </span>
+          </div>
+        </div>
+
+        {/* Body */}
+        <div className="milo-card-body">
+          <div className="milo-cname">{event.title}</div>
+          <div className="milo-cloc">
+            <span className="milo-cloc-pin">📍</span>
+            {event.location || 'Location TBA'}
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="milo-cfoot">
+          <div className="milo-cgo">{goCount} people going</div>
+          <div className="milo-avs">
+            {avatarLetters.map((av, i) => (
+              <div key={i} className="milo-av" style={{ background: av.color }}>
+                {av.letter}
+              </div>
+            ))}
+          </div>
+        </div>
+      </motion.div>
+    )
+
+    if (onClick) return inner
+    return <Link href={href || `/events/${event.id}`}>{inner}</Link>
+  }
+
+  // ── Marketing DS variant (uses .glass CSS classes) ────────────────────────
+  const marketingInner = (
+    <motion.div
+      className={clsx('group glass rounded-2xl overflow-hidden flex flex-col', className)}
+      style={{ animationDelay: `${animationDelay * 0.04}s` }}
+      whileHover={{ y: -3 }}
+      transition={{ type: 'spring', stiffness: 280, damping: 22 }}
+      onClick={onClick ? () => onClick(event) : undefined}
+    >
+      {/* Image */}
+      <div className="img-h relative h-[180px] flex-shrink-0">
+        {event.video_url ? (
+          <video
+            src={event.video_url}
+            autoPlay muted loop playsInline
+            className="w-full h-full object-cover opacity-60 mix-blend-lighten"
+          />
+        ) : event.image ? (
+          <Image
+            src={event.image}
+            alt={event.title}
+            fill
+            className="object-cover opacity-60 mix-blend-lighten"
+            sizes="(max-width: 768px) 100vw, 50vw"
+          />
+        ) : (
+          <div
+            className="w-full h-full"
+            style={{ background: `linear-gradient(135deg, ${accentColor}22 0%, rgba(5,5,5,.8) 100%)` }}
+          />
+        )}
+        <div
+          className="absolute inset-0"
+          style={{ background: 'linear-gradient(to top, rgba(5,5,5,.75) 0%, transparent 55%)' }}
+        />
+        {/* Category pill */}
+        <span
+          className="absolute top-3 left-3 font-mono text-[8px] tracking-[.1em] uppercase px-2.5 py-1 rounded-full"
+          style={{ background: `${accentColor}22`, color: accentColor, border: `0.5px solid ${accentColor}44` }}
+        >
+          {event.category || 'Event'}
+        </span>
+        {event.is_verified && (
+          <span
+            className="absolute top-3 right-3 font-mono text-[8px] tracking-[.08em] uppercase px-2 py-1 rounded-full"
+            style={{ background: 'rgba(60,230,180,.12)', color: '#3ce6b4', border: '0.5px solid rgba(60,230,180,.3)' }}
+          >
+            ✓ Verified
+          </span>
+        )}
+      </div>
+
+      {/* Body */}
+      <div className="p-4 flex flex-col gap-2 flex-1">
+        <h3
+          className="font-d text-[15px] font-bold leading-tight group-hover:text-gold transition-colors duration-300"
+          style={{ color: '#E8EEF8' }}
+        >
+          {event.title}
+        </h3>
+        <div className="flex items-center gap-1.5 font-mono text-[10px]" style={{ color: 'rgba(232,238,248,.38)' }}>
+          <span style={{ fontSize: 11 }}>📍</span>
+          <span className="truncate">{event.location || 'TBA'}</span>
+        </div>
+        <div
+          className="mt-auto pt-3 flex items-center justify-between border-t"
+          style={{ borderColor: 'rgba(255,255,255,.05)' }}
+        >
+          <span className="font-d text-[13px] font-bold" style={{ color: accentColor }}>
+            {formatPrice(event.price)}
+          </span>
+          <span
+            className="font-mono text-[9px] tracking-[.08em] uppercase"
+            style={{ color: 'rgba(232,238,248,.35)' }}
+          >
+            {formatDate(event.date)}
+          </span>
+        </div>
+      </div>
+    </motion.div>
+  )
+
+  if (onClick) return marketingInner
+  return (
+    <Link href={href || `/events/${event.id}`} style={{ cursor: 'pointer' }}>
+      {marketingInner}
+    </Link>
   )
 }
 
@@ -15541,72 +15903,6 @@ import { twMerge } from "tailwind-merge"
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
-
-
-================================================================================
-FILE: src/lib/zIndex 2.ts
-================================================================================
-/**
- * Z-INDEX LADDER
- *
- * Problem: Header (z-[100]) and BottomNav (z-[100]) were at the same level.
- * On scroll the header backdrop-blur layer would paint over BottomNav icons.
- * Modals were scattered across z-[110], z-[120], z-[150], z-[200], z-[210] with
- * no system — some modals appeared under the header.
- *
- * Fix: Single source of truth. Import these constants into every component
- * that needs a fixed z-index so stacking order is obvious at a glance.
- *
- * Layer map (low → high):
- *  BASE       = normal document flow
- *  STICKY     = sticky headers, floating action buttons  (10)
- *  NAV        = bottom nav bar                          (50)
- *  HEADER     = top navigation header                   (60)   ← above BottomNav
- *  LOCATION   = location popup (attached to header)     (70)
- *  SIDEBAR    = profile / notification sidebars         (80)
- *  OVERLAY    = sidebar backdrop overlays               (85)
- *  MODAL      = full-screen modals, bottom sheets       (90)
- *  MODAL_BG   = modal backdrop                         (88)
- *  TOAST      = notification toasts                     (95)
- *  PRELOADER  = site/page preloaders                   (100)
- *  CURSOR     = custom cursor elements                 (110)
- */
-
-export const Z = {
-  STICKY: 10,
-  NAV: 50,
-  HEADER: 60,
-  LOCATION: 70,
-  OVERLAY: 85,
-  SIDEBAR: 80,
-  MODAL_BG: 88,
-  MODAL: 90,
-  TOAST: 95,
-  PRELOADER: 100,
-  CURSOR: 110,
-} as const;
-
-/**
- * Tailwind class helpers — use these instead of magic numbers.
- * In Tailwind v4 arbitrary values just work, so these match the Z constants above.
- *
- * Usage:
- *   import { ZC } from "@/lib/zIndex";
- *   <div className={ZC.HEADER}>...</div>
- */
-export const ZC = {
-  STICKY: "z-[10]",
-  NAV: "z-[50]",
-  HEADER: "z-[60]",
-  LOCATION: "z-[70]",
-  SIDEBAR: "z-[80]",
-  OVERLAY: "z-[85]",
-  MODAL_BG: "z-[88]",
-  MODAL: "z-[90]",
-  TOAST: "z-[95]",
-  PRELOADER: "z-[100]",
-  CURSOR: "z-[110]",
-} as const;
 
 
 ================================================================================

@@ -390,14 +390,20 @@ export default function ProfileSidebar({ isOpen, onClose, onAuthClick }: Profile
   animate={{ x: 0, opacity: 1 }}
   exit={{ x: "-100%", opacity: 0 }}
   transition={SPRING_CONFIG}
-  className={clsx(
-    "fixed inset-y-0 left-0 w-full max-w-sm max-h-full bg-black/40 backdrop-blur-3xl border-r border-white/10 z-[120] flex flex-col font-[family-name:var(--font-lexend)] transition-shadow duration-500",
-    isGhostMode && "shadow-[inset_0_0_50px_#10b9811a] border-emerald-500/30"
-  )}
+  className="fixed inset-y-0 left-0 w-full max-w-sm max-h-full bg-black/40 backdrop-blur-3xl border-r z-[80] flex flex-col font-[family-name:var(--font-lexend)] transition-all duration-500"
+  style={{
+    borderColor: isGhostMode
+      ? 'rgba(52,211,153,0.3)'   // emerald-400/30
+      : 'rgba(255,255,255,0.1)', // white/10
+    boxShadow: isGhostMode
+      ? 'inset 0 0 50px rgba(16,185,129,0.12)' // emerald glow
+      : 'none',
+  }}
 >
   <div className="flex-1 overflow-y-auto p-8 no-scrollbar overscroll-contain touch-pan-y">
     {renderContent()}
-  </div></motion.div>
+  </div>
+</motion.div>
         </>
       )}
     </AnimatePresence>
