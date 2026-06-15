@@ -168,15 +168,17 @@ export default function Header({
             <Plus size={18} strokeWidth={2.5} />
           </button>
 
-          <button
-            onClick={onNotificationsClick}
-            className="hidden md:flex items-center justify-center w-10 h-10 rounded-xl bg-white/10 border border-white/20 text-white hover:bg-white/20 hover:scale-105 active:scale-95 transition-all duration-300 relative"
-          >
-            <Bell size={18} />
-            {unreadCount > 0 && (
-              <div className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full" />
-            )}
-          </button>
+          {isAuthenticated && (
+            <button
+              onClick={onNotificationsClick}
+              className="hidden md:flex items-center justify-center w-10 h-10 rounded-xl bg-white/10 border border-white/20 text-white hover:bg-white/20 hover:scale-105 active:scale-95 transition-all duration-300 relative"
+            >
+              <Bell size={18} />
+              {unreadCount > 0 && (
+                <div className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full" />
+              )}
+            </button>
+          )}
         </div>
       </div>
     </header>

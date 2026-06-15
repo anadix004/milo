@@ -6,6 +6,17 @@ import EmptyState from "@/components/EmptyState";
 import Link from 'next/link'
 import Image from 'next/image'
 
+interface EventData {
+  id: string
+  title: string
+  category: string
+  image?: string
+  location?: string
+  price?: string
+  date?: string
+  is_verified?: boolean
+}
+
 const FILTERS = ['All', 'Techno', 'Social', 'Meetups', 'Art & Culture', 'Food & Walk', 'Comedy', 'Sports']
 const CITIES  = ['All Cities', 'Delhi', 'Mumbai', 'Bangalore']
 
@@ -22,22 +33,38 @@ const CATEGORY_COLORS: Record<string, string> = {
 export default function EventsClient() {
   const [activeFilter, setActiveFilter] = useState('All')
   const [activeCity,   setActiveCity]   = useState('All Cities')
-  const [events,       setEvents]       = useState<any[]>([])
+  const [events,       setEvents]       = useState<EventData[]>([])
   const [loading,      setLoading]      = useState(true)
+  const [offset,       setOffset]       = useState(0)
+  const [hasMore,      setHasMore]      = useState(true)
 
   useEffect(() => {
     const fetchEvents = async () => {
-      setLoading(true)
+      if (offset === 0) {
+        setLoading(true)
+      }
       const supabase = createClient()
-      let q = supabase.from('events').select('*').order('created_at', { ascending: false }).limit(40)
+      let q = supabase.from('events').select('*').order('created_at', { ascending: false }).range(offset, offset + 39)
       if (activeCity !== 'All Cities') q = q.eq('cityId', activeCity.toLowerCase())
       if (activeFilter !== 'All')      q = q.eq('category', activeFilter)
       const { data } = await q
-      setEvents(data || [])
+      const newEvents = (data || []) as EventData[]
+      
+      if (offset === 0) {
+        setEvents(newEvents)
+      } else {
+        setEvents(prev => [...prev, ...newEvents])
+      }
+      
+      if (newEvents.length < 40) {
+        setHasMore(false)
+      } else {
+        setHasMore(true)
+      }
       setLoading(false)
     }
     fetchEvents()
-  }, [activeFilter, activeCity])
+  }, [activeFilter, activeCity, offset])
 
   return (
     <section className="pt-28 pb-24 px-5 md:px-10">
@@ -64,7 +91,11 @@ export default function EventsClient() {
             {FILTERS.map(f => (
               <button
                 key={f}
-                onClick={() => setActiveFilter(f)}
+                onClick={() => {
+                  setActiveFilter(f)
+                  setOffset(0)
+                  setHasMore(true)
+                }}
                 className="font-mono text-[9px] tracking-[.1em] uppercase px-3.5 py-2 rounded-full border transition-all duration-300"
                 style={{
                   background: activeFilter === f ? 'rgba(201,168,76,.12)' : 'transparent',
@@ -81,7 +112,11 @@ export default function EventsClient() {
             {CITIES.map(c => (
               <button
                 key={c}
-                onClick={() => setActiveCity(c)}
+                onClick={() => {
+                  setActiveCity(c)
+                  setOffset(0)
+                  setHasMore(true)
+                }}
                 className="font-mono text-[9px] tracking-[.1em] uppercase px-3.5 py-2 rounded-full border transition-all duration-300"
                 style={{
                   background: activeCity === c ? 'rgba(255,255,255,.06)' : 'transparent',
@@ -132,10 +167,13 @@ export default function EventsClient() {
         )}
 
         {/* Load more */}
-        {!loading && events.length >= 40 && (
+        {!loading && hasMore && events.length >= 40 && (
           <div className="text-center mt-14">
-            <button className="shim font-mono text-[11px] tracking-[.1em] uppercase px-10 py-3.5 rounded-full border transition-all hover:bg-white/[.04]"
-              style={{ borderColor: 'rgba(255,255,255,.1)', color: 'rgba(232,238,248,.5)' }}>
+            <button 
+              onClick={() => setOffset(prev => prev + 40)}
+              className="shim font-mono text-[11px] tracking-[.1em] uppercase px-10 py-3.5 rounded-full border transition-all hover:bg-white/[.04]"
+              style={{ borderColor: 'rgba(255,255,255,.1)', color: 'rgba(232,238,248,.5)' }}
+            >
               Load more events
             </button>
           </div>
@@ -145,7 +183,7 @@ export default function EventsClient() {
   )
 }
 
-function EventCard({ event, idx }: { event: any; idx: number }) {
+function EventCard({ event, idx }: { event: EventData; idx: number }) {
   const accentColor = CATEGORY_COLORS[event.category] || '#C9A84C'
 
   return (

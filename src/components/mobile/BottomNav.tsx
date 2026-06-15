@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { Home, Search, PlusCircle, Bell, User } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useNotifications } from "../NotificationContext";
 import { useAuth } from "../AuthContext";
 import clsx from "clsx";
@@ -23,12 +23,14 @@ export default function BottomNav({
   const { unreadCount } = useNotifications();
   const { isAuthenticated } = useAuth();
 
+  const router = useRouter();
+
   const handleRadarClick = () => {
     if (pathname === "/") {
       const el = document.getElementById("event-listing");
       if (el) el.scrollIntoView({ behavior: "smooth" });
     } else {
-      window.location.href = "/";
+      router.push("/");
     }
   };
 
@@ -79,8 +81,16 @@ export default function BottomNav({
             )}
           >
             {tab.primary ? (
-              <div className="w-14 h-14 rounded-full bg-white flex items-center justify-center -mt-10 shadow-[0_0_30px_rgba(255,255,255,0.4)] border-4 border-black ring-1 ring-white/10">
-                <Icon size={24} className="text-black" />
+              // Background slab prevents content from bleeding through the gap
+              // above the nav border-top where the button protrudes (-mt-10 = 40px up)
+              <div className="relative">
+                <div
+                  className="absolute inset-x-0 bottom-0 bg-black/90"
+                  style={{ top: '-40px', zIndex: -1 }}
+                />
+                <div className="w-14 h-14 rounded-full bg-white flex items-center justify-center -mt-10 shadow-[0_0_30px_rgba(255,255,255,0.4)] border-4 border-black ring-1 ring-white/10">
+                  <Icon size={24} className="text-black" />
+                </div>
               </div>
             ) : (
               <div className="relative">

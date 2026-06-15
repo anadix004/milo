@@ -10,6 +10,7 @@ export default function Loading() {
               className="w-1 rounded-full"
               style={{
                 background: 'linear-gradient(to top, #C9A84C, #b48cff)',
+                height: '8px',
                 animation: `bar-bounce 1.1s ease-in-out ${i * 0.1}s infinite`,
               }}
             />

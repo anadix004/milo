@@ -28,12 +28,13 @@ export default function ProfilePage() {
   }, [isLoading, isAuthenticated, router]);
 
   useEffect(() => {
-    if (!isLoading) {
-      setShowLoadTrouble(false);
-      return;
+    if (isLoading) {
+      const t = setTimeout(() => setShowLoadTrouble(true), 6000);
+      return () => {
+        clearTimeout(t);
+        setShowLoadTrouble(false);
+      };
     }
-    const t = setTimeout(() => setShowLoadTrouble(true), 6000);
-    return () => clearTimeout(t);
   }, [isLoading]);
 
   if (isLoading) {
@@ -132,7 +133,7 @@ export default function ProfilePage() {
                   onClick={logout}
                   className="flex items-center gap-2 px-4 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full text-white/70 transition-colors cursor-pointer"
                 >
-                  <Settings size={16} />
+                  <LogOut size={16} />
                   <span className="hidden md:inline font-black uppercase text-[11px] tracking-[0.22em]">Logout</span>
                 </button>
               </div>

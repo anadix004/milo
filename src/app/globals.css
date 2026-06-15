@@ -38,6 +38,7 @@
 
   /* ── City accent defaults (Delhi) ── */
   --ac:  #4A7FD4;
+  --ac-raw: 74, 127, 212; /* raw RGB for rgba() composition in JS/TSX */
   --acg: rgba(74,127,212,.15);
   --acd: rgba(74,127,212,.28);
   --br:  rgba(74,127,212,.14);
@@ -52,18 +53,21 @@
 /* ── Per-city accent overrides ── */
 body.city-delhi {
   --ac:  #4A7FD4;
+  --ac-raw: 74, 127, 212;
   --acg: rgba(74,127,212,.15);
   --acd: rgba(74,127,212,.28);
   --br:  rgba(74,127,212,.14);
 }
 body.city-blr {
   --ac:  #3DB865;
+  --ac-raw: 61, 184, 101;
   --acg: rgba(61,184,101,.15);
   --acd: rgba(61,184,101,.28);
   --br:  rgba(61,184,101,.14);
 }
 body.city-mum {
   --ac:  #8B5CF6;
+  --ac-raw: 139, 92, 246;
   --acg: rgba(139,92,246,.15);
   --acd: rgba(139,92,246,.28);
   --br:  rgba(139,92,246,.14);
@@ -88,13 +92,18 @@ body {
 @media (pointer: fine) {
   body { cursor: none !important; }
   button, a, [role="button"] { cursor: none !important; }
-  /* PHASE 2 FIX: Restore text cursor for inputs */
-  input, textarea, select, [contenteditable] { cursor: text !important; }
+  /* Restore standard cursors for interactive form elements */
+  input, textarea, [contenteditable] { cursor: text !important; }
+  select { cursor: pointer !important; } /* select ≠ text input — needs pointer */
 }
 
+/* UI-007: inline-flex so text centers vertically when min-height: 44px overrides intrinsic height */
 button:not(.no-min-size), a:not(.no-min-size), [role="button"]:not(.no-min-size) {
   min-height: 44px;
   min-width: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .no-scrollbar::-webkit-scrollbar { display: none; }

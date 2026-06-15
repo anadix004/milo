@@ -51,7 +51,7 @@ interface DropdownProps {
   label: string;
   value: string;
   options: string[];
-  onChange: (val: any) => void;
+  onChange: (val: string) => void;
   icon?: React.ReactNode;
 }
 
@@ -157,6 +157,12 @@ function normalizePriceFilter(value: string | null | undefined) {
   return null;
 }
 
+const CITY_ID_MAP: Record<string, string[]> = {
+  "del": ["del", "delhi-ncr", "delhi", "noida", "gurugram", "faridabad", "ghaziabad"],
+  "mum": ["mum", "mumbai", "south-mumbai", "western-suburbs", "eastern-suburbs", "navi-mumbai", "harbour-line", "thane"],
+  "blr": ["blr", "bangalore", "central-bangalore", "north-bangalore", "south-bangalore", "east-bangalore", "west-bangalore"],
+};
+
 export default function EventListing({
   selectedCity,
   onAuthRequired,
@@ -165,7 +171,7 @@ export default function EventListing({
   initialSearchQuery,
 }: EventListingProps) {
   const isMobile = useIsMobile();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
   const { isAuthenticated } = useAuth();
   const { addNotification } = useNotifications();
   const [events, setEvents] = useState<EventData[]>([]);
@@ -173,6 +179,8 @@ export default function EventListing({
   const [fetchError, setFetchError] = useState(false);
   const [fetchErrorMessage, setFetchErrorMessage] = useState<string>("");
   const [retryAttempt, setRetryAttempt] = useState(0);
+  const [offset, setOffset] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
   const [expandedEvent, setExpandedEvent] = useState<EventData | null>(null);
   const [selectedCat, setSelectedCat] = useState("All");
   const [sortOrder, setSortOrder] = useState<SortOrder>("featured");
@@ -203,27 +211,52 @@ export default function EventListing({
     setFetchError(false);
     setFetchErrorMessage("");
     setRetryAttempt((prev) => prev + 1);
-    fetchEvents();
+    fetchEvents(offset);
   };
 
-  const fetchEvents = async () => {
-    setIsLoading(true);
+  const fetchEvents = async (currentOffset = 0) => {
+    if (currentOffset === 0) {
+      setIsLoading(true);
+    }
     setFetchError(false);
     try {
       const { data, error } = await supabase
         .from("events")
         .select("*")
-        .eq("is_verified", true);
+        .eq("is_verified", true)
+        .order("created_at", { ascending: false })
+        .range(currentOffset, currentOffset + 39);
 
       if (error) throw error;
       
       const fetchedEvents: EventData[] = (data || []).map(e => ({ ...e, name: e.title }));
-      setEvents(fetchedEvents);
-    } catch (err: any) {
-      addNotification("system", `Failed to load events: ${err.message}`);
-      setEvents([]);
+      if (currentOffset === 0) {
+        setEvents(fetchedEvents);
+      } else {
+        setEvents(prev => {
+          const combined = [...prev, ...fetchedEvents];
+          const seen = new Set();
+          return combined.filter(e => {
+            if (seen.has(e.id)) return false;
+            seen.add(e.id);
+            return true;
+          });
+        });
+      }
+      
+      if (fetchedEvents.length < 40) {
+        setHasMore(false);
+      } else {
+        setHasMore(true);
+      }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      addNotification("system", `Failed to load events: ${message}`);
+      if (currentOffset === 0) {
+        setEvents([]);
+      }
       setFetchError(true);
-      setFetchErrorMessage(err.message ?? "Unknown error");
+      setFetchErrorMessage(message);
     } finally {
       setIsLoading(false);
     }
@@ -270,7 +303,8 @@ export default function EventListing({
     const channel = supabase.channel("radar_live")
       .on("postgres_changes", { event: "*", schema: "public", table: "events" }, (payload) => {
         if (payload.eventType === "INSERT" || payload.eventType === "UPDATE") {
-          const newEvent = { ...(payload.new as any), name: (payload.new as any).title };
+          const rawNew = payload.new as EventData;
+          const newEvent = { ...rawNew, name: rawNew.title };
           if (newEvent.is_verified) {
              setEvents(prev => {
                 const existing = prev.filter(e => e.id !== newEvent.id);
@@ -280,7 +314,7 @@ export default function EventListing({
              setEvents(prev => prev.filter(e => e.id !== newEvent.id));
           }
         } else if (payload.eventType === "DELETE") {
-           setEvents(prev => prev.filter(e => e.id !== (payload.old as any).id));
+           setEvents(prev => prev.filter(e => e.id !== (payload.old as EventData).id));
         }
       })
       .subscribe();
@@ -322,8 +356,9 @@ export default function EventListing({
         setBookmarkedEvents(prev => new Set(prev).add(eventId));
         addNotification("radar", "Event saved to your radar.");
       }
-    } catch (err: any) {
-      addNotification("system", `Pulse Error: ${err.message}`);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      addNotification("system", `Pulse Error: ${message}`);
     }
   };
   const joinEvent = async (id: string) => {
@@ -346,8 +381,9 @@ export default function EventListing({
       setJoinedEvents((prev) => new Set(prev).add(id));
       const event = events.find(e => e.id === id);
       if (event) addNotification("radar", `Plan joined: ${event.name} added to your list.`);
-    } catch (err: any) {
-      addNotification("system", `Join failed: ${err.message}`);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      addNotification("system", `Join failed: ${message}`);
     }
   };
 
@@ -356,11 +392,6 @@ export default function EventListing({
   const weekStr = new Date(Date.now() + 604800000).toISOString().split("T")[0];
   const monthStr = new Date(Date.now() + 2592000000).toISOString().split("T")[0];
 
-  const CITY_ID_MAP: Record<string, string[]> = {
-    "del": ["del", "delhi-ncr", "delhi", "noida", "gurugram", "faridabad", "ghaziabad"],
-    "mum": ["mum", "mumbai", "south-mumbai", "western-suburbs", "eastern-suburbs", "navi-mumbai", "harbour-line", "thane"],
-    "blr": ["blr", "bangalore", "central-bangalore", "north-bangalore", "south-bangalore", "east-bangalore", "west-bangalore"],
-  };
 
   const filteredEvents = useMemo(() => {
     let result = events.filter(e => {
@@ -428,7 +459,7 @@ export default function EventListing({
               {selectedCity ? getCityName(selectedCity) : "Global"} <span className="text-white/50 italic">Events</span>
             </h2>
             <p className="font-[family-name:var(--font-roboto-mono)] text-white/80 text-[10px] md:text-xs uppercase tracking-[0.4em]">
-              Explore what's happening near you
+              Explore what&apos;s happening near you
             </p>
           </div>
         </div>
@@ -617,6 +648,21 @@ export default function EventListing({
                 ))}
               </motion.div>
             </AnimatePresence>
+
+            {hasMore && events.length >= 40 && (
+              <div className="text-center mt-12">
+                <button
+                  onClick={() => {
+                    const nextOffset = offset + 40;
+                    setOffset(nextOffset);
+                    fetchEvents(nextOffset);
+                  }}
+                  className="px-10 py-3.5 rounded-full border border-white/10 text-white/50 hover:text-white hover:bg-white/[0.04] transition-all font-mono text-[11px] tracking-[.1em] uppercase cursor-pointer"
+                >
+                  Load more events
+                </button>
+              </div>
+            )}
           </div>
         </>
       )}
@@ -640,8 +686,8 @@ export default function EventListing({
   );
 }
 
-function FomoCounter() {
-  const count = useMemo(() => Math.floor(Math.random() * 200) + 50, []);
+function FomoCounter({ eventId }: { eventId: string }) {
+  const count = stableCount(eventId, 50, 200);
   return (
     <div className="w-8 h-8 rounded-full border-2 border-black bg-gradient-to-tr from-purple-500 to-cyan-500 flex items-center justify-center text-[10px] font-black text-white relative z-10">+{count}</div>
   );
@@ -662,7 +708,7 @@ function FeaturedCarousel({ items, onExpand }: { items: EventData[], onExpand: (
     <div className="relative w-full overflow-hidden group/carousel">
       <div className="flex transition-transform duration-1000 ease-[cubic-bezier(0.23,1,0.32,1)]" style={{ transform: `translateX(-${currentIndex * 85}%)`, marginLeft: "5%" }}>
         {items.map((item, idx) => (
-          <motion.div key={item.id} onClick={() => onExpand(item)} className={clsx("relative min-w-[85vw] md:min-w-[60vw] aspect-[16/9] md:aspect-[21/9] mr-6 rounded-2xl overflow-hidden cursor-pointer group shrink-0 transition-all duration-700", currentIndex === idx ? "opacity-100 scale-100" : "opacity-40 scale-95")}>
+          <motion.div key={item.id} onClick={() => onExpand(item)} className={clsx("relative aspect-[16/9] md:aspect-[21/9] mr-6 rounded-2xl overflow-hidden cursor-pointer group shrink-0 transition-all duration-700", currentIndex === idx ? "opacity-100 scale-100" : "opacity-40 scale-95")} style={{ minWidth: 'min(85vw, 700px)', maxWidth: 'min(85vw, 700px)' }}>
             {item.video_url ? (
               <video src={item.video_url} autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
             ) : (
@@ -722,7 +768,10 @@ function stableCount(seed: string, min: number, range: number): number {
 function SkeletonEventCard() {
   return (
     <div className="milo-card animate-pulse">
-      <div className="milo-card-img bg-white/5" />
+      {/* Explicit fill div so the aspect-ratio container isn't zero-height in skeleton */}
+      <div className="milo-card-img">
+        <div className="absolute inset-0 bg-white/5 rounded-[14px]" />
+      </div>
       <div className="milo-card-body">
         <div className="h-5 bg-white/10 rounded w-3/4 mb-3" />
         <div className="h-3 bg-white/10 rounded w-1/2" />
@@ -842,7 +891,6 @@ function EventDetailView({
   onSelectEvent: (e: EventData) => void 
 }) {
   const isMobile = useIsMobile();
-  const [isLiked, setIsLiked] = useState(false);
   
   useEffect(() => {
     document.body.style.overflow = "hidden";
@@ -870,7 +918,7 @@ function EventDetailView({
       </div>
       <div className={clsx("flex-1 flex flex-col gap-8", isMobile ? "p-6" : "p-8 md:p-16 overflow-y-auto no-scrollbar")}>
         <div className={isMobile ? "mt-[-40px] relative z-10" : ""}>
-          <span className="text-white/40 text-[10px] font-mono uppercase tracking-[0.4em] mb-4 block">{event.category} // {event.date}</span>
+          <span className="text-white/40 text-[10px] font-mono uppercase tracking-[0.4em] mb-4 block">{event.category} {"//"} {event.date}</span>
           <h2 className={clsx("font-black text-white uppercase tracking-tighter leading-none mb-4", isMobile ? "text-3xl" : "text-4xl md:text-6xl")}>{event.title}</h2>
         </div>
         
@@ -885,7 +933,7 @@ function EventDetailView({
              <Image src="https://i.pravatar.cc/100?img=12" width={32} height={32} alt="User" className="rounded-full border-2 border-black object-cover" />
              <Image src="https://i.pravatar.cc/100?img=4" width={32} height={32} alt="User" className="rounded-full border-2 border-black object-cover" />
              <Image src="https://i.pravatar.cc/100?img=9" width={32} height={32} alt="User" className="rounded-full border-2 border-black object-cover" />
-             <FomoCounter />
+              <FomoCounter eventId={event.id} />
            </div>
            <div className="flex-1">
              <p className="text-[10px] font-black text-white uppercase tracking-widest leading-none">Friends & Others</p>

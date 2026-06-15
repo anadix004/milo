@@ -10,7 +10,7 @@ import { useAuth } from "@/components/AuthContext";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login, isAuthenticated } = useAuth();
+  const { login, isAuthenticated, loginWithGoogle } = useAuth();
   
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -36,8 +36,9 @@ export default function LoginPage() {
     try {
       await login(email, password);
       router.push("/");
-    } catch (err: any) {
-      setError(err.message || "Failed to log in");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -86,7 +87,7 @@ export default function LoginPage() {
               </div>
               <h1 className="text-4xl font-black uppercase tracking-tighter text-white">LOGIN</h1>
               <p className="text-white/50 text-sm font-mono tracking-widest uppercase">
-                Welcome back to your city's radar
+                Welcome back to your city&apos;s radar
               </p>
             </div>
 
@@ -104,7 +105,7 @@ export default function LoginPage() {
                 <div>
                   <input
                     type="email"
-                    placeholder="Phone Number / Email ID"
+                    placeholder="Email address"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
@@ -148,7 +149,7 @@ export default function LoginPage() {
 
             <div className="text-center mt-8 space-y-6">
               <p className="text-white/50 text-sm">
-                Don't have an account?{" "}
+                Don&apos;t have an account?{" "}
                 <Link href="/signup" className="text-white font-bold hover:underline">
                   Sign up
                 </Link>
@@ -160,7 +161,10 @@ export default function LoginPage() {
                 <div className="flex-1 h-px bg-white/10" />
               </div>
 
-              <button className="w-full py-4 bg-white/5 border border-white/10 text-white font-bold text-sm rounded-xl hover:bg-white/10 transition-colors flex items-center justify-center gap-3">
+              <button
+                onClick={loginWithGoogle}
+                className="w-full py-4 bg-white/5 border border-white/10 text-white font-bold text-sm rounded-xl hover:bg-white/10 transition-colors flex items-center justify-center gap-3"
+              >
                 <svg viewBox="0 0 24 24" width="20" height="20" xmlns="http://www.w3.org/2000/svg">
                   <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
                   <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>

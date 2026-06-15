@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useAuth } from "./AuthContext";
 import { useNotifications } from "./NotificationContext";
 import { createClient } from "@/utils/supabase/client";
@@ -26,11 +26,11 @@ import BottomSheet from "@/components/mobile/BottomSheet";
 
 type AuthStep = "gateway" | "login" | "signup-credentials" | "signup-handle" | "identity";
 
-const SPRING_TRANSITION: any = { type: "spring", stiffness: 300, damping: 30 };
+const SPRING_TRANSITION = { type: "spring" as const, stiffness: 300, damping: 30 };
 
 export default function AuthModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const isMobile = useIsMobile();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
   const { login, signUp, user, isAuthenticated, refreshProfile, recoverPassword, loginWithGoogle } = useAuth();
   const { addNotification } = useNotifications();
   const router = useRouter();
@@ -82,8 +82,9 @@ export default function AuthModal({ isOpen, onClose }: { isOpen: boolean; onClos
     setErrorStatus(null);
     try {
       await login(formData.email, formData.password);
-    } catch (err: any) {
-      setErrorStatus(err.message || "Login Failed");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      setErrorStatus(message);
     } finally {
       setIsSyncing(false);
     }
@@ -126,8 +127,9 @@ export default function AuthModal({ isOpen, onClose }: { isOpen: boolean; onClos
       await refreshProfile();
       router.refresh();
       onClose();
-    } catch (err: any) {
-      setErrorStatus(err.message || "Operation Failed");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      setErrorStatus(message);
     } finally {
       setIsSyncing(false);
     }

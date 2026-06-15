@@ -49,7 +49,7 @@ export default function HeroSection() {
             poster="https://images.unsplash.com/photo-1540039155732-684735035727?w=1200"
             className="w-full h-full object-cover opacity-70"
           >
-            <source src="/city event/long event.mp4" type="video/mp4" />
+            <source src="/city-event/long-event.mp4" type="video/mp4" />
           </video>
           {/* Subtle dark overlay */}
           <div className="absolute inset-0 bg-black/50 w-full h-full pointer-events-none" />
