@@ -97,8 +97,9 @@ body {
   select { cursor: pointer !important; } /* select ≠ text input — needs pointer */
 }
 
-/* UI-007: inline-flex so text centers vertically when min-height: 44px overrides intrinsic height */
-button:not(.no-min-size), a:not(.no-min-size), [role="button"]:not(.no-min-size) {
+/* UI-007: inline-flex so text centers vertically when min-height: 44px overrides intrinsic height.
+   Wrapped in :where() to ensure zero specificity, letting Tailwind display/dimension utilities override it. */
+:where(button:not(.no-min-size)), :where(a:not(.no-min-size)), :where([role="button"]:not(.no-min-size)) {
   min-height: 44px;
   min-width: 44px;
   display: inline-flex;
