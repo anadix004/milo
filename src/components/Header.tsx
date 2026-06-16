@@ -10,6 +10,7 @@ import BrandLogo from "./BrandLogo";
 import { useNotifications } from "./NotificationContext";
 import { useLocation } from "./LocationContext";
 import LocationSelectorPopup from "./LocationSelectorPopup";
+import { useIsMobile } from "@/hooks/useMediaQuery";
 
 interface HeaderProps {
   onProfileClick: () => void;
@@ -30,6 +31,7 @@ export default function Header({
   const [isScrolled, setIsScrolled] = useState(false);
   const [isLocationOpen, setIsLocationOpen] = useState(false);
   const { scrollY } = useScroll();
+  const isMobile = useIsMobile();
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     setIsScrolled(latest > 100);
@@ -121,34 +123,37 @@ export default function Header({
         <div className="flex items-center gap-2 md:gap-4 pointer-events-auto justify-end">
           {/* Location Selector */}
           <div className="relative">
-            {/* Mobile */}
-            <button
-              onClick={() => setIsLocationOpen(!isLocationOpen)}
-              className={clsx(
-                "flex md:hidden items-center gap-1.5 px-3 py-2 rounded-full border backdrop-blur-md transition-all",
-                selectedCity
-                  ? "border-white/20 bg-white/10 text-white"
-                  : "border-white/30 bg-white/15 text-white animate-pulse"
-              )}
-            >
-              <MapPin
-                size={14}
-                className={selectedCity ? "text-white/60" : "text-white"}
-              />
-              <span className="font-black text-[9px] uppercase tracking-widest">
-                {getCityName()}
-              </span>
-            </button>
-            {/* Desktop */}
-            <button
-              onClick={() => setIsLocationOpen(!isLocationOpen)}
-              className="hidden md:flex items-center gap-2 px-4 py-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-white transition-colors"
-            >
-              <MapPin size={16} className="text-white/60" />
-              <span className="font-bold text-[11px] uppercase tracking-wider">
-                {getCityName()}
-              </span>
-            </button>
+            {isMobile ? (
+              /* Mobile */
+              <button
+                onClick={() => setIsLocationOpen(!isLocationOpen)}
+                className={clsx(
+                  "flex items-center gap-1.5 px-3 py-2 rounded-full border backdrop-blur-md transition-all",
+                  selectedCity
+                    ? "border-white/20 bg-white/10 text-white"
+                    : "border-white/30 bg-white/15 text-white animate-pulse"
+                )}
+              >
+                <MapPin
+                  size={14}
+                  className={selectedCity ? "text-white/60" : "text-white"}
+                />
+                <span className="font-black text-[9px] uppercase tracking-widest">
+                  {getCityName()}
+                </span>
+              </button>
+            ) : (
+              /* Desktop */
+              <button
+                onClick={() => setIsLocationOpen(!isLocationOpen)}
+                className="flex items-center gap-2 px-4 py-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-white transition-colors animate-fade-in"
+              >
+                <MapPin size={16} className="text-white/60" />
+                <span className="font-bold text-[11px] uppercase tracking-wider">
+                  {getCityName()}
+                </span>
+              </button>
+            )}
             {/*
              * FIX: LocationSelectorPopup was z-[110]/z-[120].
              * Now it sits at z-[70] (LOCATION tier) — above the header (z-60)
