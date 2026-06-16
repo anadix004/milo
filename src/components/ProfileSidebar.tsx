@@ -3,7 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { User, Mail, Globe, Image as ImageIcon, QrCode, LogOut, X, ChevronRight, ShieldCheck, Camera, Loader2, Shield } from "lucide-react";
 import Image from "next/image";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import clsx from "clsx";
 import { createClient } from "@/utils/supabase/client";
@@ -34,7 +34,7 @@ interface RSVP {
 
 export default function ProfileSidebar({ isOpen, onClose, onAuthClick }: ProfileSidebarProps) {
   const isMobile = useIsMobile();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
   const { user, isAuthenticated, logout, refreshProfile } = useAuth();
   const router = useRouter();
   const [isUploading, setIsUploading] = useState(false);

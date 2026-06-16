@@ -119,6 +119,7 @@ export default function ExplorePage() {
                 key={i}
                 className="w-1 rounded-full"
                 style={{
+                  height: "8px",
                   background: "linear-gradient(to top, #4A7FD4, #b48cff)",
                   animation: `bar-bounce 1.1s ease-in-out ${i * 0.1}s infinite`,
                 }}

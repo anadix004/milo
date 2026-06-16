@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { Edit3, Music, MapPin, Award, Loader2, Camera } from "lucide-react";
 import Image from "next/image";
 import { useAuth } from "@/components/AuthContext";
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { useNotifications } from "@/components/NotificationContext";
 
@@ -21,7 +21,7 @@ interface DigitalPassportProps {
 export default function DigitalPassport({ onEditProfile }: DigitalPassportProps) {
   const { user, isLoading, updateProfile, refreshProfile } = useAuth();
   const { addNotification } = useNotifications();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const coverInputRef = useRef<HTMLInputElement>(null);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);

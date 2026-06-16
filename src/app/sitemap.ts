@@ -34,7 +34,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // Cities
     { url: `${baseUrl}/city/delhi`,      lastModified: now, changeFrequency: 'daily',   priority: 0.85 },
     { url: `${baseUrl}/city/mumbai`,     lastModified: now, changeFrequency: 'daily',   priority: 0.85 },
-    { url: `${baseUrl}/city/bangalore`,  lastModified: now, changeFrequency: 'daily',   priority: 0.85 },
+    { url: `${baseUrl}/city/bengaluru`,  lastModified: now, changeFrequency: 'daily',   priority: 0.85 },
     // Company
     { url: `${baseUrl}/about`,           lastModified: now, changeFrequency: 'monthly', priority: 0.6 },
     { url: `${baseUrl}/contact`,         lastModified: now, changeFrequency: 'monthly', priority: 0.6 },

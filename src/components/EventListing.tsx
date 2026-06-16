@@ -160,7 +160,7 @@ function normalizePriceFilter(value: string | null | undefined) {
 const CITY_ID_MAP: Record<string, string[]> = {
   "del": ["del", "delhi-ncr", "delhi", "noida", "gurugram", "faridabad", "ghaziabad"],
   "mum": ["mum", "mumbai", "south-mumbai", "western-suburbs", "eastern-suburbs", "navi-mumbai", "harbour-line", "thane"],
-  "blr": ["blr", "bangalore", "central-bangalore", "north-bangalore", "south-bangalore", "east-bangalore", "west-bangalore"],
+  "blr": ["blr", "bangalore", "bengaluru", "central-bangalore", "north-bangalore", "south-bangalore", "east-bangalore", "west-bangalore"],
 };
 
 export default function EventListing({
@@ -769,7 +769,7 @@ function SkeletonEventCard() {
   return (
     <div className="milo-card animate-pulse">
       {/* Explicit fill div so the aspect-ratio container isn't zero-height in skeleton */}
-      <div className="milo-card-img">
+      <div className="milo-card-img min-h-[180px]">
         <div className="absolute inset-0 bg-white/5 rounded-[14px]" />
       </div>
       <div className="milo-card-body">

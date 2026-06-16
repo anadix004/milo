@@ -13,6 +13,14 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   role TEXT DEFAULT 'user' CHECK (role IN ('owner', 'admin', 'team', 'user')),
   city TEXT,
   bio TEXT,
+  phone TEXT,
+  date_of_birth TEXT,
+  instagram TEXT,
+  twitter TEXT,
+  spotify TEXT,
+  gender TEXT,
+  cover_url TEXT,
+  is_ghost BOOLEAN DEFAULT false,
   created_at TIMESTAMPTZ DEFAULT now(),
   updated_at TIMESTAMPTZ DEFAULT now()
 );

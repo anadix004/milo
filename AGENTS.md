@@ -126,3 +126,7 @@ Available tools:
 3. **Read `baharmilo_full_redesign.html`** before working on any UI section
 4. **Spring physics for motion** — no CSS linear transitions for major movements
 5. **Check Next.js App Router docs** — don't assume old Pages Router patterns work
+6. **No window.location navigation** — Always use `next/navigation` `useRouter` to prevent hard reloads and SPA state loss.
+7. **Supabase Client Instantiation** — Never call `createClient()` directly in a React component body. Always wrap it in `useMemo(() => createClient(), [])` to prevent infinite subscription loops on re-render.
+8. **Z-Index System** — Avoid arbitrary `z-[...]` Tailwind classes. Consult and use the documented z-index ladder (or unify with `zIndex.ts`) to prevent stacking collisions between sidebars, modals, and overlays.
+9. **Supabase Schema Consistency** — Do not submit fields to database updates (e.g. profiles) without verifying the column actually exists in the backend schema (`supabase_setup.sql`).

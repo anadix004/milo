@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 import { Ticket, Bookmark, History, QrCode, Loader2 } from "lucide-react";
 import clsx from "clsx";
@@ -16,7 +16,7 @@ export default function MyRadar() {
   const [bookmarks, setBookmarks] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { user } = useAuth();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
   useEffect(() => {
     const fetchData = async () => {
       if (!user) {

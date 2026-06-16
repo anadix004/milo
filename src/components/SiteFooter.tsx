@@ -5,7 +5,7 @@ const FOOTER_LINKS = {
     { href: '/events',         label: 'All Events'  },
     { href: '/city/delhi',     label: 'Delhi'       },
     { href: '/city/mumbai',    label: 'Mumbai'      },
-    { href: '/city/bangalore', label: 'Bangalore'   },
+    { href: '/city/bengaluru', label: 'Bengaluru'   },
   ],
   Company: [
     { href: '/about',   label: 'About'   },
@@ -40,7 +40,7 @@ export default function SiteFooter() {
             <div className="mt-5 flex items-center gap-1.5">
               <div className="gold-dot" />
               <span className="font-mono text-[9px] tracking-[.14em] uppercase" style={{ color: 'rgba(201,168,76,.6)' }}>
-                Live in Delhi, Mumbai & Bangalore
+                Live in Delhi, Mumbai & Bengaluru
               </span>
             </div>
           </div>

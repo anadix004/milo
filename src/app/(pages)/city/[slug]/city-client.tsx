@@ -44,8 +44,8 @@ const CITY_CONFIG: Record<string, {
       { code: 'ADH', name: 'Andheri', desc: 'Comedy & improv' },
     ],
   },
-  bangalore: {
-    name: 'Bangalore',
+  bengaluru: {
+    name: 'Bengaluru',
     accent: '#3DB865',
     accentDim: 'rgba(61,184,101,.12)',
     accentBdr: 'rgba(61,184,101,.28)',
@@ -66,9 +66,17 @@ const CATEGORY_COLORS: Record<string, string> = {
   'Art & Culture': '#f9643c', 'Food & Walk': '#C9A84C',
 }
 
+const WHATSAPP_LINKS: Record<string, string> = {
+  delhi: "https://chat.whatsapp.com/GzTG445P70x8MfifnKg1uy?mode=gi_t",
+  mumbai: "https://chat.whatsapp.com/JuyswAkQ1733fZZAA3H3G3?mode=gi_t",
+  bengaluru: "https://chat.whatsapp.com/BwOUV0sjQ0lDTFpiGSOP2j?mode=gi_t",
+};
+
 export default function CityClient({ slug, events }: { slug: string; events: any[] }) {
   const cfg = CITY_CONFIG[slug]
   if (!cfg) return null
+
+  const whatsappUrl = WHATSAPP_LINKS[slug] || "https://chat.whatsapp.com";
 
   return (
     <>
@@ -207,10 +215,15 @@ export default function CityClient({ slug, events }: { slug: string; events: any
               style={{ color: 'rgba(232,238,248,.45)' }}>
               Real-time plans, after-hours invites, and the people who actually show up.
             </p>
-            <button className="shim font-mono text-[11px] font-bold tracking-[.1em] uppercase px-10 py-4 rounded-full transition-all relative z-10 hover:opacity-90"
-              style={{ background: cfg.accent, color: '#050505' }}>
+            <a 
+              href={whatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block shim font-mono text-[11px] font-bold tracking-[.1em] uppercase px-10 py-4 rounded-full transition-all relative z-10 hover:opacity-90 cursor-pointer"
+              style={{ background: cfg.accent, color: '#050505' }}
+            >
               Join {cfg.name} Group
-            </button>
+            </a>
           </div>
         </div>
       </section>

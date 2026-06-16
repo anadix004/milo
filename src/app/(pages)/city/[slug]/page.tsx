@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation'
 import { supabase } from '@/utils/supabase'
 import CityClient from './city-client'
 
-const VALID_CITIES = ['delhi', 'mumbai', 'bangalore'] as const
+const VALID_CITIES = ['delhi', 'mumbai', 'bangalore', 'bengaluru'] as const
 
 const CITY_META: Record<string, { title: string; description: string }> = {
   delhi: {
@@ -14,9 +14,13 @@ const CITY_META: Record<string, { title: string; description: string }> = {
     title: 'Mumbai Events — The Circuit | Milo',
     description: 'Discover events in Mumbai. Bandra flea markets, Lower Parel jazz, Marine Drive sunset sessions, and Colaba gallery openings.',
   },
+  bengaluru: {
+    title: 'Bengaluru Events — The Circuit | Milo',
+    description: 'Discover events in Bengaluru. Indie gigs in Indiranagar, startup socials in Koramangala, Cubbon Park cycling, and HSR terrace sessions.',
+  },
   bangalore: {
-    title: 'Bangalore Events — The Circuit | Milo',
-    description: 'Discover events in Bangalore. Indie gigs in Indiranagar, startup socials in Koramangala, Cubbon Park cycling, and HSR terrace sessions.',
+    title: 'Bengaluru Events — The Circuit | Milo',
+    description: 'Discover events in Bengaluru. Indie gigs in Indiranagar, startup socials in Koramangala, Cubbon Park cycling, and HSR terrace sessions.',
   },
 }
 
@@ -41,12 +45,14 @@ export default async function CityPage({ params }: Props) {
   const { slug } = await params
   if (!VALID_CITIES.includes(slug as any)) notFound()
 
+  const canonicalSlug = slug === 'bangalore' ? 'bengaluru' : slug
+
   const { data: events } = await supabase
     .from('events')
     .select('*')
-    .eq('cityId', slug)
+    .eq('cityId', canonicalSlug)
     .order('created_at', { ascending: false })
     .limit(24)
 
-  return <CityClient slug={slug} events={events || []} />
+  return <CityClient slug={canonicalSlug} events={events || []} />
 }

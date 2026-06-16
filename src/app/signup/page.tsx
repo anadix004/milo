@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -12,7 +12,7 @@ import { createClient } from "@/utils/supabase/client";
 export default function SignupPage() {
   const router = useRouter();
   const { isAuthenticated } = useAuth();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
   
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");

@@ -7,7 +7,7 @@ import { useState, useEffect } from 'react'
 const CITIES = [
   { slug: 'delhi',     label: 'DEL' },
   { slug: 'mumbai',    label: 'BOM' },
-  { slug: 'bangalore', label: 'BLR' },
+  { slug: 'bengaluru', label: 'BLR' },
 ]
 
 const NAV_LINKS = [

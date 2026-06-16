@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { X, PlusCircle, Globe, ShieldCheck, Lock, Upload, Video, Image as ImageIcon, CheckCircle2, Loader2, ArrowRight, ArrowLeft } from "lucide-react";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { useAuth } from "./AuthContext";
 import { createClient } from "@/utils/supabase/client";
 import { useNotifications } from "./NotificationContext";
@@ -25,7 +25,7 @@ type Step = 1 | 2 | 3 | 4;
 
 export default function EventSubmission({ isOpen, onClose, onAuthRedirect }: EventSubmissionProps) {
   const isMobile = useIsMobile();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
   const { user, isAuthenticated } = useAuth();
   const { addNotification } = useNotifications();
   
@@ -151,6 +151,7 @@ export default function EventSubmission({ isOpen, onClose, onAuthRedirect }: Eve
         image: imageUrl || "https://images.unsplash.com/photo-1492684223066-81342ee5ff30",
         video_url: videoUrl,
         user_id: user.id,
+        aadhaar_id: hashedAadhaar,
         is_verified: false 
       });
 
@@ -259,6 +260,9 @@ export default function EventSubmission({ isOpen, onClose, onAuthRedirect }: Eve
           onChange={(e) => setFormData({...formData, aadhaarId: e.target.value})} 
           className="w-full bg-white/[0.03] border border-white/10 rounded-2xl p-6 text-sm text-white outline-none focus:border-white/30 transition-all font-black tracking-widest uppercase font-mono" 
         />
+        <p className="text-[9px] text-white/25 font-mono mt-2 px-2 leading-relaxed uppercase tracking-widest">
+          🔒 Privacy Lock: Your Aadhaar ID is cryptographically hashed (SHA-256) on your device. The raw number is never sent to our servers.
+        </p>
       </div>
       <div className="space-y-4">
         <div className="flex items-center justify-between px-2">

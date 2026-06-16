@@ -18,7 +18,7 @@ interface EventData {
 }
 
 const FILTERS = ['All', 'Techno', 'Social', 'Meetups', 'Art & Culture', 'Food & Walk', 'Comedy', 'Sports']
-const CITIES  = ['All Cities', 'Delhi', 'Mumbai', 'Bangalore']
+const CITIES  = ['All Cities', 'Delhi', 'Mumbai', 'Bengaluru']
 
 const CATEGORY_COLORS: Record<string, string> = {
   Techno:        '#b48cff',

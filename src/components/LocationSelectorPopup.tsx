@@ -7,6 +7,8 @@ import { useLocation } from "./LocationContext";
 import { useRouter, usePathname } from "next/navigation";
 import { useIsMobile } from "@/hooks/useMediaQuery";
 
+import { ZC } from "@/lib/zIndex";
+
 interface LocationSelectorPopupProps {
   isOpen: boolean;
   onClose: () => void;
@@ -24,50 +26,45 @@ export default function LocationSelectorPopup({ isOpen, onClose }: LocationSelec
   const pathname = usePathname();
   const isMobile = useIsMobile();
 
-  const handleSelect = (cityId: string) => {
+  const handleCitySelect = (cityId: string) => {
     setSelectedCity(cityId);
-    
-    // Map internal codes to full city names for URLs
-    let cityUrl = cityId;
-    if (cityId === "del") cityUrl = "delhi";
-    if (cityId === "mum") cityUrl = "mumbai";
-    if (cityId === "blr") cityUrl = "bengaluru";
-
-    // If already on an explore page, route to the new city
-    if (pathname?.startsWith("/explore/")) {
-      router.push(`/explore/${cityUrl}`);
-    }
-
     onClose();
+    
+    const isExplorePage = pathname.startsWith("/explore/");
+    if (isExplorePage) {
+      const citySlug = cityId === "del" ? "delhi" : cityId === "mum" ? "mumbai" : "bengaluru";
+      router.push(`/explore/${citySlug}`);
+    }
   };
 
   const cityList = (
-    <>
-      <div className={clsx("p-3 border-b border-white/10 bg-white/5", isMobile && "pt-2")}>
-        <h3 className="text-[10px] font-black uppercase tracking-widest text-white/50 text-center">
-          Choose Your Location
-        </h3>
+    <div className="p-4 space-y-3">
+      <h3 className="text-[10px] font-mono text-white/40 uppercase tracking-[0.25em]">Select City</h3>
+      <div className="space-y-2">
+        {CITIES.map((city) => {
+          const isSelected = selectedCity === city.id;
+          return (
+            <button
+              key={city.id}
+              onClick={() => handleCitySelect(city.id)}
+              className={clsx(
+                "w-full px-5 py-4 rounded-2xl text-left text-sm font-black uppercase tracking-widest transition-all flex items-center justify-between group",
+                isSelected 
+                  ? "bg-white text-black" 
+                  : "text-white/60 hover:text-white hover:bg-white/5"
+              )}
+            >
+              {city.name}
+              {isSelected ? (
+                <CheckCircle2 size={16} className="text-black" />
+              ) : (
+                <MapPin size={16} className="text-white/20 group-hover:text-white/40 transition-colors" />
+              )}
+            </button>
+          );
+        })}
       </div>
-      <div className="flex flex-col py-2">
-        {CITIES.map((city) => (
-          <button
-            key={city.id}
-            onClick={() => handleSelect(city.id)}
-            className={clsx(
-              "w-full px-4 py-3 flex items-center justify-between text-sm font-bold transition-colors",
-              selectedCity === city.id 
-                ? "text-white bg-white/10" 
-                : "text-white/60 hover:text-white hover:bg-white/5"
-            )}
-          >
-            <span>{city.name}</span>
-            {selectedCity === city.id && (
-              <CheckCircle2 size={16} className="text-white" />
-            )}
-          </button>
-        ))}
-      </div>
-    </>
+    </div>
   );
 
   if (isMobile) {
@@ -79,7 +76,7 @@ export default function LocationSelectorPopup({ isOpen, onClose }: LocationSelec
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[110]"
+              className={`fixed inset-0 bg-black/60 backdrop-blur-sm ${ZC.OVERLAY}`}
               onClick={onClose}
             />
             <motion.div
@@ -87,7 +84,7 @@ export default function LocationSelectorPopup({ isOpen, onClose }: LocationSelec
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="fixed bottom-0 inset-x-0 z-[120] bg-zinc-900 border-t border-white/10 rounded-t-2xl overflow-hidden shadow-2xl"
+              className={`fixed bottom-0 inset-x-0 ${ZC.MODAL} bg-zinc-900 border-t border-white/10 rounded-t-2xl overflow-hidden shadow-2xl`}
               style={{ paddingBottom: "max(16px, env(safe-area-inset-bottom))" }}
             >
               <div className="flex justify-center pt-3 pb-1">
@@ -109,14 +106,14 @@ export default function LocationSelectorPopup({ isOpen, onClose }: LocationSelec
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[110]"
+            className={`fixed inset-0 ${ZC.LOCATION}`}
             onClick={onClose}
           />
           <motion.div
             initial={{ opacity: 0, y: -10, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -10, scale: 0.95 }}
-            className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 bg-zinc-900 border border-white/10 rounded-2xl overflow-hidden shadow-2xl z-[120]"
+            className={`absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 bg-zinc-900 border border-white/10 rounded-2xl overflow-hidden shadow-2xl ${ZC.LOCATION}`}
           >
             {cityList}
           </motion.div>

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Cookie, X } from "lucide-react";
+import { ZC } from "@/lib/zIndex";
 
 export default function CookieConsent() {
   const [isVisible, setIsVisible] = useState(false);
@@ -35,7 +36,7 @@ export default function CookieConsent() {
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 100, opacity: 0 }}
           transition={{ type: "spring", stiffness: 200, damping: 25 }}
-          className="fixed bottom-24 left-4 right-4 md:bottom-8 md:left-auto md:right-8 md:max-w-sm z-[200] bg-zinc-950 border border-white/10 rounded-2xl p-5 shadow-[0_20px_40px_rgba(0,0,0,0.8)] backdrop-blur-xl"
+          className={`fixed bottom-24 left-4 right-4 md:bottom-8 md:left-auto md:right-8 md:max-w-sm ${ZC.TOAST} bg-zinc-950 border border-white/10 rounded-2xl p-5 shadow-[0_20px_40px_rgba(0,0,0,0.8)] backdrop-blur-xl`}
         >
           <div className="flex items-start gap-4">
             <div className="p-3 bg-white/5 rounded-full shrink-0">

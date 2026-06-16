@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Video, Image as ImageIcon, X, Loader2 } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
@@ -29,7 +29,7 @@ export default function VibeCheck({ eventId }: VibeCheckProps) {
   const [stories, setStories] = useState<Story[]>([]);
   const [activeStory, setActiveStory] = useState<Story | null>(null);
   const [isUploading, setIsUploading] = useState(false);
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
   const { user, isAuthenticated } = useAuth();
   const { addNotification } = useNotifications();
 
