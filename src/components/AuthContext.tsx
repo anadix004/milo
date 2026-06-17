@@ -12,6 +12,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useNotifications } from "./NotificationContext";
 import { Session, User } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
+import { signOut as serverSignOut } from "@/app/actions/auth";
 
 interface AuthUser extends User {
   username?: string;
@@ -132,12 +133,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [supabase, addNotification, router]);
 
   const logout = async () => {
-    await supabase.auth.signOut();
+    // Clear local state immediately for snappy UI
     setUser(null);
     setSession(null);
-    router.refresh();
-    router.push("/");
     addNotification("session", "Logged out successfully.");
+    
+    // Call server action to clear HttpOnly cookies and redirect
+    await serverSignOut();
   };
 
   const recoverPassword = async (email: string) => {
