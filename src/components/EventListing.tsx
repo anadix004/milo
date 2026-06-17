@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect, useRef, useCallback } from "react";
+import React, { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { Search, MapPin, Calendar, Clock, Filter, Star, ChevronRight, X, Music, Trophy, Layout, Search as SearchIcon, Heart, Share2, Ticket, Check, ArrowUpDown, Send, Loader2 } from "lucide-react";
@@ -300,25 +300,46 @@ export default function EventListing({
       fetchBookmarks();
     }
 
+    let updateBuffer: { type: string, payload: any }[] = [];
+    let flushTimeout: NodeJS.Timeout | null = null;
+
+    const flushUpdates = () => {
+      if (updateBuffer.length === 0) return;
+      
+      setEvents(prev => {
+        let next = [...prev];
+        for (const { type, payload } of updateBuffer) {
+           if (type === "INSERT" || type === "UPDATE") {
+             const rawNew = payload.new as EventData;
+             const newEvent = { ...rawNew, name: rawNew.title };
+             if (newEvent.is_verified) {
+               next = [newEvent, ...next.filter(e => e.id !== newEvent.id)];
+             } else {
+               next = next.filter(e => e.id !== newEvent.id);
+             }
+           } else if (type === "DELETE") {
+             next = next.filter(e => e.id !== (payload.old as EventData).id);
+           }
+        }
+        return next;
+      });
+      updateBuffer = [];
+      flushTimeout = null;
+    };
+
     const channel = supabase.channel("radar_live")
       .on("postgres_changes", { event: "*", schema: "public", table: "events" }, (payload) => {
-        if (payload.eventType === "INSERT" || payload.eventType === "UPDATE") {
-          const rawNew = payload.new as EventData;
-          const newEvent = { ...rawNew, name: rawNew.title };
-          if (newEvent.is_verified) {
-             setEvents(prev => {
-                const existing = prev.filter(e => e.id !== newEvent.id);
-                return [newEvent, ...existing];
-             });
-          } else {
-             setEvents(prev => prev.filter(e => e.id !== newEvent.id));
-          }
-        } else if (payload.eventType === "DELETE") {
-           setEvents(prev => prev.filter(e => e.id !== (payload.old as EventData).id));
-        }
+         updateBuffer.push({ type: payload.eventType, payload });
+         if (!flushTimeout) {
+           flushTimeout = setTimeout(flushUpdates, 2500);
+         }
       })
       .subscribe();
-    return () => { supabase.removeChannel(channel); };
+
+    return () => { 
+      if (flushTimeout) clearTimeout(flushTimeout);
+      supabase.removeChannel(channel); 
+    };
   }, []);
 
   const FIXED_CATEGORIES = ["All", ...OFFICIAL_CATEGORIES];
@@ -637,10 +658,10 @@ export default function EventListing({
             <AnimatePresence mode="wait">
               <motion.div 
                 key={`${selectedCity}-${selectedCat}-${searchQuery}-${timeFilter}-${sortOrder}`}
-                initial={{ opacity: 0, filter: "blur(20px)" }}
-                animate={{ opacity: 1, filter: "blur(0px)" }}
-                exit={{ opacity: 0, filter: "blur(20px)" }}
-                transition={{ duration: 0.6, ease: [0.19, 1, 0.22, 1] }}
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -15 }}
+                transition={{ duration: 0.4, ease: "easeOut" }}
                 className="milo-card-grid"
               >
                 {filteredEvents.filter(e => !e.featured).map((event) => (
@@ -788,7 +809,41 @@ function SkeletonEventCard() {
   );
 }
 
-function EventGridCard({ event, onExpand }: { event: EventData, onExpand: (e: EventData) => void }) {
+const InViewVideo = React.memo(({ src }: { src: string }) => {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            videoRef.current?.play().catch(() => {});
+          } else {
+            videoRef.current?.pause();
+          }
+        });
+      },
+      { rootMargin: "100px" }
+    );
+
+    if (videoRef.current) observer.observe(videoRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <video
+      ref={videoRef}
+      src={src}
+      muted
+      loop
+      playsInline
+      style={{ width: "100%", height: "100%", objectFit: "cover", transition: "filter .3s, transform .35s" }}
+    />
+  );
+});
+InViewVideo.displayName = "InViewVideo";
+
+const EventGridCard = React.memo(({ event, onExpand }: { event: EventData, onExpand: (e: EventData) => void }) => {
   // Derive a friendly time slot tag from category or a fallback
   const tagLabel = event.featured ? "● Live now" : event.category || "Tonight";
   const tagClass = getTagClass(tagLabel);
@@ -816,12 +871,7 @@ function EventGridCard({ event, onExpand }: { event: EventData, onExpand: (e: Ev
       {/* Image area */}
       <div className="milo-card-img">
         {event.video_url ? (
-          <video
-            src={event.video_url}
-            autoPlay muted loop playsInline
-            style={{ width: "100%", height: "100%", objectFit: "cover",
-              transition: "filter .3s, transform .35s" }}
-          />
+          <InViewVideo src={event.video_url} />
         ) : (
           <Image
             src={event.image}
@@ -869,7 +919,8 @@ function EventGridCard({ event, onExpand }: { event: EventData, onExpand: (e: Ev
       </div>
     </motion.div>
   );
-}
+}, (prev, next) => prev.event.id === next.event.id);
+EventGridCard.displayName = "EventGridCard";
 
 function EventDetailView({ 
   event, 
