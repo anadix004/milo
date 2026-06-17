@@ -8,7 +8,6 @@ import { useRouter } from "next/navigation";
 import clsx from "clsx";
 import { createClient } from "@/utils/supabase/client";
 import { useAuth } from "./AuthContext";
-import IdentityScan from "./IdentityScan";
 
 import { useIsMobile } from "@/hooks/useMediaQuery";
 import BottomSheet from "@/components/mobile/BottomSheet";
@@ -196,22 +195,7 @@ export default function ProfileSidebar({ isOpen, onClose, onAuthClick }: Profile
             </div>
 
             <div className="grid grid-cols-1 gap-3">
-              <button 
-                onClick={() => setUpdateMode(updateMode === "camera" ? null : "camera")}
-                className={clsx(
-                  "p-6 rounded-[1.5rem] border flex items-center justify-between transition-all",
-                  updateMode === "camera" ? "bg-white text-black border-white" : "bg-white/5 border-white/5 hover:border-white/20 text-white"
-                )}
-              >
-                <div className="flex items-center gap-4">
-                  <Camera size={20} />
-                  <div className="text-left">
-                    <p className="font-black text-[10px] tracking-widest uppercase">Live Pulse Sync</p>
-                    <p className="text-[7px] uppercase tracking-widest opacity-40">Identity Scan Pulse</p>
-                  </div>
-                </div>
-              </button>
-              
+
               <div className="relative group">
                  <input 
                    type="file" 
@@ -234,22 +218,6 @@ export default function ProfileSidebar({ isOpen, onClose, onAuthClick }: Profile
               </div>
             </div>
 
-            <AnimatePresence>
-              {updateMode === "camera" && (
-                <motion.div 
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: "auto", opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  className="p-4 bg-white/5 rounded-3xl border border-white/5 overflow-hidden"
-                >
-                   <IdentityScan onComplete={async () => {
-                     await refreshProfile();
-                     setIsUpdatingAvatar(false);
-                     setUpdateMode(null);
-                   }} />
-                </motion.div>
-              )}
-            </AnimatePresence>
 
             <button 
               onClick={() => setIsUpdatingAvatar(false)}

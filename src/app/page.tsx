@@ -13,14 +13,13 @@ import MarqueeBar from "@/components/MarqueeBar";
 
 const ProfileSidebar = dynamic(() => import("@/components/ProfileSidebar"), { ssr: false });
 const EventSubmission = dynamic(() => import("@/components/EventSubmission"), { ssr: false });
-const AuthModal = dynamic(() => import("@/components/AuthModal"), { ssr: false });
 const NotificationSidebar = dynamic(() => import("@/components/NotificationSidebar"), { ssr: false });
 
 export default function Home() {
   const { isAuthenticated } = useAuth();
   const [isReady, setIsReady] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [activeModal, setActiveModal] = useState<"profile" | "event" | "auth" | "notifications" | null>(null);
+  const [activeModal, setActiveModal] = useState<"profile" | "event" | "notifications" | null>(null);
 
   useEffect(() => {
     setProgress(100);
@@ -34,7 +33,7 @@ export default function Home() {
     if (isAuthenticated) {
       callback();
     } else {
-      setActiveModal("auth");
+      window.location.href = '/auth';
     }
   };
 
@@ -52,19 +51,15 @@ export default function Home() {
       <ProfileSidebar
         isOpen={activeModal === "profile"}
         onClose={closeModals}
-        onAuthClick={() => setActiveModal("auth")}
+        onAuthClick={() => { window.location.href = '/auth'; }}
       />
 
       <EventSubmission
         isOpen={activeModal === "event"}
         onClose={closeModals}
-        onAuthRedirect={() => setActiveModal("auth")}
+        onAuthRedirect={() => { window.location.href = '/auth'; }}
       />
 
-      <AuthModal
-        isOpen={activeModal === "auth"}
-        onClose={() => setActiveModal(null)}
-      />
 
       <NotificationSidebar
         isOpen={activeModal === "notifications"}

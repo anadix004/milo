@@ -7,7 +7,6 @@ import BottomNav from "@/components/mobile/BottomNav";
 import EventListing from "@/components/EventListing";
 import { useAuth } from "@/components/AuthContext";
 import { useLocation } from "@/components/LocationContext";
-import AuthModal from "@/components/AuthModal";
 import CityDefaultBanner from "@/components/CityDefaultBanner";
 import EventSubmission from "@/components/EventSubmission";
 import { useState } from "react";
@@ -28,7 +27,7 @@ function ExploreContent() {
   const { isAuthenticated } = useAuth();
   const { selectedCity, setSelectedCity } = useLocation();
 
-  const [activeModal, setActiveModal] = useState<"auth" | "event" | null>(null);
+  const [activeModal, setActiveModal] = useState<"event" | null>(null);
 
   const getCityCode = (urlCity: string): string => {
     const map: Record<string, string> = {
@@ -49,14 +48,14 @@ function ExploreContent() {
 
   const handleAuthRequired = () => {
     if (isAuthenticated) return;
-    setActiveModal("auth");
+    router.push("/auth");
   };
 
   const handleEventClick = () => {
     if (isAuthenticated) {
       setActiveModal("event");
     } else {
-      setActiveModal("auth");
+      router.push("/auth");
     }
   };
 
@@ -64,7 +63,7 @@ function ExploreContent() {
     if (isAuthenticated) {
       router.push("/profile");
     } else {
-      setActiveModal("auth");
+      router.push("/auth");
     }
   };
 
@@ -95,14 +94,10 @@ function ExploreContent() {
       />
 
       {/* FIX: Modals now live here so Plus button works correctly */}
-      <AuthModal
-        isOpen={activeModal === "auth"}
-        onClose={() => setActiveModal(null)}
-      />
       <EventSubmission
         isOpen={activeModal === "event"}
         onClose={() => setActiveModal(null)}
-        onAuthRedirect={() => setActiveModal("auth")}
+        onAuthRedirect={() => router.push("/auth")}
       />
     </main>
   );

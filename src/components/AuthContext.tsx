@@ -35,7 +35,9 @@ interface AuthContextType {
   session: Session | null;
   isLoading: boolean;
   isAuthenticated: boolean;
+  logout: () => Promise<void>;
   refreshProfile: () => Promise<void>;
+  updateProfile: (updates: Partial<AuthUser>) => Promise<void>;
   recoverPassword: (email: string) => Promise<void>;
 }
 
@@ -130,6 +132,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   }, [supabase, addNotification, router]);
 
+  const logout = async () => {
+    await supabase.auth.signOut();
+    setUser(null);
+    setSession(null);
+    router.refresh();
+    router.push("/");
+    addNotification("session", "Logged out successfully.");
+  };
+
   const recoverPassword = async (email: string) => {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/auth/reset-password`,
@@ -138,6 +149,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       addNotification("system", `Recovery failed: ${error.message}`);
     } else {
       addNotification("session", "Recovery pulse sent. Check your inbox.");
+    }
+  };
+
+  const updateProfile = async (updates: Partial<AuthUser>) => {
+    if (!user) return;
+    try {
+      const { error } = await supabase
+        .from("profiles")
+        .update(updates)
+        .eq("id", user.id);
+
+      if (error) throw error;
+
+      setUser({ ...user, ...updates });
+      addNotification("session", "Profile synchronized.");
+    } catch (err) {
+      console.error("Profile update error:", err);
+      addNotification("system", "Profile synchronization failed.");
     }
   };
 
@@ -150,7 +179,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         session,
         isLoading,
         isAuthenticated,
+        logout,
         refreshProfile,
+        updateProfile,
         recoverPassword,
       }}
     >
