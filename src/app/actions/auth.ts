@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
+import { headers } from 'next/headers'
 
 export async function signInWithPassword(formData: FormData) {
   const email = formData.get('email') as string
@@ -60,11 +61,17 @@ export async function signUpWithEmail(formData: FormData) {
 
 export async function signInWithGoogle() {
   const supabase = await createClient()
+  const headersList = await headers()
+  
+  // Construct origin dynamically based on environment
+  const host = headersList.get('x-forwarded-host') || headersList.get('host')
+  const protocol = headersList.get('x-forwarded-proto') || (host?.includes('localhost') ? 'http' : 'https')
+  const origin = `${protocol}://${host}`
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/auth/callback`,
+      redirectTo: `${origin}/auth/callback`,
     },
   })
 

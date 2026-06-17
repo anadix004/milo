@@ -79,7 +79,7 @@ export default function SiteNav() {
 
         {/* CTA */}
         <div className="hidden md:flex items-center gap-3">
-          <Link href="/login" className="font-mono text-[11px] tracking-[.06em] uppercase transition-colors"
+          <Link href="/auth" className="font-mono text-[11px] tracking-[.06em] uppercase transition-colors"
             style={{ color: 'rgba(232,238,248,.42)' }}>
             Log in
           </Link>

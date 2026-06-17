@@ -63,7 +63,7 @@ export default function EventDetailPage() {
 
   const handleJoinPlan = async () => {
     if (!isAuthenticated || !user) {
-      router.push("/login?redirect=" + encodeURIComponent(window.location.pathname));
+      router.push("/auth?redirect=" + encodeURIComponent(window.location.pathname));
       return;
     }
     
@@ -102,7 +102,7 @@ export default function EventDetailPage() {
     return (
       <main className="w-full min-h-screen bg-[#000000] flex flex-col items-center justify-center pb-20 pt-[100px]">
         <Header 
-          onProfileClick={() => isAuthenticated ? router.push("/profile") : router.push("/login")}
+          onProfileClick={() => isAuthenticated ? router.push("/profile") : router.push("/auth")}
           onEventClick={() => {}}
           onNotificationsClick={() => {}}
           isSidebarOpen={false} 
@@ -121,7 +121,7 @@ export default function EventDetailPage() {
   return (
     <main className="w-full min-h-screen bg-[#000000] pb-20 overflow-x-hidden pt-[100px]">
       <Header 
-        onProfileClick={() => isAuthenticated ? router.push("/profile") : router.push("/login")}
+        onProfileClick={() => isAuthenticated ? router.push("/profile") : router.push("/auth")}
         onEventClick={() => {}}
         onNotificationsClick={() => {}}
         isSidebarOpen={false} 

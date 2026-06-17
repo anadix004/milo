@@ -23,7 +23,7 @@ export default function ProfilePage() {
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      router.replace("/login");
+      router.replace("/auth");
     }
   }, [isLoading, isAuthenticated, router]);
 
@@ -70,7 +70,7 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen relative pb-24 md:pb-12 pt-[96px]" style={{ background: "var(--background)" }}>
       <Header
-        onProfileClick={() => router.push("/login")}
+        onProfileClick={() => router.push("/auth")}
         onEventClick={() => setActiveModal("event")}
         onNotificationsClick={() => {}}
         isSidebarOpen={false}
@@ -78,7 +78,7 @@ export default function ProfilePage() {
       <EventSubmission
         isOpen={activeModal === "event"}
         onClose={() => setActiveModal(null)}
-        onAuthRedirect={() => router.push("/login")}
+        onAuthRedirect={() => router.push("/auth")}
       />
       <div className="max-w-6xl mx-auto px-4 md:px-8">
         <div className="mb-8 rounded-[2rem] border border-white/10 bg-gradient-to-b from-white/10 to-white/[0.03] overflow-hidden">
