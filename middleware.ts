@@ -27,51 +27,54 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  // IMPORTANT: Avoid writing any logic between createServerClient and
-  // supabase.auth.getUser(). A simple mistake can make it very hard to debug
-  // issues with users being randomly logged out.
-
   const {
     data: { user },
   } = await supabase.auth.getUser()
 
-  // Routes that require an authenticated session.
-  // Notifications, landing page, login, and public pages are intentionally excluded.
-  const protectedPrefixes = ['/admin', '/chat', '/create-event', '/profile']
-  const isProtectedRoute = protectedPrefixes.some((prefix) =>
-    request.nextUrl.pathname.startsWith(prefix)
-  )
+  const path = request.nextUrl.pathname
 
-  if (!user && isProtectedRoute) {
-    const url = request.nextUrl.clone()
-    url.pathname = '/login'
-    return NextResponse.redirect(url)
+  // Public paths that redirect to dashboard if already logged in
+  const isAuthRoute = path.startsWith('/auth')
+  
+  // Protected paths that require authentication
+  const isProtectedRoute = path.startsWith('/dashboard') || path.startsWith('/complete-profile') || path.startsWith('/admin')
+
+  if (isAuthRoute) {
+    if (user && !path.startsWith('/auth/callback')) {
+      return NextResponse.redirect(new URL('/dashboard', request.url))
+    }
+    return supabaseResponse
   }
 
-  // IMPORTANT: You *must* return the supabaseResponse object as it is. If you're
-  // creating a new response object with NextResponse.next() make sure to:
-  // 1. Pass the request in it, like so:
-  //    const myNewResponse = NextResponse.next({ request })
-  // 2. Copy over the cookies, like so:
-  //    myNewResponse.cookies.setAll(supabaseResponse.cookies.getAll())
-  // 3. Change the myNewResponse object to fit your needs, but avoid changing
-  //    the cookies!
-  // 4. Finally: return myNewResponse
-  // If this is not done, you may be causing the browser and server to go out
-  // of sync and terminate the user's session.
+  if (isProtectedRoute) {
+    if (!user) {
+      return NextResponse.redirect(new URL('/auth', request.url))
+    }
+
+    if (path.startsWith('/admin')) {
+      // Check admin status. In Supabase, custom metadata or fetching the role is needed.
+      // Since we indexed `profiles.role`, we should fetch it here or rely on app_metadata.
+      // Let's rely on the DB query for absolute certainty as middleware runs in Edge and can query via REST
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single()
+      
+      const role = profile?.role ?? 'user'
+      const isAdmin = role === 'admin' || role === 'owner' || role === 'team' || user.email === 'milo.anadi@gmail.com'
+
+      if (!isAdmin) {
+        return NextResponse.redirect(new URL('/dashboard', request.url))
+      }
+    }
+  }
 
   return supabaseResponse
 }
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * Feel free to modify this pattern to include more paths.
-     */
     '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }
