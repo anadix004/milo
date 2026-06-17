@@ -88,38 +88,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     let isMounted = true;
 
-    const initAuth = async () => {
-      try {
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-        if (isMounted) setSession(session);
-        if (session?.user && isMounted) {
-          await fetchProfile(session.user.id, session.user);
-        }
-      } catch (err) {
-        console.error("Critical Auth Initializer Error:", err);
-      } finally {
-        if (isMounted) setIsLoading(false);
-      }
-    };
-
-    initAuth();
+    // Fallback timeout to guarantee we never hang indefinitely on the loading screen
+    const timeoutId = setTimeout(() => {
+      if (isMounted) setIsLoading(false);
+    }, 5000);
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (!isMounted) return;
+      
       setSession(session);
+      
+      // Immediately set a base user from the session so the UI can render
+      if (session?.user && !user) {
+        setUser({ ...session.user, role: "user" } as AuthUser);
+      } else if (!session) {
+        setUser(null);
+      }
+
+      // Unblock the loading screen immediately once session state is determined
+      if (isMounted) setIsLoading(false);
+      clearTimeout(timeoutId);
+
+      // Asynchronously fetch extended profile data without blocking the UI
       if (session?.user) {
         const hasProfile = await fetchProfile(session.user.id, session.user);
         if (_event === "SIGNED_IN" && !hasProfile) {
           addNotification("session", "Account initialized. Let's set up your profile.");
         }
-      } else {
-        setUser(null);
       }
-      if (isMounted) setIsLoading(false);
 
       if (_event === "SIGNED_IN" || _event === "SIGNED_OUT") {
         router.refresh();
@@ -128,6 +126,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     return () => {
       isMounted = false;
+      clearTimeout(timeoutId);
       subscription.unsubscribe();
     };
   }, [supabase, addNotification, router]);
