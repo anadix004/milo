@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import CursorBlob from "@/components/CursorBlob";
 import CityDefaultBanner from "@/components/CityDefaultBanner";
 import HeroSection from "@/components/HeroSection";
 import Preloader from "@/components/Preloader";

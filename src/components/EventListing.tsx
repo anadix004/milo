@@ -294,11 +294,14 @@ export default function EventListing({
   };
 
   useEffect(() => {
-    fetchEvents();
-    if (isAuthenticated) {
+    if (isAuthenticated && user) {
       fetchJoined();
       fetchBookmarks();
     }
+  }, [isAuthenticated, user]);
+
+  useEffect(() => {
+    fetchEvents();
 
     let updateBuffer: { type: string, payload: any }[] = [];
     let flushTimeout: NodeJS.Timeout | null = null;

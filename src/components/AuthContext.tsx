@@ -46,6 +46,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const supabase = useMemo(() => createClient(), []);
+  const sessionRef = useRef<Session | null>(null);
 
   const [user, setUser] = useState<AuthUser | null>(null);
   const [session, setSession] = useState<Session | null>(null);
@@ -120,8 +121,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
       }
 
-      if (_event === "SIGNED_IN" || _event === "SIGNED_OUT") {
+      if (_event === "SIGNED_OUT") {
+        sessionRef.current = null;
         router.refresh();
+      } else if (_event === "SIGNED_IN") {
+        if (session?.access_token !== sessionRef.current?.access_token) {
+          sessionRef.current = session;
+          router.refresh();
+        }
       }
     });
 

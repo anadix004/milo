@@ -86,15 +86,6 @@ body {
   color: var(--foreground);
   overflow-x: hidden;
   touch-action: manipulation;
-  cursor: auto;
-}
-
-@media (pointer: fine) {
-  body { cursor: none !important; }
-  button, a, [role="button"] { cursor: none !important; }
-  /* Restore standard cursors for interactive form elements */
-  input, textarea, [contenteditable] { cursor: text !important; }
-  select { cursor: pointer !important; } /* select ≠ text input — needs pointer */
 }
 
 /* UI-007: inline-flex so text centers vertically when min-height: 44px overrides intrinsic height.
@@ -110,15 +101,7 @@ body {
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-/* ============================================================
-   CURSOR BLOB — hide on touch devices
-   ============================================================ */
-#cur, #ring, #blob { display: none; }
-@media (pointer: fine) {
-  #cur  { display: block !important; }
-  #ring { display: block !important; }
-  #blob { display: block !important; }
-}
+
 
 
 /* ============================================================
