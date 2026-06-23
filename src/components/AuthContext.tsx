@@ -229,7 +229,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   if (!isClient) {
-    return <>{children}</>;
+    return (
+      <AuthContext.Provider
+        value={{
+          user: null,
+          session: null,
+          isLoading: true,
+          isAuthenticated: false,
+          logout: async () => {},
+          refreshProfile: async () => {},
+          updateProfile: async () => {},
+          recoverPassword: async () => {},
+        }}
+      >
+        {children}
+      </AuthContext.Provider>
+    );
   }
 
   return (
