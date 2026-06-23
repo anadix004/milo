@@ -190,6 +190,8 @@ export default function EventListing({
   const [budgetFilter, setBudgetFilter] = useState("All"); // All, < 500, < 2000, 2000+
   const [joinedEvents, setJoinedEvents] = useState<Set<string>>(new Set());
   const [bookmarkedEvents, setBookmarkedEvents] = useState<Set<string>>(new Set());
+  const [joinedEventsLoaded, setJoinedEventsLoaded] = useState(false);
+  const [bookmarkedEventsLoaded, setBookmarkedEventsLoaded] = useState(false);
   const { user } = useAuth();
 
   const didApplyInitialFilters = useRef(false);
@@ -263,7 +265,10 @@ export default function EventListing({
   };
 
   const fetchJoined = async () => {
-    if (!user) return;
+    if (!user) {
+      setJoinedEventsLoaded(true);
+      return;
+    }
     try {
       const { data, error } = await supabase
         .from("rsvps")
@@ -275,11 +280,16 @@ export default function EventListing({
       setJoinedEvents(new Set(data.map(r => r.event_id)));
     } catch (err) {
       console.error("Error fetching joined events:", err);
+    } finally {
+      setJoinedEventsLoaded(true);
     }
   };
 
   const fetchBookmarks = async () => {
-    if (!user) return;
+    if (!user) {
+      setBookmarkedEventsLoaded(true);
+      return;
+    }
     try {
       const { data, error } = await supabase
         .from("bookmarks")
@@ -290,13 +300,20 @@ export default function EventListing({
       setBookmarkedEvents(new Set(data.map(b => b.event_id)));
     } catch (err) {
       console.error("Error fetching bookmarks:", err);
+    } finally {
+      setBookmarkedEventsLoaded(true);
     }
   };
 
   useEffect(() => {
     if (isAuthenticated && user) {
+      setJoinedEventsLoaded(false);
+      setBookmarkedEventsLoaded(false);
       fetchJoined();
       fetchBookmarks();
+    } else {
+      setJoinedEventsLoaded(true);
+      setBookmarkedEventsLoaded(true);
     }
   }, [isAuthenticated, user]);
 
@@ -581,7 +598,7 @@ export default function EventListing({
         </div>
       </div>
 
-      {isLoading ? (
+      {isLoading || (isAuthenticated && (!joinedEventsLoaded || !bookmarkedEventsLoaded)) ? (
         <div className="max-w-[1440px] mx-auto px-6 py-12">
           <div className="milo-card-grid">
             {Array.from({ length: 8 }).map((_, i) => (
