@@ -12,7 +12,6 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@auth0/auth0-react": "^2.19.0",
     "@radix-ui/react-slot": "^1.2.4",
     "@sparticuz/chromium": "^133.0.0",
     "@supabase/ssr": "^0.10.0",

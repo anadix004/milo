@@ -1,6 +1,3 @@
-// NOTE: Ensure Auth0 has a Rule/Action that adds { role: 'authenticated' } to the ID token custom claims
-// Without this, Supabase RLS will reject authenticated requests
-
 "use client";
 
 import React, {
@@ -11,13 +8,13 @@ import React, {
   useRef,
   useMemo,
 } from "react";
-import { Auth0Provider, useAuth0 } from "@auth0/auth0-react";
-import { createClient, setTokenResolver } from "@/utils/supabase/client";
+import { createClient } from "@/utils/supabase/client";
 import { useNotifications } from "./NotificationContext";
+import { Session, User } from "@supabase/supabase-js";
+import { useRouter } from "next/navigation";
+import { signOut as serverSignOut } from "@/app/actions/auth";
 
-interface AuthUser {
-  id: string;
-  email?: string;
+interface AuthUser extends User {
   username?: string;
   full_name?: string;
   display_name?: string;
@@ -32,15 +29,11 @@ interface AuthUser {
   twitter?: string;
   spotify?: string;
   cover_url?: string;
-  user_metadata?: {
-    full_name?: string;
-    avatar_url?: string;
-  };
 }
 
 interface AuthContextType {
   user: AuthUser | null;
-  session: any | null;
+  session: Session | null;
   isLoading: boolean;
   isAuthenticated: boolean;
   logout: () => Promise<void>;
@@ -51,57 +44,23 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-function AuthProviderInner({ children }: { children: React.ReactNode }) {
-  const {
-    getIdTokenClaims,
-    isAuthenticated,
-    isLoading: authLoading,
-    user: auth0User,
-    logout: auth0Logout,
-  } = useAuth0();
-
+export function AuthProvider({ children }: { children: React.ReactNode }) {
   const supabase = useMemo(() => createClient(), []);
+  const sessionRef = useRef<Session | null>(null);
+
   const [user, setUser] = useState<AuthUser | null>(null);
-  const [session, setSession] = useState<any>(null);
+  const userRef = useRef<AuthUser | null>(null);
+
+  useEffect(() => {
+    userRef.current = user;
+  }, [user]);
+
+  const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { addNotification } = useNotifications();
+  const router = useRouter();
 
-  // Set up token resolver on mount / auth state change
-  useEffect(() => {
-    if (isAuthenticated) {
-      const getAccessToken = async () => {
-        try {
-          const claims = await getIdTokenClaims();
-          return claims?.__raw || null;
-        } catch (err) {
-          console.error("Auth0 token retrieval failed:", err);
-          return null;
-        }
-      };
-      setTokenResolver(getAccessToken);
-    } else {
-      setTokenResolver(null);
-    }
-  }, [isAuthenticated, getIdTokenClaims]);
-
-  // Construct a mock session object that mimics Supabase's structure
-  useEffect(() => {
-    if (isAuthenticated && auth0User) {
-      getIdTokenClaims().then((claims) => {
-        setSession({
-          access_token: claims?.__raw || "",
-          user: {
-            id: auth0User.sub || auth0User.email || "",
-            email: auth0User.email,
-          },
-        });
-      });
-    } else {
-      setSession(null);
-    }
-  }, [isAuthenticated, auth0User, getIdTokenClaims]);
-
-  const fetchProfile = async (uid: string, baseUser: AuthUser) => {
+  const fetchProfile = async (uid: string, baseUser: User) => {
     try {
       const { data, error } = await supabase
         .from("profiles")
@@ -129,56 +88,82 @@ function AuthProviderInner({ children }: { children: React.ReactNode }) {
   };
 
   const refreshProfile = async () => {
-    if (isAuthenticated && auth0User) {
-      const uid = auth0User.sub || auth0User.email || "";
-      const baseUser: AuthUser = {
-        id: uid,
-        email: auth0User.email,
-        user_metadata: {
-          full_name: auth0User.name,
-          avatar_url: auth0User.picture,
-        },
-      };
-      await fetchProfile(uid, baseUser);
+    if (session?.user) {
+      await fetchProfile(session.user.id, session.user);
     }
   };
 
-  // Sync profile when authentication state changes
   useEffect(() => {
-    if (!authLoading) {
-      if (isAuthenticated && auth0User) {
-        const uid = auth0User.sub || auth0User.email || "";
-        const baseUser: AuthUser = {
-          id: uid,
-          email: auth0User.email,
-          user_metadata: {
-            full_name: auth0User.name,
-            avatar_url: auth0User.picture,
-          },
-        };
-        fetchProfile(uid, baseUser).then(() => {
-          setIsLoading(false);
-        });
-      } else {
+    let isMounted = true;
+
+    // Fallback timeout to guarantee we never hang indefinitely on the loading screen
+    const timeoutId = setTimeout(() => {
+      if (isMounted) setIsLoading(false);
+    }, 5000);
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      if (!isMounted) return;
+      
+      setSession(session);
+      
+      // Immediately set a base user from the session so the UI can render
+      if (session?.user && !userRef.current) {
+        setUser({ ...session.user, role: "user" } as AuthUser);
+      } else if (!session) {
         setUser(null);
-        setIsLoading(false);
       }
-    }
-  }, [authLoading, isAuthenticated, auth0User]);
+
+      // Unblock the loading screen immediately once session state is determined
+      if (isMounted) setIsLoading(false);
+      clearTimeout(timeoutId);
+
+      // Asynchronously fetch extended profile data without blocking the UI
+      if (session?.user && (!userRef.current || !userRef.current.username)) {
+        const hasProfile = await fetchProfile(session.user.id, session.user);
+        if (_event === "SIGNED_IN" && !hasProfile) {
+          addNotification("session", "Account initialized. Let's set up your profile.");
+        }
+      }
+
+      if (_event === "SIGNED_OUT") {
+        sessionRef.current = null;
+        router.refresh();
+      } else if (_event === "SIGNED_IN") {
+        if (session?.access_token !== sessionRef.current?.access_token) {
+          sessionRef.current = session;
+          router.refresh();
+        }
+      }
+    });
+
+    return () => {
+      isMounted = false;
+      clearTimeout(timeoutId);
+      subscription.unsubscribe();
+    };
+  }, [supabase, addNotification, router]);
 
   const logout = async () => {
+    // Clear local state immediately for snappy UI
     setUser(null);
     setSession(null);
-    setTokenResolver(null);
     addNotification("session", "Logged out successfully.");
-    auth0Logout({ logoutParams: { returnTo: window.location.origin } });
+    
+    // Call server action to clear HttpOnly cookies and redirect
+    await serverSignOut();
   };
 
   const recoverPassword = async (email: string) => {
-    addNotification(
-      "session",
-      "Auth0 manages password recovery. Please use login page reset options."
-    );
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/auth/reset-password`,
+    });
+    if (error) {
+      addNotification("system", `Recovery failed: ${error.message}`);
+    } else {
+      addNotification("session", "Recovery pulse sent. Check your inbox.");
+    }
   };
 
   const updateProfile = async (updates: Partial<AuthUser>) => {
@@ -199,6 +184,8 @@ function AuthProviderInner({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const isAuthenticated = !!session;
+
   return (
     <AuthContext.Provider
       value={{
@@ -214,50 +201,6 @@ function AuthProviderInner({ children }: { children: React.ReactNode }) {
     >
       {children}
     </AuthContext.Provider>
-  );
-}
-
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const domain =
-    process.env.NEXT_PUBLIC_AUTH0_DOMAIN || "placeholder-domain.us.auth0.com";
-  const clientId =
-    process.env.NEXT_PUBLIC_AUTH0_CLIENT_ID || "placeholder-client-id";
-
-  const [isClient, setIsClient] = useState(false);
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  if (!isClient) {
-    return (
-      <AuthContext.Provider
-        value={{
-          user: null,
-          session: null,
-          isLoading: true,
-          isAuthenticated: false,
-          logout: async () => {},
-          refreshProfile: async () => {},
-          updateProfile: async () => {},
-          recoverPassword: async () => {},
-        }}
-      >
-        {children}
-      </AuthContext.Provider>
-    );
-  }
-
-  return (
-    <Auth0Provider
-      domain={domain}
-      clientId={clientId}
-      authorizationParams={{
-        redirect_uri:
-          typeof window !== "undefined" ? window.location.origin : undefined,
-      }}
-    >
-      <AuthProviderInner>{children}</AuthProviderInner>
-    </Auth0Provider>
   );
 }
 

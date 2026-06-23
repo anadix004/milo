@@ -26,34 +26,8 @@
 
 import { createBrowserClient } from '@supabase/ssr'
 
-let activeTokenResolver: (() => Promise<string | null>) | null = null
-
-export function setTokenResolver(resolver: (() => Promise<string | null>) | null) {
-  activeTokenResolver = resolver
-}
-
 export function createClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder-milo.supabase.co"
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "placeholder-anon-key"
-  
-  return createBrowserClient(url, key, {
-    global: {
-      fetch: async (url, options = {}) => {
-        if (activeTokenResolver) {
-          try {
-            const token = await activeTokenResolver()
-            if (token) {
-              options.headers = {
-                ...options.headers,
-                Authorization: `Bearer ${token}`,
-              }
-            }
-          } catch (err) {
-            console.error("Failed to inject Auth0 token:", err)
-          }
-        }
-        return fetch(url, options)
-      },
-    },
-  })
+  return createBrowserClient(url, key)
 }

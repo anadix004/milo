@@ -193,18 +193,7 @@ function getRandomDate() {
 }
 
 async function seed() {
-  console.log("Cleaning up old demo events...");
-  const { error: cleanError } = await supabase
-    .from('events')
-    .delete()
-    .or('title.ilike.%- delhi,title.ilike.%- mumbai,title.ilike.%- bengaluru');
-  if (cleanError) {
-    console.error("Warning: Failed to clean up old demo events:", cleanError.message);
-  } else {
-    console.log("Old demo events cleaned up successfully.");
-  }
-
-  console.log("Generating 10 diverse demo events for each city (Delhi, Mumbai, Bengaluru)...");
+  console.log("Generating 10 random demo events for each city (Delhi, Mumbai, Bengaluru)...");
   
   const { data: adminUsers } = await supabase
     .from('profiles')
@@ -219,30 +208,9 @@ async function seed() {
   const generatedEvents = [];
 
   for (const city of cities) {
-    // Generate 10 categories: all 8 standard categories + 2 unique additional categories
-    const cityCategories = [...CATEGORIES];
-    const extraCategories = [...CATEGORIES].sort(() => Math.random() - 0.5).slice(0, 2);
-    cityCategories.push(...extraCategories);
-    // Shuffle the 10 categories
-    cityCategories.sort(() => Math.random() - 0.5);
-
-    // Keep track of used titles to prevent exact duplicates if random picker chooses the same
-    const usedTitles = new Set();
-
     for (let i = 0; i < 10; i++) {
-      const category = cityCategories[i];
-      
-      // Try to find a unique title for this category
-      let titleCandidates = EVENT_TITLES[category];
-      let titleBase = getRandomElement(titleCandidates);
-      let attempts = 0;
-      while (usedTitles.has(titleBase) && attempts < 10) {
-        titleBase = getRandomElement(titleCandidates);
-        attempts++;
-      }
-      usedTitles.add(titleBase);
-
-      const title = `${titleBase} - ${city.toUpperCase()}`;
+      const category = getRandomElement(CATEGORIES);
+      const title = `${getRandomElement(EVENT_TITLES[category])} - ${city.toUpperCase()}`;
       const description = getRandomElement(DESCRIPTIONS);
       const location = getRandomElement(CITY_LOCATIONS[city]);
       const date = getRandomDate();
