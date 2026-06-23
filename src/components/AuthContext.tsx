@@ -8,7 +8,7 @@ import React, {
   useRef,
   useMemo,
 } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { createClient } from "@/utils/supabase/client";
 import { useNotifications } from "./NotificationContext";
 import { Session, User } from "@supabase/supabase-js";
 import { useRouter } from "next/navigation";
@@ -49,6 +49,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const sessionRef = useRef<Session | null>(null);
 
   const [user, setUser] = useState<AuthUser | null>(null);
+  const userRef = useRef<AuthUser | null>(null);
+
+  useEffect(() => {
+    userRef.current = user;
+  }, [user]);
+
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { addNotification } = useNotifications();
@@ -103,7 +109,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setSession(session);
       
       // Immediately set a base user from the session so the UI can render
-      if (session?.user && !user) {
+      if (session?.user && !userRef.current) {
         setUser({ ...session.user, role: "user" } as AuthUser);
       } else if (!session) {
         setUser(null);
@@ -114,7 +120,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       clearTimeout(timeoutId);
 
       // Asynchronously fetch extended profile data without blocking the UI
-      if (session?.user) {
+      if (session?.user && (!userRef.current || !userRef.current.username)) {
         const hasProfile = await fetchProfile(session.user.id, session.user);
         if (_event === "SIGNED_IN" && !hasProfile) {
           addNotification("session", "Account initialized. Let's set up your profile.");

@@ -2,7 +2,7 @@
 
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Calendar, Clock, MapPin, Tag, Users, AlertCircle, ArrowLeft, Loader2, Music, Check, Share2, Heart, Ticket } from "lucide-react";
 import { useAuth } from "@/components/AuthContext";
 import { useLocation } from "@/components/LocationContext";
@@ -19,7 +19,7 @@ export default function EventDetailPage() {
   const { isAuthenticated, user } = useAuth();
   const { selectedCity } = useLocation();
   const { addNotification } = useNotifications();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   const [event, setEvent] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);

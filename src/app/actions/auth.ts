@@ -25,7 +25,7 @@ export async function signInWithPassword(formData: FormData) {
   }
 
   revalidatePath('/', 'layout')
-  redirect('/dashboard')
+  redirect('/explore')
 }
 
 export async function signUpWithEmail(formData: FormData) {
@@ -56,7 +56,7 @@ export async function signUpWithEmail(formData: FormData) {
   }
 
   revalidatePath('/', 'layout')
-  redirect('/dashboard')
+  redirect('/explore')
 }
 
 export async function signInWithGoogle() {

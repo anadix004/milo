@@ -37,11 +37,11 @@ export async function middleware(request: NextRequest) {
   const isAuthRoute = path.startsWith('/auth')
   
   // Protected paths that require authentication
-  const isProtectedRoute = path.startsWith('/dashboard') || path.startsWith('/complete-profile') || path.startsWith('/admin')
+  const isProtectedRoute = path.startsWith('/complete-profile') || path.startsWith('/admin')
 
   if (isAuthRoute) {
     if (user && !path.startsWith('/auth/callback')) {
-      return NextResponse.redirect(new URL('/dashboard', request.url))
+      return NextResponse.redirect(new URL('/explore', request.url))
     }
     return supabaseResponse
   }
@@ -65,7 +65,7 @@ export async function middleware(request: NextRequest) {
       const isAdmin = role === 'admin' || role === 'owner' || role === 'team' || user.email === 'milo.anadi@gmail.com'
 
       if (!isAdmin) {
-        return NextResponse.redirect(new URL('/dashboard', request.url))
+        return NextResponse.redirect(new URL('/explore', request.url))
       }
     }
   }

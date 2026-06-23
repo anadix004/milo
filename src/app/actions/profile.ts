@@ -53,7 +53,8 @@ export async function uploadIdentification(formData: FormData) {
     return { error: `Profile update failed: ${updateError.message}`, data: null }
   }
 
-  revalidatePath('/dashboard')
+  revalidatePath('/explore')
+  revalidatePath('/profile')
   revalidatePath('/complete-profile')
 
   return { error: null, data: { publicUrl } }
@@ -87,7 +88,8 @@ export async function updateProfile(formData: FormData) {
     return { error: `Profile update failed: ${updateError.message}`, data: null }
   }
 
-  revalidatePath('/dashboard')
+  revalidatePath('/explore')
+  revalidatePath('/profile')
 
   return { error: null, data: { success: true } }
 }

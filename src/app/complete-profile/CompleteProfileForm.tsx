@@ -56,7 +56,7 @@ export default function CompleteProfileForm() {
       if (result?.error) {
         setError(result.error)
       } else {
-        router.push('/dashboard')
+        router.push('/explore')
       }
     })
   }
@@ -105,7 +105,7 @@ export default function CompleteProfileForm() {
 
       <button
         type="button"
-        onClick={() => router.push('/dashboard')}
+        onClick={() => router.push('/explore')}
         className="w-full text-center font-mono text-[10px] text-white/20 uppercase tracking-widest hover:text-white transition-colors font-black mt-4"
       >
         Skip for now

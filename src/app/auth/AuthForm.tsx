@@ -164,8 +164,8 @@ export default function AuthForm() {
 
             {activeTab === 'signup' && (
               <label className="flex items-start gap-3 cursor-pointer group pt-2">
-                <div className="w-5 h-5 mt-0.5 rounded border border-white/20 bg-white/5 flex items-center justify-center group-hover:border-white/40 transition-colors shrink-0">
-                  <input type="checkbox" name="ageChecked" className="opacity-0 absolute w-full h-full cursor-pointer" />
+                <div className="relative w-5 h-5 mt-0.5 rounded border border-white/20 bg-white/5 flex items-center justify-center group-hover:border-white/40 transition-colors shrink-0">
+                  <input type="checkbox" name="ageChecked" className="peer opacity-0 absolute w-full h-full cursor-pointer" />
                   <div className="w-3 h-3 rounded-sm bg-white scale-0 transition-transform peer-checked:scale-100" />
                   {/* Since peer approach might be complex with custom checkbox in Tailwind without explicit peer class, we can just rely on standard checkbox visually hidden */}
                 </div>
