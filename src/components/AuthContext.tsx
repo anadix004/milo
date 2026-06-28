@@ -11,7 +11,7 @@ import React, {
 import { createClient } from "@/utils/supabase/client";
 import { useNotifications } from "./NotificationContext";
 import { Session, User } from "@supabase/supabase-js";
-import { useRouter } from "next/navigation";
+
 import { signOut as serverSignOut } from "@/app/actions/auth";
 
 interface AuthUser extends User {
@@ -58,7 +58,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { addNotification } = useNotifications();
-  const router = useRouter();
+
 
   const fetchProfile = async (uid: string, baseUser: User) => {
     try {
@@ -129,11 +129,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (_event === "SIGNED_OUT") {
         sessionRef.current = null;
-        router.refresh();
+        // No router.refresh() — React state (setUser/setSession) already updates the UI.
+        // A hard refresh was causing EventListing to remount, resetting events[] to []
+        // and making the explore page appear broken after login.
       } else if (_event === "SIGNED_IN") {
         if (session?.access_token !== sessionRef.current?.access_token) {
           sessionRef.current = session;
-          router.refresh();
+          // No router.refresh() — session is already live via cookie + React state.
         }
       }
     });
@@ -143,7 +145,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       clearTimeout(timeoutId);
       subscription.unsubscribe();
     };
-  }, [supabase, addNotification, router]);
+  }, [supabase, addNotification]);
 
   const logout = async () => {
     // Clear local state immediately for snappy UI
