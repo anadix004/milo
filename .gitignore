@@ -33,3 +33,5 @@ next-env.d.ts
 node_modules_corrupt
 .env.local
 /.agents/
+milo_codebase.zip
+repo_dump.txt
