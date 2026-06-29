@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { User, Mail, Globe, Image as ImageIcon, QrCode, LogOut, X, ChevronRight, ShieldCheck, Camera, Loader2, Shield } from "lucide-react";
 import Image from "next/image";
+import QRCode from "qrcode";
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import clsx from "clsx";
@@ -42,6 +43,22 @@ export default function ProfileSidebar({ isOpen, onClose, onAuthClick }: Profile
   const [showPass, setShowPass] = useState(false);
   const [rsvps, setRsvps] = useState<RSVP[]>([]);
   const isGhostMode = !!user?.is_ghost;
+  const [qrCodeUrl, setQrCodeUrl] = useState<string>("");
+
+  useEffect(() => {
+    if (user?.id) {
+      QRCode.toDataURL(`milo:${user.id}`, {
+        color: {
+          dark: '#000000',
+          light: '#ffffff'
+        },
+        width: 200,
+        margin: 1
+      })
+      .then(url => setQrCodeUrl(url))
+      .catch(err => console.error("QR Code generation error:", err));
+    }
+  }, [user?.id]);
 
   useEffect(() => {
     if (!isMobile) {
@@ -255,12 +272,18 @@ export default function ProfileSidebar({ isOpen, onClose, onAuthClick }: Profile
                   >
                     <div className="p-8 bg-white rounded-[2rem] flex flex-col items-center space-y-6">
                       <div className="p-2 bg-white rounded-xl border-4 border-black/5 shadow-2xl relative w-48 h-48">
-                         <Image 
-                            src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=milo:${user?.id || 'guest'}&bgcolor=ffffff&color=000000`} 
-                            alt="Milo Pass QR"
-                            fill
-                            className="p-2"
-                         />
+                         {qrCodeUrl ? (
+                           <Image 
+                              src={qrCodeUrl} 
+                              alt="Milo Pass QR"
+                              fill
+                              className="p-2"
+                           />
+                         ) : (
+                           <div className="w-full h-full flex items-center justify-center">
+                             <Loader2 className="animate-spin text-black/25" size={24} />
+                           </div>
+                         )}
                       </div>
                       <div className="flex flex-col items-center gap-2">
                          <ShieldCheck className="text-black" size={24} />
