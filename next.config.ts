@@ -26,7 +26,8 @@ const nextConfig: NextConfig = {
     ],
   },
   compiler: {
-    removeConsole: process.env.NODE_ENV === 'production' ? { exclude: ['error'] } : false,
+    // TEMP: disabled for debugging — re-enable after skeleton loop is fixed
+    // removeConsole: process.env.NODE_ENV === 'production' ? { exclude: ['error'] } : false,
   },
 };
 
