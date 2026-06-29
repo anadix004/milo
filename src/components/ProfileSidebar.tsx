@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import clsx from "clsx";
 import { createClient } from "@/utils/supabase/client";
 import { useAuth } from "./AuthContext";
+import { useNotifications } from "./NotificationContext";
 
 import { useIsMobile } from "@/hooks/useMediaQuery";
 import BottomSheet from "@/components/mobile/BottomSheet";
@@ -37,6 +38,7 @@ export default function ProfileSidebar({ isOpen, onClose, onAuthClick }: Profile
   const supabase = useMemo(() => createClient(), []);
   const { user, isAuthenticated, logout, refreshProfile, updateProfile } = useAuth();
   const router = useRouter();
+  const { addNotification } = useNotifications();
   const [isUploading, setIsUploading] = useState(false);
   const [isUpdatingAvatar, setIsUpdatingAvatar] = useState(false);
   const [updateMode, setUpdateMode] = useState<"camera" | "upload" | null>(null);
@@ -101,6 +103,20 @@ export default function ProfileSidebar({ isOpen, onClose, onAuthClick }: Profile
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !user) return;
+
+    // Validate file size (max 5MB)
+    const MAX_SIZE = 5 * 1024 * 1024;
+    if (file.size > MAX_SIZE) {
+      addNotification("system", "Image size must be less than 5MB.");
+      return;
+    }
+
+    // Validate file type
+    const ALLOWED_TYPES = ["image/png", "image/jpeg", "image/jpg", "image/webp", "image/gif"];
+    if (!ALLOWED_TYPES.includes(file.type.toLowerCase())) {
+      addNotification("system", "Only PNG, JPG, WEBP, or GIF images are allowed.");
+      return;
+    }
 
     setIsUploading(true);
     try {
