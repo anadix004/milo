@@ -176,6 +176,12 @@ export default function EventListing({
   const { addNotification } = useNotifications();
   const [events, setEvents] = useState<EventData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  // DEBUG: track mount/unmount
+  useEffect(() => {
+    console.log('[EventListing] MOUNTED');
+    return () => console.log('[EventListing] UNMOUNTED');
+  }, []);
   const [fetchError, setFetchError] = useState(false);
   const [fetchErrorMessage, setFetchErrorMessage] = useState<string>("");
   const [retryAttempt, setRetryAttempt] = useState(0);
@@ -215,11 +221,13 @@ export default function EventListing({
   };
 
   const fetchEvents = async (currentOffset = 0) => {
+    console.count('[EventListing] fetchEvents called');
     if (currentOffset === 0) {
       setIsLoading(true);
     }
     setFetchError(false);
     try {
+      console.log('[EventListing] fetching from supabase...');
       const { data, error } = await supabase
         .from("events")
         .select("*")
@@ -227,6 +235,7 @@ export default function EventListing({
         .order("created_at", { ascending: false })
         .range(currentOffset, currentOffset + 39);
 
+      console.log('[EventListing] fetch result:', { data: data?.length, error });
       if (error) throw error;
       
       const fetchedEvents: EventData[] = (data || []).map(e => ({ ...e, name: e.title }));
@@ -251,6 +260,7 @@ export default function EventListing({
       }
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
+      console.error('[EventListing] fetch error:', message);
       addNotification("system", `Failed to load events: ${message}`);
       if (currentOffset === 0) {
         setEvents([]);
@@ -258,6 +268,7 @@ export default function EventListing({
       setFetchError(true);
       setFetchErrorMessage(message);
     } finally {
+      console.log('[EventListing] finally: setIsLoading(false)');
       setIsLoading(false);
     }
   };
