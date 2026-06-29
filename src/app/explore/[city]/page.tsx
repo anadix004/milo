@@ -1,7 +1,7 @@
 "use client";
 
-import { Suspense, useEffect } from "react";
-import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Header from "@/components/Header";
 import BottomNav from "@/components/mobile/BottomNav";
 import EventListing from "@/components/EventListing";
@@ -21,30 +21,15 @@ import { useState } from "react";
  */
 
 function ExploreContent() {
-  const params = useParams();
+
   const router = useRouter();
   const searchParams = useSearchParams(); // safe inside Suspense
   const { isAuthenticated } = useAuth();
-  const { selectedCity, setSelectedCity } = useLocation();
+  const { selectedCity } = useLocation();
 
   const [activeModal, setActiveModal] = useState<"event" | null>(null);
 
-  const getCityCode = (urlCity: string): string => {
-    const map: Record<string, string> = {
-      delhi: "del",
-      mumbai: "mum",
-      bengaluru: "blr",
-    };
-    return map[urlCity] || urlCity;
-  };
 
-  // Sync URL param → location context
-  useEffect(() => {
-    const urlCity = params?.city as string;
-    if (urlCity) {
-      setSelectedCity(getCityCode(urlCity));
-    }
-  }, [params, setSelectedCity]);
 
   const handleAuthRequired = () => {
     if (isAuthenticated) return;

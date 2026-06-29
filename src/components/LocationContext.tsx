@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { usePathname } from "next/navigation";
 
 interface LocationContextType {
@@ -59,14 +59,14 @@ export const LocationProvider = ({ children }: { children: React.ReactNode }) =>
     applyCityClass(selectedCity);
   }, [selectedCity]);
 
-  const setSelectedCity = (city: string | null) => {
+  const setSelectedCity = useCallback((city: string | null) => {
     setCity(city);
     if (city) {
       localStorage.setItem("milo_city", city);
     } else {
       localStorage.removeItem("milo_city");
     }
-  };
+  }, []);
 
   return (
     <LocationContext.Provider value={{ selectedCity, setSelectedCity }}>

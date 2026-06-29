@@ -65,9 +65,9 @@ export default function TeamPanel() {
     }
   };
 
-  const revokeAccess = async (email: string) => {
-    if (email === "milo.anadi@gmail.com") {
-      addNotification("system", "Cannot revoke access from the core platform owner.");
+  const revokeAccess = async (email: string, role: string) => {
+    if (role === "owner") {
+      addNotification("system", "Cannot revoke access from the platform owner.");
       return;
     }
     
@@ -153,16 +153,16 @@ export default function TeamPanel() {
                     </div>
                     
                     <div className="flex justify-end">
-                      {admin.email !== "milo.anadi@gmail.com" ? (
+                      {admin.role !== "owner" ? (
                         <button 
-                          onClick={() => revokeAccess(admin.email)}
+                          onClick={() => revokeAccess(admin.email, admin.role)}
                           className="p-2 md:p-3 rounded-xl md:rounded-2xl bg-rose-500/10 text-rose-500 hover:bg-rose-500 hover:text-black transition-all"
                           title="Revoke Access"
                         >
                           <UserX size={16} />
                         </button>
                       ) : (
-                        <div className="p-2 md:p-3 rounded-xl md:rounded-2xl bg-white/5 text-white/20" title="Core Owner (Cannot be removed)">
+                        <div className="p-2 md:p-3 rounded-xl md:rounded-2xl bg-white/5 text-white/20" title="Platform Owner (Cannot be removed)">
                           <ShieldCheck size={16} />
                         </div>
                       )}

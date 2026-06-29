@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { createClient as createServerSupabase } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 
@@ -9,48 +10,72 @@ const schema = z.object({
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
-    const result = schema.safeParse(body);
-    
-    if (!result.success) {
-      return NextResponse.json({ error: result.error.issues?.[0]?.message || 'Invalid input' }, { status: 400 });
-    }
+    // ── Auth guard ─────────────────────────────────────────────────────────────
+    // Verify the caller is logged in via their session cookie, then check their
+    // role in the DB using the service-role client.  Without this check, any
+    // unauthenticated HTTP client could call this endpoint and promote themselves
+    // to admin (privilege escalation).
+    const supabaseUser = await createServerSupabase();
+    const { data: { user }, error: authError } = await supabaseUser.auth.getUser();
 
-    const { email, action } = result.data;
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
     const supabaseAdmin = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 
+    const { data: callerProfile } = await supabaseAdmin
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+
+    const callerRole = callerProfile?.role ?? 'user';
+    if (!['admin', 'owner', 'team'].includes(callerRole)) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+    // ── End auth guard ─────────────────────────────────────────────────────────
+
+    const body = await request.json();
+    const result = schema.safeParse(body);
+
+    if (!result.success) {
+      return NextResponse.json({ error: result.error.issues?.[0]?.message || 'Invalid input' }, { status: 400 });
+    }
+
+    const { email, action } = result.data;
+
     if (action === 'invite' || action === 'promote') {
-      // 1. Check if user already exists
+      // Check if user already exists in the DB
       const { data: existingProfile } = await supabaseAdmin
         .from('profiles')
-        .select('*')
+        .select('id')
         .eq('email', email)
         .single();
 
       if (existingProfile) {
-        // User exists, promote them directly
+        // User exists — promote them directly
         const { error } = await supabaseAdmin
           .from('profiles')
           .update({ role: 'admin' })
           .eq('id', existingProfile.id);
-          
+
         if (error) throw error;
         return NextResponse.json({ success: true, message: 'Existing user promoted to Admin' });
       } else {
-        // User does not exist, send an invite with the 'admin' role in metadata
-        // The database trigger public.handle_new_user will handle profile creation
+        // User doesn't exist — send an invite; the DB trigger handle_new_user
+        // will create their profile with role: 'admin' from the metadata.
         const { error } = await supabaseAdmin.auth.admin.inviteUserByEmail(email, {
           data: { role: 'admin' }
         });
-        
+
         if (error) {
           return NextResponse.json({ error: error.message }, { status: 400 });
         }
-        
+
         return NextResponse.json({ success: true, message: 'Invitation sent and Admin access granted' });
       }
     }
@@ -60,7 +85,7 @@ export async function POST(request: Request) {
         .from('profiles')
         .update({ role: 'user' })
         .eq('email', email);
-        
+
       if (error) {
         return NextResponse.json({ error: error.message }, { status: 400 });
       }

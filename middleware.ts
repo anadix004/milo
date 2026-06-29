@@ -62,7 +62,7 @@ export async function middleware(request: NextRequest) {
         .single()
       
       const role = profile?.role ?? 'user'
-      const isAdmin = role === 'admin' || role === 'owner' || role === 'team' || user.email === 'milo.anadi@gmail.com'
+      const isAdmin = role === 'admin' || role === 'owner' || role === 'team'
 
       if (!isAdmin) {
         return NextResponse.redirect(new URL('/explore', request.url))
