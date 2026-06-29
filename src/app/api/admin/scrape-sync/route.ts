@@ -192,6 +192,40 @@ async function reHostImage(
 
 // ── Route Handler ─────────────────────────────────────────────────────────────
 export async function POST(req: NextRequest) {
+  // Auth guard
+  try {
+    const { createClient: createServerSupabase } = await import("@/lib/supabase/server");
+    const supabaseUser = await createServerSupabase();
+    const { data: { user }, error: authError } = await supabaseUser.auth.getUser();
+
+    if (authError || !user) {
+      return new Response(
+        `data: ${JSON.stringify({ type: "error", message: "Unauthorized" })}\n\n`,
+        { headers: { "Content-Type": "text/event-stream" }, status: 401 }
+      );
+    }
+
+    const supabaseAdmin = getSupabaseAdmin();
+    const { data: callerProfile } = await supabaseAdmin
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+
+    const callerRole = callerProfile?.role ?? "user";
+    if (!["admin", "owner", "team"].includes(callerRole)) {
+      return new Response(
+        `data: ${JSON.stringify({ type: "error", message: "Forbidden" })}\n\n`,
+        { headers: { "Content-Type": "text/event-stream" }, status: 403 }
+      );
+    }
+  } catch (err: any) {
+    return new Response(
+      `data: ${JSON.stringify({ type: "error", message: `Auth error: ${err.message}` })}\n\n`,
+      { headers: { "Content-Type": "text/event-stream" }, status: 500 }
+    );
+  }
+
   // Parse form data before creating the stream (request body can only be read once)
   let formData: FormData;
   try {

@@ -46,7 +46,25 @@ export const COMMON_URL_COLUMNS = [
 export function isValidUrl(url: string): boolean {
   try {
     const parsed = new URL(url);
-    return parsed.protocol === "http:" || parsed.protocol === "https:";
+    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+      return false;
+    }
+    const hostname = parsed.hostname.toLowerCase();
+    // Prevent SSRF / internal IP probe / cloud metadata scans
+    if (
+      hostname === "localhost" ||
+      hostname === "127.0.0.1" ||
+      hostname === "0.0.0.0" ||
+      hostname === "[::1]" ||
+      hostname.startsWith("192.168.") ||
+      hostname.startsWith("10.") ||
+      hostname.startsWith("169.254.") || // link-local metadata
+      hostname.startsWith("127.") ||
+      /^172\.(1[6-9]|2[0-9]|3[0-1])\./.test(hostname)
+    ) {
+      return false;
+    }
+    return true;
   } catch {
     return false;
   }
