@@ -49,20 +49,24 @@ export default function CityDefaultBanner({
   const pathname = usePathname();
   const [dismissed, setDismissed] = useState(false);
 
-  // Only show when no city has been chosen AND banner hasn't been dismissed
-  if (selectedCity || dismissed) return null;
+  // Show when no city has been chosen OR if the city is Delhi by default but not explicitly selected
+  const isExplicit = typeof window !== "undefined" && localStorage.getItem("milo_city_explicit") === "true";
+  const shouldShow = (!selectedCity || (selectedCity === "del" && !isExplicit)) && !dismissed;
+
+  if (!shouldShow) return null;
 
   const handleSelect = (code: string, slug: string) => {
     setSelectedCity(code);
+    localStorage.setItem("milo_city_explicit", "true");
     if (navigateOnSelect || pathname?.startsWith("/explore")) {
       router.push(`/explore/${slug}`);
     }
-    // Banner auto-hides because selectedCity is now set
   };
 
   const handleDismiss = () => {
     // Silently commit Delhi so the banner never shows again this session
     setSelectedCity("del");
+    localStorage.setItem("milo_city_explicit", "true");
     setDismissed(true);
   };
 

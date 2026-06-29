@@ -47,6 +47,12 @@ export const LocationProvider = ({ children }: { children: React.ReactNode }) =>
 
       setCity(cityCode);
       localStorage.setItem("milo_city", cityCode);
+      
+      // If the user navigates directly to a non-default city (mumbai/bengaluru),
+      // we treat it as an explicit selection. Otherwise, keep it as default.
+      if (cityCode !== "del") {
+        localStorage.setItem("milo_city_explicit", "true");
+      }
       applyCityClass(cityCode);
     } else if (savedCity) {
       setCity(savedCity);
@@ -63,8 +69,10 @@ export const LocationProvider = ({ children }: { children: React.ReactNode }) =>
     setCity(city);
     if (city) {
       localStorage.setItem("milo_city", city);
+      localStorage.setItem("milo_city_explicit", "true");
     } else {
       localStorage.removeItem("milo_city");
+      localStorage.removeItem("milo_city_explicit");
     }
   }, []);
 
