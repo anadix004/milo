@@ -61,19 +61,25 @@ export async function signUpWithEmail(formData: FormData) {
 
 export async function signInWithGoogle() {
   const supabase = await createClient()
-  const headersList = await headers()
-  
-  // Construct origin dynamically based on environment
-  const host = headersList.get('x-forwarded-host') || headersList.get('host')
-  const protocol = headersList.get('x-forwarded-proto') || (host?.includes('localhost') ? 'http' : 'https')
-  const origin = `${protocol}://${host}`
+  const headersList = await headers();
+  // Construct redirect origin safely to prevent Host Header Injection / OAuth Callback spoofing.
+  // x-forwarded-host can be spoofed if the reverse proxy isn't explicitly configured to overwrite it.
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_VERCEL_URL;
+  let origin = "";
+  if (appUrl) {
+    origin = appUrl.startsWith("http") ? appUrl : `https://${appUrl}`;
+  } else {
+    const host = headersList.get('host') || 'localhost:3000';
+    const protocol = host.includes('localhost') ? 'http' : 'https';
+    origin = `${protocol}://${host}`;
+  }
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
       redirectTo: `${origin}/auth/callback`,
     },
-  })
+  });
 
   if (error) {
     return { error: error.message, data: null }
