@@ -9,7 +9,7 @@ import { useLocation } from "@/components/LocationContext";
 import { useNotifications } from "@/components/NotificationContext";
 import Header from "@/components/Header";
 import { getCategoryColour, getCategoryButtonGlow, getCategoryCardAura } from "@/lib/aura";
-import { createClient } from "@/utils/supabase/client";
+import { createClient, createPublicClient } from "@/utils/supabase/client";
 
 export default function EventDetailPage() {
   const params = useParams();
@@ -20,6 +20,7 @@ export default function EventDetailPage() {
   const { selectedCity } = useLocation();
   const { addNotification } = useNotifications();
   const supabase = useMemo(() => createClient(), []);
+  const publicSupabase = useMemo(() => createPublicClient(), []);
 
   const [event, setEvent] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -30,7 +31,7 @@ export default function EventDetailPage() {
       setIsLoading(true);
       if (!slug) return;
       
-      const { data, error } = await supabase
+      const { data, error } = await publicSupabase
         .from('events')
         .select('*')
         .eq('id', slug)
@@ -44,7 +45,7 @@ export default function EventDetailPage() {
       setIsLoading(false);
     }
     fetchEventData();
-  }, [slug, supabase]);
+  }, [slug, publicSupabase]);
 
   useEffect(() => {
     async function checkJoined() {

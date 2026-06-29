@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { createClient } from '@/utils/supabase/client'
+import { createClient, createPublicClient } from '@/utils/supabase/client'
 import EmptyState from "@/components/EmptyState";
 import Link from 'next/link'
 import Image from 'next/image'
@@ -43,7 +43,7 @@ export default function EventsClient() {
       if (offset === 0) {
         setLoading(true)
       }
-      const supabase = createClient()
+      const supabase = createPublicClient()
       let q = supabase.from('events').select('*').order('created_at', { ascending: false }).range(offset, offset + 39)
       if (activeCity !== 'All Cities') q = q.eq('cityId', activeCity.toLowerCase())
       if (activeFilter !== 'All')      q = q.eq('category', activeFilter)

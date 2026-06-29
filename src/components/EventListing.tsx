@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { Search, MapPin, Calendar, Clock, Filter, Star, ChevronRight, X, Music, Trophy, Layout, Search as SearchIcon, Heart, Share2, Ticket, Check, ArrowUpDown, Send, Loader2 } from "lucide-react";
 import clsx from "clsx";
-import { createClient } from "@/utils/supabase/client";
+import { createClient, createPublicClient } from "@/utils/supabase/client";
 import { useNotifications } from "./NotificationContext";
 import { useAuth } from "./AuthContext";
 import { useLocation } from "./LocationContext";
@@ -172,16 +172,11 @@ export default function EventListing({
 }: EventListingProps) {
   const isMobile = useIsMobile();
   const supabase = useMemo(() => createClient(), []);
+  const publicSupabase = useMemo(() => createPublicClient(), []);
   const { isAuthenticated } = useAuth();
   const { addNotification } = useNotifications();
   const [events, setEvents] = useState<EventData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-
-  // DEBUG: track mount/unmount
-  useEffect(() => {
-    console.log('[EventListing] MOUNTED');
-    return () => console.log('[EventListing] UNMOUNTED');
-  }, []);
   const [fetchError, setFetchError] = useState(false);
   const [fetchErrorMessage, setFetchErrorMessage] = useState<string>("");
   const [retryAttempt, setRetryAttempt] = useState(0);
@@ -221,24 +216,19 @@ export default function EventListing({
   };
 
   const fetchEvents = async (currentOffset = 0) => {
-    console.count('[EventListing] fetchEvents called');
-    if (currentOffset === 0) {
-      setIsLoading(true);
-    }
+    if (currentOffset === 0) setIsLoading(true);
     setFetchError(false);
     try {
-      console.log('[EventListing] fetching from supabase...');
-      const { data, error } = await supabase
+      const { data, error } = await publicSupabase
         .from("events")
         .select("*")
         .eq("is_verified", true)
         .order("created_at", { ascending: false })
         .range(currentOffset, currentOffset + 39);
 
-      console.log('[EventListing] fetch result:', { data: data?.length, error });
       if (error) throw error;
-      
-      const fetchedEvents: EventData[] = (data || []).map(e => ({ ...e, name: e.title }));
+
+      const fetchedEvents: EventData[] = ((data as any[]) || []).map((e: any) => ({ ...e, name: e.title }));
       if (currentOffset === 0) {
         setEvents(fetchedEvents);
       } else {
@@ -252,23 +242,15 @@ export default function EventListing({
           });
         });
       }
-      
-      if (fetchedEvents.length < 40) {
-        setHasMore(false);
-      } else {
-        setHasMore(true);
-      }
+
+      setHasMore(fetchedEvents.length >= 40);
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
-      console.error('[EventListing] fetch error:', message);
       addNotification("system", `Failed to load events: ${message}`);
-      if (currentOffset === 0) {
-        setEvents([]);
-      }
+      if (currentOffset === 0) setEvents([]);
       setFetchError(true);
       setFetchErrorMessage(message);
     } finally {
-      console.log('[EventListing] finally: setIsLoading(false)');
       setIsLoading(false);
     }
   };
@@ -311,29 +293,50 @@ export default function EventListing({
     }
   }, [isAuthenticated, user]);
 
+  // Effect 1: Initial data fetch with a safety timeout.
+  // Kept separate from the realtime subscription so a slow/blocked WebSocket
+  // (common in Chrome with strict cookie/CSP settings) cannot prevent events loading.
   useEffect(() => {
-    fetchEvents();
+    let cancelled = false;
 
+    // Safety net: if fetchEvents hasn't resolved in 8 seconds, un-stick the UI.
+    // This covers Chrome-specific hangs (WebSocket auth re-init, cookie issues).
+    const safetyTimer = setTimeout(() => {
+      if (!cancelled) {
+        console.warn('[EventListing] safety timeout fired — forcing isLoading=false');
+        setIsLoading(false);
+      }
+    }, 8000);
+
+    fetchEvents().finally(() => clearTimeout(safetyTimer));
+
+    return () => { cancelled = true; clearTimeout(safetyTimer); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Effect 2: Realtime subscription — completely decoupled from initial fetch.
+  // If the WebSocket fails or is blocked (Chrome extensions, CSP), it only
+  // affects live updates, not the initial event list.
+  useEffect(() => {
     let updateBuffer: { type: string, payload: any }[] = [];
     let flushTimeout: NodeJS.Timeout | null = null;
 
     const flushUpdates = () => {
       if (updateBuffer.length === 0) return;
-      
       setEvents(prev => {
         let next = [...prev];
         for (const { type, payload } of updateBuffer) {
-           if (type === "INSERT" || type === "UPDATE") {
-             const rawNew = payload.new as EventData;
-             const newEvent = { ...rawNew, name: rawNew.title };
-             if (newEvent.is_verified) {
-               next = [newEvent, ...next.filter(e => e.id !== newEvent.id)];
-             } else {
-               next = next.filter(e => e.id !== newEvent.id);
-             }
-           } else if (type === "DELETE") {
-             next = next.filter(e => e.id !== (payload.old as EventData).id);
-           }
+          if (type === "INSERT" || type === "UPDATE") {
+            const rawNew = payload.new as EventData;
+            const newEvent = { ...rawNew, name: rawNew.title };
+            if (newEvent.is_verified) {
+              next = [newEvent, ...next.filter(e => e.id !== newEvent.id)];
+            } else {
+              next = next.filter(e => e.id !== newEvent.id);
+            }
+          } else if (type === "DELETE") {
+            next = next.filter(e => e.id !== (payload.old as EventData).id);
+          }
         }
         return next;
       });
@@ -341,20 +344,24 @@ export default function EventListing({
       flushTimeout = null;
     };
 
-    const channel = supabase.channel("radar_live")
-      .on("postgres_changes", { event: "*", schema: "public", table: "events" }, (payload) => {
-         updateBuffer.push({ type: payload.eventType, payload });
-         if (!flushTimeout) {
-           flushTimeout = setTimeout(flushUpdates, 2500);
-         }
-      })
-      .subscribe();
+    let channel: ReturnType<typeof publicSupabase.channel> | null = null;
+    try {
+      channel = publicSupabase.channel(`radar_live_${Math.random().toString(36).slice(2)}`)
+        .on("postgres_changes", { event: "*", schema: "public", table: "events" }, (payload) => {
+          updateBuffer.push({ type: payload.eventType, payload });
+          if (!flushTimeout) flushTimeout = setTimeout(flushUpdates, 2500);
+        })
+        .subscribe();
+    } catch (err) {
+      console.warn('[EventListing] Realtime subscription failed (non-fatal):', err);
+    }
 
-    return () => { 
+    return () => {
       if (flushTimeout) clearTimeout(flushTimeout);
-      supabase.removeChannel(channel); 
+      if (channel) publicSupabase.removeChannel(channel);
     };
-  }, []);
+  }, [publicSupabase]);
+
 
   const FIXED_CATEGORIES = ["All", ...OFFICIAL_CATEGORIES];
 
