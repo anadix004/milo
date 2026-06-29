@@ -30,7 +30,7 @@ export async function uploadIdentification(formData: FormData) {
 
   const ext = file.name.split('.').pop()
   const timestamp = Date.now()
-  const filePath = `public/${user.id}/id_${timestamp}.${ext}`
+  const filePath = `private/${user.id}/id_${timestamp}.${ext}`
 
   const { error: uploadError } = await supabase.storage
     .from('user-documents')
@@ -40,13 +40,20 @@ export async function uploadIdentification(formData: FormData) {
     return { error: `Upload failed: ${uploadError.message}`, data: null }
   }
 
-  const { data: { publicUrl } } = supabase.storage
+  // Generate a long-lived (1 year) signed URL to prevent exposing government IDs via public URLs
+  const { data: signedData, error: signedError } = await supabase.storage
     .from('user-documents')
-    .getPublicUrl(filePath)
+    .createSignedUrl(filePath, 31536000)
+
+  if (signedError || !signedData?.signedUrl) {
+    return { error: `Failed to secure document: ${signedError?.message || 'Unknown error'}`, data: null }
+  }
+
+  const securedUrl = signedData.signedUrl
 
   const { error: updateError } = await supabase
     .from('profiles')
-    .update({ id_document_url: publicUrl })
+    .update({ id_document_url: securedUrl })
     .eq('id', user.id)
 
   if (updateError) {
@@ -57,7 +64,7 @@ export async function uploadIdentification(formData: FormData) {
   revalidatePath('/profile')
   revalidatePath('/complete-profile')
 
-  return { error: null, data: { publicUrl } }
+  return { error: null, data: { publicUrl: securedUrl } }
 }
 
 export async function updateProfile(formData: FormData) {

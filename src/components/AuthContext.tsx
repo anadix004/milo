@@ -64,7 +64,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const { data, error } = await supabase
         .from("profiles")
-        .select("*")
+        .select("id, username, full_name, display_name, avatar_url, role, is_ghost, bio, location, city, instagram, twitter, spotify, cover_url")
         .eq("id", uid)
         .single();
 
@@ -170,15 +170,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const updateProfile = async (updates: Partial<AuthUser>) => {
     if (!user) return;
+
+    // Allowlist only safe user fields to prevent privilege escalation (e.g. role, id_document_url)
+    const allowedKeys: (keyof AuthUser)[] = [
+      "username", "full_name", "display_name", "avatar_url",
+      "is_ghost", "bio", "location", "city",
+      "instagram", "twitter", "spotify", "cover_url"
+    ];
+
+    const safeUpdates = Object.keys(updates).reduce((acc: any, key) => {
+      if (allowedKeys.includes(key as keyof AuthUser)) {
+        acc[key] = updates[key as keyof AuthUser];
+      }
+      return acc;
+    }, {});
+
+    if (Object.keys(safeUpdates).length === 0) return;
+
     try {
       const { error } = await supabase
         .from("profiles")
-        .update(updates)
+        .update(safeUpdates)
         .eq("id", user.id);
 
       if (error) throw error;
 
-      setUser({ ...user, ...updates });
+      setUser({ ...user, ...safeUpdates });
       addNotification("session", "Profile synchronized.");
     } catch (err) {
       console.error("Profile update error:", err);

@@ -18,10 +18,6 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'vttllhuzmttqpxsrdvnt.supabase.co',
-      },
-      {
-        protocol: 'https',
-        hostname: '**', // Allow any other external sources for now since it's a social app
       }
     ],
   },

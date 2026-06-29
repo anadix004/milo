@@ -23,7 +23,7 @@ export default function ApprovalsGrid() {
     setIsLoading(true);
     let query = supabase
       .from("events")
-      .select("*")
+      .select("id, title, description, date, time, location, price, category, image, video_url, featured, cityId, is_verified, venue_address, ticket_links")
       .eq("is_verified", viewMode === "live")
       .order("created_at", { ascending: false });
       

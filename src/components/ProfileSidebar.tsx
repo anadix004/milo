@@ -34,14 +34,13 @@ interface RSVP {
 export default function ProfileSidebar({ isOpen, onClose, onAuthClick }: ProfileSidebarProps) {
   const isMobile = useIsMobile();
   const supabase = useMemo(() => createClient(), []);
-  const { user, isAuthenticated, logout, refreshProfile } = useAuth();
+  const { user, isAuthenticated, logout, refreshProfile, updateProfile } = useAuth();
   const router = useRouter();
   const [isUploading, setIsUploading] = useState(false);
   const [isUpdatingAvatar, setIsUpdatingAvatar] = useState(false);
   const [updateMode, setUpdateMode] = useState<"camera" | "upload" | null>(null);
   const [showPass, setShowPass] = useState(false);
   const [rsvps, setRsvps] = useState<RSVP[]>([]);
-  const { updateProfile } = useAuth();
   const isGhostMode = !!user?.is_ghost;
 
   useEffect(() => {
