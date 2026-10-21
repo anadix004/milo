@@ -24,12 +24,20 @@ The **Milo marketing website** — an immersive landing page that markets the Mi
 
 | Layer | Technology |
 |---|---|
-| Framework | Next.js (App Router) |
-| 3D Engine | Three.js / React Three Fiber |
-| Animation | GSAP (GreenSock) + Framer Motion |
-| Scroll | Lenis (inertial smooth scroll) |
+| Framework | Next.js 16.2 (App Router, React 19.2, TS 5) |
+| 3D / Hero motion | Canvas frame-scrubbing (image sequences in `constants/frames.ts`; Zephyr-style, 240+ JPEGs) — **not** Three.js/R3F (dropped; see audit GAP-01) |
+| Animation | Framer Motion 12.38 (primary); transform CSS. GSAP **not installed** (still referenced in spec only) |
+| Scroll | Lenis 1.3 (inertial smooth scroll) — see `SmoothScroll` |
 | Language | TypeScript |
-| Backend | Supabase (event scraping/sync) |
+| Styling | Tailwind CSS 4 (`@tailwindcss/postcss`), `tailwind-merge`, `clsx`, `cva` |
+| Icons | lucide-react 1.7 |
+| Dates | date-fns (inferred from hooks) |
+| QR | qrcode 1.5 (client-side generation post SEC-03 hardening) |
+| Validation | zod 4 (forms/APIs) |
+| Tables / spreadsheets | xlsx (ImportStroke) |
+| Headless browser | puppeteer + puppeteer-extra + stealth, `@sparticuz/chromium` (scrape-sync job) |
+| Backend | Supabase (`@supabase/supabase-js 2.100`, `@supabase/ssr 0.10`, service role key server-side only) |
+| Analytics/SEO | `sitemap.ts`, `manifest.ts`, not-found page (Next builtins) |
 
 ---
 
@@ -39,8 +47,13 @@ The **Milo marketing website** — an immersive landing page that markets the Mi
 - **Motion:** Physics-based spring animations — NO linear movement
 - **Depth:** Multi-layer parallax + WebGL particle systems
 - **Interactivity:** Zero-latency transitions between 3D and 2D UI
-- **Performance target:** 60 FPS on MacBook Air M-series
+- **Performance target:** 60 FPS on MacBook Air M-series (canvas frame-scrubbing + lazy loading of first 20 frames only)
 - **Always dark** — same palette as the mobile app
+
+### Active design reference
+- `baharmilo_full_redesign.html` (root) — most advanced design, still the canonical visual spec.
+- `Wireframe/`, `Event_sheets/`, `Screenshots/` — supporting assets.
+- `audits/` — four audit files: `milo_comprehensive_audit.md` (most authoritative, Apr 9 2026), `milo_audit_report.md`, `manual testing report.md`, `Final Pre-Launch Polish.md`. Read these before changes around auth/RLS/admin.
 
 ---
 

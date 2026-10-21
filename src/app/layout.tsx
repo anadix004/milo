@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Lexend, Roboto_Mono, Plus_Jakarta_Sans } from "next/font/google";
+import { Lexend, Roboto_Mono, Plus_Jakarta_Sans, Instrument_Serif, Geist } from "next/font/google";
 import "./globals.css";
 import { NotificationProvider } from "@/components/NotificationContext";
 import { AuthProvider } from "@/components/AuthContext";
@@ -23,6 +23,17 @@ const plusJakarta = Plus_Jakarta_Sans({
 const robotoMono = Roboto_Mono({
   subsets: ["latin"],
   variable: "--font-roboto-mono",
+});
+
+const instrumentSerif = Instrument_Serif({
+  subsets: ["latin"],
+  weight: ["400"],
+  variable: "--font-instrument",
+});
+
+const geist = Geist({
+  subsets: ["latin"],
+  variable: "--font-geist",
 });
 
 export const metadata: Metadata = {
@@ -68,7 +79,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body
-        className={`${lexend.variable} ${plusJakarta.variable} ${robotoMono.variable} antialiased bg-black text-white selection:bg-white selection:text-black overflow-x-hidden`}
+        className={`${lexend.variable} ${plusJakarta.variable} ${robotoMono.variable} ${instrumentSerif.variable} ${geist.variable} antialiased bg-black text-white selection:bg-white selection:text-black overflow-x-hidden`}
       >
 
         <NotificationProvider>
