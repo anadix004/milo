@@ -43,6 +43,16 @@ export const METRO_CITIES: MetropolitanCity[] = [
       { id: "east-bangalore", label: "East Bangalore" },
       { id: "west-bangalore", label: "West Bangalore" },
     ]
+  },
+  {
+    id: "lucknow",
+    label: "Lucknow",
+    zones: [
+      { id: "hazratganj", label: "Hazratganj" },
+      { id: "gomti-nagar", label: "Gomti Nagar" },
+      { id: "indira-nagar", label: "Indira Nagar" },
+      { id: "aliganj", label: "Aliganj" },
+    ]
   }
 ];
 

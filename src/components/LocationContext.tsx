@@ -18,11 +18,12 @@ const CITY_CLASS: Record<string, string> = {
   del: "city-delhi",
   blr: "city-blr",
   mum: "city-mum",
+  lko: "city-lko",
 };
 
 function applyCityClass(city: string | null) {
   // Remove all existing city classes
-  document.body.classList.remove("city-delhi", "city-blr", "city-mum");
+  document.body.classList.remove("city-delhi", "city-blr", "city-mum", "city-lko");
   if (city && CITY_CLASS[city]) {
     document.body.classList.add(CITY_CLASS[city]);
   }
@@ -37,13 +38,14 @@ export const LocationProvider = ({ children }: { children: React.ReactNode }) =>
     const savedCity = localStorage.getItem("milo_city");
 
     // Check if we are on a city-specific route
-    const match = pathname?.match(/^\/explore\/(delhi|mumbai|bengaluru)/);
+    const match = pathname?.match(/^\/explore\/(delhi|mumbai|bengaluru|lucknow)/);
     if (match) {
       const cityFromUrl = match[1];
       let cityCode = cityFromUrl;
       if (cityFromUrl === "delhi") cityCode = "del";
       if (cityFromUrl === "mumbai") cityCode = "mum";
       if (cityFromUrl === "bengaluru") cityCode = "blr";
+      if (cityFromUrl === "lucknow") cityCode = "lko";
 
       setCity(cityCode);
       localStorage.setItem("milo_city", cityCode);

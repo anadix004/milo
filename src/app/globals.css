@@ -71,6 +71,13 @@ body.city-blr {
   --acd: rgba(61,184,101,.28);
   --br:  rgba(61,184,101,.14);
 }
+body.city-lko {
+  --ac:  #E87A3C;
+  --ac-raw: 232, 122, 60;
+  --acg: rgba(232,122,60,.15);
+  --acd: rgba(232,122,60,.28);
+  --br:  rgba(232,122,60,.14);
+}
 body.city-mum {
   --ac:  #8B5CF6;
   --ac-raw: 139, 92, 246;

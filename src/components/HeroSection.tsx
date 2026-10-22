@@ -12,7 +12,7 @@ export default function HeroSection() {
   const { addNotification } = useNotifications();
 
   const citySlug = (cityCode: string | null) =>
-    cityCode === "mum" ? "mumbai" : cityCode === "blr" ? "bengaluru" : "delhi";
+    cityCode === "mum" ? "mumbai" : cityCode === "blr" ? "bengaluru" : cityCode === "lko" ? "lucknow" : "delhi";
 
   const ensureCitySlug = () => {
     const slug = citySlug(selectedCity ?? "del");
@@ -41,7 +41,7 @@ export default function HeroSection() {
       <div className="relative z-40 h-full max-w-7xl mx-auto px-6 md:px-10 flex flex-col justify-end gap-10 pb-[22dvh] md:pb-24">
         <div className="space-y-6 md:space-y-8 max-w-3xl">
           <p className="m-0 font-[family-name:var(--font-geist)] text-xs tracking-[0.34em] uppercase text-[var(--txm)]">
-            {selectedCity === "mum" ? "Mumbai" : selectedCity === "blr" ? "Bengaluru" : "Delhi"} — curated tonight
+            {selectedCity === "lko" ? "Lucknow" : selectedCity === "mum" ? "Mumbai" : selectedCity === "blr" ? "Bengaluru" : "Delhi"} — curated tonight
           </p>
           <h1 className="m-0 font-[family-name:var(--font-instrument)] text-[clamp(3.2rem,12vw,8.4rem)] leading-[0.88] tracking-[-0.03em] text-[var(--tx)]">
             What&apos;s actually happening,
