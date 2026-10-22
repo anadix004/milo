@@ -43,6 +43,12 @@
   --acd: rgba(74,127,212,.28);
   --br:  rgba(74,127,212,.14);
 
+  /* ── Premium gradient tokens ── */
+  --premium-bg: radial-gradient(60% 55% at 50% 40%, var(--acg), transparent 70%), radial-gradient(45% 40% at 85% 20%, rgba(180,140,255,0.12), transparent 70%), radial-gradient(40% 40% at 15% 80%, rgba(201,168,76,0.08), transparent 70%), #050505;
+  --premium-accent: linear-gradient(135deg, var(--ac), rgba(255,255,255,0.10));
+  --premium-surface: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01));
+  --premium-glow: 0 12px 40px var(--acg);
+
   /* ── Static text colours — NEVER change per city ── */
   --tx:  #E8EEF8;
   /* PHASE 2 FIX: Increased opacity for readability (was .42/.07) */

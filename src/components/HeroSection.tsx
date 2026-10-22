@@ -26,44 +26,47 @@ export default function HeroSection() {
 
   return (
     <section className="relative w-full h-[100dvh] overflow-hidden bg-[#0a0a0a]">
-      {/* Ambient city wash — no photography available, use layered gradients */}
+      {/* Premium ambient mesh — layered gradients */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            "radial-gradient(60% 55% at 50% 40%, var(--acg), transparent 70%)",
+            "radial-gradient(60% 55% at 50% 40%, var(--acg), transparent 70%), radial-gradient(45% 40% at 85% 20%, rgba(180,140,255,0.12), transparent 70%), radial-gradient(40% 40% at 15% 80%, rgba(201,168,76,0.08), transparent 70%), #050505",
         }}
       />
-      <div className="absolute inset-0 pointer-events-none opacity-30"
-        style={{ backgroundImage: "url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%222%22 height=%222%22><rect width=%222%22 height=%222%22 fill=%22%23ffffff%22 fill-opacity=%22.03%22/></svg>')" }}
+      <div className="absolute inset-0 pointer-events-none opacity-20 mix-blend-overlay"
+        style={{ backgroundImage: "url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%223%22 height=%223%22><rect width=%223%22 height=%223%22 fill=%22%23ffffff%22 fill-opacity=%22.05%22/></svg>')" }}
       />
 
       <div className="relative z-40 h-full max-w-7xl mx-auto px-6 md:px-10 flex flex-col justify-end gap-10 pb-[22dvh] md:pb-24">
         <div className="space-y-6 md:space-y-8 max-w-3xl">
           <p className="m-0 font-[family-name:var(--font-geist)] text-xs tracking-[0.34em] uppercase text-[var(--txm)]">
-            {selectedCity === "mum" ? "Mumbai" : selectedCity === "blr" ? "Bengaluru" : "Delhi"} — tonight's ledger
+            {selectedCity === "mum" ? "Mumbai" : selectedCity === "blr" ? "Bengaluru" : "Delhi"} — curated tonight
           </p>
           <h1 className="m-0 font-[family-name:var(--font-instrument)] text-[clamp(3.2rem,12vw,8.4rem)] leading-[0.88] tracking-[-0.03em] text-[var(--tx)]">
-            Your city,<br />
-            <span style={{ color: "var(--ac)" }}>after dark.</span>
+            What&apos;s actually happening,
+            <br />
+            <span style={{ background: "linear-gradient(120deg, var(--ac), #ffffff)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+              in your city tonight.
+            </span>
           </h1>
           <p className="m-0 max-w-[42ch] text-[1rem] leading-[1.75] text-[var(--txm)] font-[family-name:var(--font-geist)]">
-            Stop searching. See what is actually happening on your streets tonight and
-            commit in one tap.
+            One feed of real events across venues, campuses and culture hubs.
+            Filter, save, and commit in one tap.
           </p>
           <div className="flex items-center gap-4 pt-2">
             <button
               onClick={handleExplore}
               className="rounded-full px-7 py-3 text-[0.85rem] font-semibold tracking-[0.04em] text-[var(--tx)] border transition-all hover:translate-y-[-1px]"
-              style={{ background: "var(--ac)", borderColor: "var(--ac)", color: "#061322" }}
+              style={{ background: "linear-gradient(135deg, var(--ac), rgba(255,255,255,0.12))", borderColor: "var(--acd)", color: "#ffffff", boxShadow: "0 10px 34px var(--acg)" }}
             >
-              Explore now
+              Explore events
             </button>
             <button
               onClick={handleExplore}
-              className="text-[0.85rem] font-medium text-[var(--txm)] tracking-[0.06em] hover:text-[var(--tx)] transition-colors"
+              className="rounded-full px-5 py-3 text-[0.85rem] font-medium text-[var(--tx)] tracking-[0.04em] border border-[var(--br)] bg-white/5 backdrop-blur hover:bg-white/10 transition-colors"
             >
-              See the cities
+              Browse cities
             </button>
           </div>
         </div>
