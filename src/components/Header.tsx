@@ -45,6 +45,7 @@ export default function Header({
     if (selectedCity === "del") return "Delhi";
     if (selectedCity === "mum") return "Mumbai";
     if (selectedCity === "blr") return "Bengaluru";
+    if (selectedCity === "lko") return "Lucknow";
     return "Location";
   };
 

@@ -18,6 +18,7 @@ const CITIES = [
   { id: "del", name: "Delhi" },
   { id: "mum", name: "Mumbai" },
   { id: "blr", name: "Bengaluru" },
+  { id: "lko", name: "Lucknow" },
 ];
 
 export default function LocationSelectorPopup({ isOpen, onClose }: LocationSelectorPopupProps) {
@@ -32,7 +33,7 @@ export default function LocationSelectorPopup({ isOpen, onClose }: LocationSelec
     
     const isExplorePage = pathname.startsWith("/explore/");
     if (isExplorePage) {
-      const citySlug = cityId === "del" ? "delhi" : cityId === "mum" ? "mumbai" : "bengaluru";
+      const citySlug = cityId === "del" ? "delhi" : cityId === "mum" ? "mumbai" : cityId === "lko" ? "lucknow" : "bengaluru";
       router.push(`/explore/${citySlug}`);
     }
   };
